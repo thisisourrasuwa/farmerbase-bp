@@ -2,202 +2,207 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Short Info – FarmerBase BP Engine</title>
+<title>Short Info</title>
 
 <style>
 body{
- font-family:Arial;
- background:#f4f6f8;
+ font-family:Arial, sans-serif;
+ background:#f5f5f5;
  margin:0
 }
-
-/* ===== HEADER / FOOTER ===== */
 header,footer{
  background:#2e7d32;
  color:#fff;
- padding:12px 20px
+ padding:12px 20px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center
 }
-header{
- font-size:16px;
+header a, footer a{
+ color:#fff;
+ text-decoration:none;
  font-weight:bold
 }
-
-/* ===== LAYOUT ===== */
 .container{
- max-width:900px;
+ max-width:1100px;
  margin:auto;
- padding:25px
-}
-.card{
  background:#fff;
- padding:22px;
- border-radius:6px;
- box-shadow:0 2px 6px rgba(0,0,0,.08)
+ padding:20px;
+ min-height:70vh
 }
-
-/* ===== META ===== */
-.meta{
- background:#e8f5e9;
- padding:14px;
- border-radius:4px;
- margin-bottom:20px;
- line-height:1.6
+h1{
+ text-align:center;
+ font-size:32px;
+ color:#2e7d32;
+ margin:15px 0 25px
 }
-.meta b{
- color:#2e7d32
-}
-
-/* ===== FORM ===== */
 h2{
- margin-top:0;
- color:#2e7d32
+ color:#333;
+ border-bottom:2px solid #e0e0e0;
+ padding-bottom:5px;
+ margin-top:25px
 }
 label{
- font-weight:bold;
  display:block;
- margin-top:14px
+ margin-top:12px;
+ font-weight:bold
 }
 input, textarea, select{
  width:100%;
  padding:8px;
- margin-top:6px;
- box-sizing:border-box;
- font-family:Arial
+ margin-top:5px;
+ box-sizing:border-box
 }
-textarea{
- min-height:70px
-}
-
-/* ===== BUTTON ===== */
-.btn{
- margin-top:20px;
- padding:10px 16px;
- border:none;
- border-radius:4px;
- cursor:pointer;
- font-size:15px;
- background:#2e7d32;
- color:#fff
+textarea{resize:vertical;min-height:90px}
+.note{
+ font-size:13px;
+ color:#555;
+ margin-top:15px
 }
 </style>
 </head>
 
 <body>
 
+<!-- ================= HEADER ================= -->
 <header>
- 🌱 FarmerBase BP Engine → Short Info
+  <a href="index.html">⬅️ मुख्यपृष्ठ</a>
+  <span>संक्षिप्त जानकारी</span>
+  <a href="production.html">उत्पादन विवरण ➡️</a>
 </header>
 
 <div class="container">
 
-<div class="card">
+<!-- ================= BUSINESS INTRO ================= -->
+<h2>१. व्यवसाय परिचय</h2>
 
-<!-- ================= AUTO BUSINESS META ================= -->
-<div class="meta">
- <b>सञ्चालक (Proprietor):</b>
- <span id="showProprietor"></span><br>
+<label>व्यवसाय / फर्मको नाम</label>
+<input id="firmName" placeholder="फर्मको नाम">
 
- <b>व्यवसाय / फर्म:</b>
- <span id="showFirm"></span>
-</div>
+<label>परियोजनाको नाम</label>
+<input id="projectName" placeholder="उदाहरण: व्यावसायिक तरकारी खेती">
 
-<h2>संक्षिप्त विवरण (Short Information)</h2>
-
-<label>📍 व्यवसायको ठेगाना</label>
-<input id="location" placeholder="जिल्ला, गाउँपालिका, वडा">
-
-<label>🏷️ व्यवसायको प्रकार</label>
-<input id="bizType" placeholder="कृषि, पशुपालन, उद्योग, सेवा">
-
-<label>📝 व्यवसायको संक्षिप्त परिचय</label>
-<textarea id="intro"
- placeholder="यो व्यवसाय के हो ? किन सुरु गरिएको ?"></textarea>
-
-<label>📄 दर्ता प्रकृया सम्बन्धि विवरण</label>
-<select id="registrationStatus">
- <option value="">-- दर्ता स्थिति छान्नुहोस् --</option>
- <option value="दर्ता भइसकेको">दर्ता भइसकेको</option>
- <option value="दर्ता प्रकृयामा">दर्ता प्रकृयामा</option>
- <option value="दर्ता गर्न बाँकी">दर्ता गर्न बाँकी</option>
+<label>व्यवसायको क्षेत्र</label>
+<select id="bizSector">
+ <option value="">छान्नुहोस्</option>
+ <option>कृषि</option>
+ <option>पशुपालन</option>
+ <option>सेवा</option>
+ <option>उत्पादन</option>
+ <option>अन्य</option>
 </select>
 
-<label>🧾 दर्ता सम्बन्धि थप विवरण</label>
-<textarea id="registrationDetail"
- placeholder="कहाँ दर्ता गरिएको/गरिने (वडा, पालिका, उद्योग कार्यालय, सहकारी, आदि)"></textarea>
+<label>व्यवसायको स्वरूप</label>
+<select id="bizStage">
+ <option value="">छान्नुहोस्</option>
+ <option>नयाँ व्यवसाय</option>
+ <option>विद्यमान व्यवसायको विस्तार</option>
+</select>
 
-<button class="btn" onclick="saveAndNext()">
- Next ➡️
-</button>
+<!-- ================= LOCATION ================= -->
+<h2>२. स्थान र दायरा</h2>
+
+<label>व्यवसायको स्थान</label>
+<input id="location" placeholder="गाउँ/नगरपालिका, जिल्ला">
+
+<label>सेवा / बजार क्षेत्र</label>
+<input id="marketArea" placeholder="स्थानीय / जिल्ला / प्रदेश / राष्ट्रिय">
+
+<!-- ================= PROMOTER ================= -->
+<h2>३. संचालक / प्रवर्तक</h2>
+
+<label>संचालकको नाम</label>
+<input id="promoter">
+
+<label>अनुभव (वर्षमा)</label>
+<input type="number" id="experience" placeholder="उदाहरण: 5">
+
+<!-- ================= LEGAL REGISTRATION ================= -->
+<h2>४. कानुनी दर्ता तथा आवद्धता</h2>
+
+<label>व्यवसाय दर्ता स्थिति</label>
+<select id="registrationStatus">
+ <option value="">छान्नुहोस्</option>
+ <option>दर्ता भइसकेको</option>
+ <option>दर्ता प्रक्रियामा</option>
+ <option>दर्ता गर्न बाँकी</option>
+</select>
+
+<label>दर्ता निकाय</label>
+<input id="registrationAuthority"
+ placeholder="गाउँपालिका / नगरपालिका / घरेलु / कम्पनी रजिष्ट्रार">
+
+<label>दर्ता नं</label>
+<input id="registrationNumber" placeholder="दर्ता प्रमाणपत्र नं">
+
+<label>PAN / VAT नं</label>
+<input id="panNumber" placeholder="PAN वा VAT नं (यदि छ भने)">
+
+<label>अन्य आवद्धता / सदस्यता (यदि छ भने)</label>
+<textarea id="affiliation"
+ placeholder="सहकारी, किसान समूह, संघ संस्था, परियोजना, NGO, Network आदि"></textarea>
+
+<!-- ================= OBJECTIVE ================= -->
+<h2>५. उद्देश्य र लक्ष्य</h2>
+
+<label>मुख्य उद्देश्य</label>
+<textarea id="objective"
+ placeholder="उत्पादन वृद्धि, आम्दानी वृद्धि, रोजगारी सिर्जना..."></textarea>
+
+<label>लक्षित ग्राहक / बजार</label>
+<textarea id="targetMarket"
+ placeholder="स्थानीय उपभोक्ता, होटल, थोक बजार..."></textarea>
+
+<!-- ================= SUMMARY ================= -->
+<h2>६. कार्यकारी सारांश (Executive Summary)</h2>
+
+<textarea id="summary"
+ placeholder="यो व्यवसाय के हो, किन सम्भाव्य छ, दर्ता स्थिति, बजार र वित्तीय सम्भावना..."></textarea>
+
+<p class="note">
+✔️ यो पेज बैंक, अनुदान तथा सरकारी निकायले सबैभन्दा पहिले हेर्छन् ।<br>
+✔️ Index बाट आएको व्यवसाय/सञ्चालक नाम अटो भरिन्छ ।
+</p>
 
 </div>
 
-</div>
-
+<!-- ================= FOOTER ================= -->
 <footer>
- FarmerBase BP Engine – कृषकमैत्री व्यवसाय योजना प्रणाली
+  <a href="index.html">⬅️ मुख्यपृष्ठ</a>
+  <span>FarmerBase BP Engine – Short Info</span>
+  <a href="production.html">उत्पादन विवरण ➡️</a>
 </footer>
 
 <script>
-/* ================= LOAD ACTIVE BUSINESS ================= */
+/* ================= AUTO FILL FROM INDEX ================= */
 const activeId = localStorage.getItem("activeBusinessId");
-let list = JSON.parse(localStorage.getItem("businessList")) || [];
+const list = JSON.parse(localStorage.getItem("businessList")) || [];
+const biz = list.find(b => b.id === activeId);
 
-const business = list.find(b => b.id === activeId);
-
-if(!business){
- alert("Active business भेटिएन। कृपया index बाट पुनः सुरु गर्नुहोस्।");
+if(biz){
+ document.getElementById("firmName").value =
+  biz.name || "";
+ document.getElementById("promoter").value =
+  biz.proprietor || "";
 }
 
-/* ================= SHOW META ================= */
-document.getElementById("showProprietor").innerText =
- business.proprietor || "";
+/* ================= AUTO SAVE ================= */
+const ids=[
+ "firmName","projectName","bizSector","bizStage",
+ "location","marketArea",
+ "promoter","experience",
+ "registrationStatus","registrationAuthority",
+ "registrationNumber","panNumber","affiliation",
+ "objective","targetMarket","summary"
+];
 
-document.getElementById("showFirm").innerText =
- business.name || "";
-
-/* ================= LOAD EXISTING SHORT INFO ================= */
-document.getElementById("location").value =
- business.location || "";
-
-document.getElementById("bizType").value =
- business.type || "";
-
-document.getElementById("intro").value =
- business.intro || "";
-
-document.getElementById("registrationStatus").value =
- business.registrationStatus || "";
-
-document.getElementById("registrationDetail").value =
- business.registrationDetail || "";
-
-/* ================= SAVE & NEXT ================= */
-function saveAndNext(){
- business.location =
-  document.getElementById("location").value.trim();
-
- business.type =
-  document.getElementById("bizType").value.trim();
-
- business.intro =
-  document.getElementById("intro").value.trim();
-
- business.registrationStatus =
-  document.getElementById("registrationStatus").value;
-
- business.registrationDetail =
-  document.getElementById("registrationDetail").value.trim();
-
- business.updatedAt = Date.now();
-
- localStorage.setItem(
-  "businessList",
-  JSON.stringify(list)
- );
-
- // 👉 NEXT PAGE
- window.location.href = "production.html";
-}
+ids.forEach(id=>{
+ const el=document.getElementById(id);
+ el.value = el.value || localStorage.getItem(id) || "";
+ el.onchange = ()=>{
+  localStorage.setItem(id, el.value);
+ };
+});
 </script>
 
 </body>
