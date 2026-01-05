@@ -47,41 +47,23 @@ td input{width:100%;box-sizing:border-box}
 
 <header>
  <a href="expense-demo.html">⬅️ खर्च विवरण</a>
- <span>पुँजिको स्रोत (Loan Interest सहित)</span>
+ <span>पुँजिको स्रोत</span>
  <a href="income-demo.html">आम्दानी विवरण ➡️</a>
 </header>
 
 <div class="container">
 
-<!-- ================= SUMMARY ================= -->
 <div class="summary">
-
 <b>स्थिर पूँजी:</b> <span id="fixedCap">0</span><br>
-<b>वार्षिक चालु खर्च:</b> <span id="annualVar">0</span><br><br>
-
-<b>कार्यशील पूँजी मोड:</b>
-<select id="wcMode" onchange="changeWCMode(this.value)">
- <option value="months">महिना आधारित</option>
- <option value="percent">प्रतिशत आधारित</option>
- <option value="manual">Manual</option>
-</select>
-
-<span id="wcOptions"></span>
-
-<hr>
-
+<b>वार्षिक चालु खर्च:</b> <span id="annualVar">0</span><br>
 <b>कार्यशील पूँजी:</b> <span id="workingCap">0</span><br>
+<hr>
 <b>कुल आवश्यक पूँजी:</b> <span id="totalCapital">0</span><br>
-
 <b>कुल %:</b> <span id="totalPercent">0%</span>
 <span id="status"></span><br>
-
-<b>वार्षिक ब्याज खर्च (Auto):</b>
-<span id="totalInterest">0</span>
-
+<b>वार्षिक ब्याज खर्च:</b> <span id="totalInterest">0</span>
 </div>
 
-<!-- ================= SOURCE TABLE ================= -->
 <table>
 <thead>
 <tr>
@@ -106,38 +88,25 @@ td input{width:100%;box-sizing:border-box}
 </footer>
 
 <script>
-/* ================= LOAD FROM EXPENSES ================= */
-const annualVar =
- Number(localStorage.getItem("variable_annual_cost")) || 0;
+/* ===== LOAD FROM EXPENSES ===== */
+const annualVar = parseFloat(localStorage.getItem("variable_annual_cost")) || 0;
+const fixedCap  = parseFloat(localStorage.getItem("fixed_total_capital")) || 0;
 
-const fixedCap =
- Number(localStorage.getItem("fixed_total_capital")) || 0;
+/* ===== WORKING CAPITAL (simple: 3 months) ===== */
+const workingCap = (annualVar/12)*3;
+const totalCapital = fixedCap + workingCap;
 
-/* ================= WORKING CAPITAL STATE ================= */
-let wcState =
- JSON.parse(localStorage.getItem("wcState")) || {
-  mode:"months",months:3,percent:20,manual:0
-};
-
-function saveWC(){
- localStorage.setItem("wcState",JSON.stringify(wcState));
-}
-function changeWCMode(m){
- wcState.mode=m; saveWC(); render();
-}
-
-/* ================= CAPITAL SOURCES ================= */
-let sources =
- JSON.parse(localStorage.getItem("capitalSources")) || [];
+/* ===== SOURCES ===== */
+let sources = JSON.parse(localStorage.getItem("capitalSources")) || [];
 
 function saveSources(){
- localStorage.setItem("capitalSources",JSON.stringify(sources));
+ localStorage.setItem("capitalSources", JSON.stringify(sources));
 }
 
 function addSource(){
  sources.push({
   id:Date.now(),
-  type:"self",   // self | grant | loan | other
+  type:"self",
   name:"",
   pct:0,
   interest:0
@@ -145,82 +114,50 @@ function addSource(){
  saveSources(); render();
 }
 
-function update(id,f,v){
- const s=sources.find(x=>x.id===id);
- s[f]=f==="pct"||f==="interest"?Number(v)||0:v;
+function update(id,field,val){
+ const s = sources.find(x=>x.id===id);
+
+ if(field==="name"){
+  s.name = val;                 // keep string
+ }else{
+  s[field] = parseFloat(val) || 0; // safe number
+ }
  saveSources(); render();
 }
 
 function removeSource(id){
  if(confirm("हटाउने हो ?")){
-  sources=sources.filter(s=>s.id!==id);
+  sources = sources.filter(s=>s.id!==id);
   saveSources(); render();
  }
 }
 
-/* ================= WORKING CAPITAL ================= */
-function calcWorkingCap(){
- if(wcState.mode==="months")
-  return (annualVar/12)*(wcState.months||3);
- if(wcState.mode==="percent")
-  return annualVar*(wcState.percent||0)/100;
- if(wcState.mode==="manual")
-  return wcState.manual||0;
- return 0;
-}
-
-/* ================= RENDER ================= */
+/* ===== RENDER ===== */
 function render(){
- document.getElementById("fixedCap").innerText=fixedCap.toFixed(2);
- document.getElementById("annualVar").innerText=annualVar.toFixed(2);
+ document.getElementById("fixedCap").innerText = fixedCap.toFixed(2);
+ document.getElementById("annualVar").innerText = annualVar.toFixed(2);
+ document.getElementById("workingCap").innerText = workingCap.toFixed(2);
+ document.getElementById("totalCapital").innerText = totalCapital.toFixed(2);
 
- document.getElementById("wcMode").value=wcState.mode;
- let opt="";
- if(wcState.mode==="months"){
-  opt=` महिना:
-  <select onchange="wcState.months=this.value;saveWC();render()">
-   <option ${wcState.months==3?"selected":""}>3</option>
-   <option ${wcState.months==6?"selected":""}>6</option>
-   <option ${wcState.months==9?"selected":""}>9</option>
-   <option ${wcState.months==12?"selected":""}>12</option>
-  </select>`;
- }
- if(wcState.mode==="percent"){
-  opt=` %:
-  <input type="number" value="${wcState.percent}"
-   onchange="wcState.percent=this.value;saveWC();render()"
-   style="width:80px">`;
- }
- if(wcState.mode==="manual"){
-  opt=` रकम:
-  <input type="number" value="${wcState.manual}"
-   onchange="wcState.manual=this.value;saveWC();render()"
-   style="width:120px">`;
- }
- document.getElementById("wcOptions").innerHTML=opt;
+ const tb = document.getElementById("capBody");
+ tb.innerHTML = "";
 
- const workingCap=calcWorkingCap();
- const totalCapital=fixedCap+workingCap;
-
- document.getElementById("workingCap").innerText=workingCap.toFixed(2);
- document.getElementById("totalCapital").innerText=totalCapital.toFixed(2);
-
- const tb=document.getElementById("capBody");
- tb.innerHTML="";
- let sumPct=0;
- let totalInterest=0;
+ let sumPct = 0;
+ let totalInterest = 0;
 
  sources.forEach(s=>{
-  sumPct+=s.pct;
-  const amt=totalCapital*s.pct/100;
+  const pct = parseFloat(s.pct) || 0;
+  const amt = totalCapital * pct / 100;
+
   const interestAmt =
-   (s.type==="loan"||s.type==="other")
-    ? amt*(s.interest||0)/100
+   (s.type==="loan" || s.type==="other")
+    ? amt * (parseFloat(s.interest)||0) / 100
     : 0;
 
-  totalInterest+=interestAmt;
+  sumPct += pct;
+  totalInterest += interestAmt;
 
-  tb.innerHTML+=`
+  tb.innerHTML += `
 <tr>
 <td>
  <select onchange="update(${s.id},'type',this.value)">
@@ -230,32 +167,37 @@ function render(){
   <option value="other" ${s.type==="other"?"selected":""}>अन्य</option>
  </select>
 </td>
-<td><input value="${s.name}"
- onchange="update(${s.id},'name',this.value)"></td>
-<td><input type="number" value="${s.pct}"
- onchange="update(${s.id},'pct',this.value)"></td>
+<td>
+ <input value="${s.name}"
+  oninput="update(${s.id},'name',this.value)">
+</td>
+<td>
+ <input type="number" value="${pct}"
+  oninput="update(${s.id},'pct',this.value)">
+</td>
 <td>${amt.toFixed(2)}</td>
 <td>
  <input type="number" value="${s.interest}"
   ${s.type==="loan"||s.type==="other"?"":"disabled"}
-  onchange="update(${s.id},'interest',this.value)">
+  oninput="update(${s.id},'interest',this.value)">
 </td>
 <td>${interestAmt.toFixed(2)}</td>
-<td><button class="btn del"
- onclick="removeSource(${s.id})">🗑️</button></td>
+<td>
+ <button class="btn del"
+  onclick="removeSource(${s.id})">🗑️</button>
+</td>
 </tr>`;
  });
 
- document.getElementById("totalPercent").innerText=sumPct+"%";
- document.getElementById("totalInterest").innerText=
-  totalInterest.toFixed(2);
+ document.getElementById("totalPercent").innerText = sumPct + "%";
+ document.getElementById("totalInterest").innerText = totalInterest.toFixed(2);
 
- document.getElementById("status").innerHTML=
+ document.getElementById("status").innerHTML =
   sumPct===100
    ?'<span class="ok"> ✔️ 100% मिल्यो</span>'
    :'<span class="warn"> ❗ 100% हुनुपर्छ</span>';
 
- /* SAVE INTEREST FOR PROFIT-LOSS */
+ /* send interest to profit-loss */
  localStorage.setItem(
   "annual_interest_cost",
   totalInterest.toFixed(2)
