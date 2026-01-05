@@ -2,188 +2,159 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Profit & Loss</title>
+<title>नाफा / नोक्सान सारांश</title>
 
 <style>
-body{
-  font-family:Arial, sans-serif;
-  margin:0;
-  background:#f4f6f7;
+body{font-family:Arial;background:#f5f5f5;margin:0}
+header,footer{
+ background:#2e7d32;color:#fff;
+ padding:12px 20px;
+ display:flex;justify-content:space-between;align-items:center
 }
-
-header{
-  background:#2e7d32;
-  color:#fff;
-  padding:14px 20px;
-  font-size:22px;
-  position:sticky;
-  top:0;
-  z-index:10;
-}
-
-/* smooth scroll */
-html{
-  scroll-behavior:smooth;
-}
-
-/* Down arrow */
-.down-arrow{
-  position:fixed;
-  top:85px;
-  right:18px;
-  font-size:26px;
-  background:#2e7d32;
-  color:#fff;
-  padding:6px 10px;
-  border-radius:50%;
-  text-decoration:none;
-  box-shadow:0 2px 6px rgba(0,0,0,.3);
-}
-.down-arrow:hover{background:#1b5e20}
-
+header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
 .container{
-  max-width:1200px;
-  margin:auto;
-  padding:20px;
+ max-width:1200px;margin:auto;background:#fff;
+ padding:20px;min-height:70vh
 }
-
-/* tables */
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin:20px 0;
-  background:#fff;
+h1{text-align:center;color:#2e7d32;margin:15px 0 25px}
+.summary{
+ background:#f1f8e9;padding:16px;margin-bottom:20px;font-size:16px
 }
-th,td{
-  border:1px solid #ccc;
-  padding:10px;
-  text-align:right;
-}
-th{
-  background:#e8f5e9;
-  text-align:center;
-}
-td:first-child{
-  text-align:left;
-}
-
-.summary-box{
-  background:#ffffff;
-  padding:20px;
-  margin-top:20px;
-  border-left:6px solid #2e7d32;
-  box-shadow:0 2px 6px rgba(0,0,0,.1);
-}
-
-.footer{
-  text-align:center;
-  padding:15px;
-  background:#2e7d32;
-  color:#fff;
-  margin-top:40px;
-}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:10px}
+th{background:#e8f5e9;text-align:center}
+td.label{font-weight:bold}
+td.amount{text-align:right}
+.net{font-size:18px;font-weight:bold}
+.profit{color:#2e7d32}
+.loss{color:#c62828}
+.note{margin-top:15px;font-size:14px;color:#444}
 </style>
 </head>
 
-<body id="top">
+<body>
 
 <header>
-  Profit & Loss Statement
+ <a href="income-demo.html">⬅️ आम्दानी ⬅️</a>
+ <span>⬇️नाफा / नोक्सान हिसाब⬇️</span>
+ <a href="profit-distribution.html">➡️ नाफा वितरण ➡️</a>
 </header>
-
-<!-- ⬇️ Down Arrow -->
-<a href="#pl-summary" class="down-arrow" title="Go to Summary">⬇️</a>
 
 <div class="container">
 
-<h2>वार्षिक Profit / Loss</h2>
+<h1>नाफा / नोक्सान सारांश (Profit / Loss)</h1>
+
+<div class="summary">
+ ✔️ Income page बाट आएको <b>कुल आम्दानी</b>,  
+ चालु खर्च र ऋणको ब्याजका आधारमा  
+ <b>शुद्ध नाफा / नोक्सान स्वतः</b> गणना हुन्छ ।
+</div>
 
 <table>
 <thead>
 <tr>
-  <th>विवरण</th>
-  <th>रकम (रु)</th>
+ <th>शीर्षक</th>
+ <th>रकम (Rs.)</th>
 </tr>
 </thead>
-<tbody id="pl-table">
+<tbody>
+
 <tr>
-  <td>कुल आम्दानी</td>
-  <td id="totalIncome">0</td>
+ <td class="label">कुल आम्दानी (Total Income)</td>
+ <td class="amount" id="totalIncome">0.00</td>
 </tr>
+
 <tr>
-  <td>कुल खर्च</td>
-  <td id="totalExpense">0</td>
+ <td class="label">वार्षिक चालु खर्च</td>
+ <td class="amount" id="annualVar">0.00</td>
 </tr>
+
+<!-- ब्याज पहिलो ठाउँ -->
 <tr>
-  <th>नेट नाफा / घाटा</th>
-  <th id="netProfit">0</th>
+ <td class="label">वार्षिक ब्याज खर्च</td>
+ <td class="amount" id="interestExpense">0.00</td>
 </tr>
+
+<tr>
+ <td class="label">कुल खर्च (चालु + ब्याज)</td>
+ <td class="amount" id="totalExpense">0.00</td>
+</tr>
+
+<tr class="net">
+ <td class="label">कुल शुद्ध नाफा / नोक्सान</td>
+ <td class="amount" id="netProfit">0.00</td>
+</tr>
+
 </tbody>
 </table>
 
-<!-- ================= SUMMARY SECTION ================= -->
-<section id="pl-summary" class="summary-box">
-
-<h2>📊 Profit / Loss Summary</h2>
-
-<p><b>Total Income :</b> रु <span id="sIncome">0</span></p>
-<p><b>Total Expense :</b> रु <span id="sExpense">0</span></p>
-<p><b>Net Profit :</b> रु <span id="sProfit">0</span></p>
-
-<h3>📈 5-Year Projection (Simple)</h3>
-
-<table>
-<thead>
-<tr>
-  <th>Year</th>
-  <th>Estimated Profit (रु)</th>
-</tr>
-</thead>
-<tbody id="projectionTable"></tbody>
-</table>
-
-<!-- ⬆️ Back to top -->
-<a href="#top" class="down-arrow" style="bottom:20px;top:auto;">⬆️</a>
-
-</section>
+<p class="note">
+✔️ आम्दानी <b>Income page</b> बाट publish भएको हो ।<br>
+✔️ ब्याज <b>Capital Source</b> बाट स्वतः आएको हो ।<br>
+✔️ यही शुद्ध नाफा <b>नाफा वितरण</b> र <b>5-Year Projection</b> मा प्रयोग हुन्छ ।
+</p>
 
 </div>
 
-<div class="footer">
-FarmerBase BP Engine – कृषकमैत्री व्यवसायिक योजना प्रणाली
-</div>
+<footer>
+ <a href="income-demo.html">⬅️ आम्दानी</a>
+ <span>FarmerBase BP Engine – Profit / Loss</span>
+ <a href="profit-distribution.html">नाफा वितरण ➡️</a>
+</footer>
 
+<!-- ================= SCRIPT (BOTTOM ONLY) ================= -->
 <script>
-/* ====== DATA LOAD ====== */
-let income = JSON.parse(localStorage.getItem("incomeData") || "[]");
-let expenses = JSON.parse(localStorage.getItem("expensesData") || "[]");
+/* =====================================================
+   1️⃣ TOTAL INCOME (SINGLE SOURCE OF TRUTH)
+   — Income page ले publish गरेको value
+===================================================== */
+const totalIncome =
+ Number(localStorage.getItem("totalIncome")) || 0;
 
-/* ====== CALCULATION ====== */
-let totalIncome = income.reduce((s,i)=>s+(+i.amount||0),0);
-let totalExpense = expenses.reduce((s,e)=>s+(+e.amount||0),0);
-let netProfit = totalIncome - totalExpense;
+/* =====================================================
+   2️⃣ VARIABLE (ANNUAL) EXPENSE
+   — Expense page बाट आएको annual sum
+===================================================== */
+const annualVar =
+ Number(localStorage.getItem("variable_annual_cost")) || 0;
 
-/* ====== DISPLAY ====== */
-function fmt(n){return n.toLocaleString("en-IN");}
+/* =====================================================
+   3️⃣ INTEREST EXPENSE
+   — Capital Source बाट आएको
+===================================================== */
+const interestExpense =
+ Number(localStorage.getItem("annual_interest_cost")) || 0;
 
-document.getElementById("totalIncome").innerText = fmt(totalIncome);
-document.getElementById("totalExpense").innerText = fmt(totalExpense);
-document.getElementById("netProfit").innerText = fmt(netProfit);
+/* =====================================================
+   4️⃣ TOTAL EXPENSE & NET PROFIT
+===================================================== */
+const totalExpense = annualVar + interestExpense;
+const netProfit = totalIncome - totalExpense;
 
-document.getElementById("sIncome").innerText = fmt(totalIncome);
-document.getElementById("sExpense").innerText = fmt(totalExpense);
-document.getElementById("sProfit").innerText = fmt(netProfit);
+/* =====================================================
+   5️⃣ RENDER
+===================================================== */
+document.getElementById("totalIncome").innerText =
+ totalIncome.toFixed(2);
 
-/* ====== 5 Year Projection ====== */
-let tbody = document.getElementById("projectionTable");
-tbody.innerHTML = "";
+document.getElementById("annualVar").innerText =
+ annualVar.toFixed(2);
 
-for(let y=1;y<=5;y++){
-  let est = netProfit * y;
-  let tr = document.createElement("tr");
-  tr.innerHTML = `<td>Year ${y}</td><td>${fmt(est)}</td>`;
-  tbody.appendChild(tr);
-}
+document.getElementById("interestExpense").innerText =
+ interestExpense.toFixed(2);
+
+document.getElementById("totalExpense").innerText =
+ totalExpense.toFixed(2);
+
+const npEl = document.getElementById("netProfit");
+npEl.innerText = netProfit.toFixed(2);
+npEl.classList.add(netProfit < 0 ? "loss" : "profit");
+
+/* =====================================================
+   6️⃣ SAVE FOR NEXT MODULES
+===================================================== */
+localStorage.setItem("totalExpense", totalExpense);
+localStorage.setItem("netProfit", netProfit);
 </script>
 
 </body>
