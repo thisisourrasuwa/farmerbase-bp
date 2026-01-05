@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Business Detail</title>
+
+<style>
+body{
+ font-family:Arial, sans-serif;
+ background:#f5f5f5;
+ margin:0
+}
+header,footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center
+}
+header a, footer a{
+ color:#fff;
+ text-decoration:none;
+ font-weight:bold
+}
+.container{
+ max-width:1200px;
+ margin:auto;
+ background:#fff;
+ padding:20px;
+ min-height:70vh
+}
+h1{
+ text-align:center;
+ font-size:32px;
+ color:#2e7d32;
+ margin:15px 0 25px
+}
+h2{
+ color:#333;
+ border-bottom:2px solid #e0e0e0;
+ padding-bottom:5px;
+ margin-top:30px
+}
+label{
+ display:block;
+ margin-top:12px;
+ font-weight:bold
+}
+textarea, input{
+ width:100%;
+ padding:8px;
+ margin-top:5px;
+ box-sizing:border-box
+}
+textarea{
+ resize:vertical;
+ min-height:90px
+}
+.note{
+ font-size:13px;
+ color:#555;
+ margin-top:15px
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <a href="short-info.html">⬅️ संक्षिप्त विवरण</a>
+  <span>व्यवसाय सम्बन्धि विस्तृत विवरण</span>
+  <a href="production.html">उत्पादन विवरण ➡️</a>
+</header>
+
+<div class="container">
+<!-- ================= BUSINESS DESCRIPTION ================= -->
+<h2>१. व्यवसायको विस्तृत विवरण</h2>
+
+<label>व्यवसाय के हो ?</label>
+<textarea id="bizDescription"
+ placeholder="यो व्यवसाय के हो, कस्तो उत्पादन/सेवा दिने हो..."></textarea>
+
+<label>व्यवसाय किन सम्भाव्य छ ?</label>
+<textarea id="bizJustification"
+ placeholder="बजार माग, स्थान, अनुभव, स्रोत साधनको उपलब्धता..."></textarea>
+
+<!-- ================= PRODUCT / SERVICE ================= -->
+<h2>२. उत्पादन / सेवा विवरण</h2>
+
+<label>मुख्य उत्पादन वा सेवा</label>
+<textarea id="productService"
+ placeholder="के–के उत्पादन/सेवा प्रदान गरिनेछ..."></textarea>
+
+<label>उत्पादन/सेवाको विशेषता</label>
+<textarea id="productFeature"
+ placeholder="गुणस्तर, नवीनता, स्थानीय स्रोत, जैविक, मूल्य..."></textarea>
+
+<!-- ================= MARKET ANALYSIS ================= -->
+<h2>३. बजार तथा माग विश्लेषण</h2>
+
+<label>लक्षित बजार</label>
+<textarea id="marketTarget"
+ placeholder="स्थानीय, होटल, थोक, उपभोक्ता, उद्योग..."></textarea>
+
+<label>माग अवस्था</label>
+<textarea id="marketDemand"
+ placeholder="माग बढ्दो/स्थिर, किन किन्ने ?"></textarea>
+
+<label>प्रतिस्पर्धी अवस्था</label>
+<textarea id="competition"
+ placeholder="अरू व्यवसाय, हाम्रो फरक पक्ष..."></textarea>
+
+<!-- ================= OPERATION PLAN ================= -->
+<h2>४. सञ्चालन योजना</h2>
+
+<label>सञ्चालन प्रक्रिया</label>
+<textarea id="operationPlan"
+ placeholder="उत्पादन/सेवा कसरी सञ्चालन हुन्छ ?"></textarea>
+
+<label>आवश्यक जनशक्ति</label>
+<textarea id="manpower"
+ placeholder="कामदार संख्या, सीप, व्यवस्थापन..."></textarea>
+
+<!-- ================= RESOURCE ================= -->
+<h2>५. स्रोत साधन</h2>
+
+<label>भूमि / भवन / पूर्वाधार</label>
+<textarea id="infrastructure"
+ placeholder="जग्गा, भवन, गोदाम, सिंचाइ, सडक..."></textarea>
+
+<label>प्रविधि / उपकरण</label>
+<textarea id="technology"
+ placeholder="मेसिन, उपकरण, प्रविधि..."></textarea>
+
+<!-- ================= RISK ================= -->
+<h2>६. जोखिम तथा न्यूनीकरण उपाय</h2>
+
+<label>सम्भावित जोखिम</label>
+<textarea id="risk"
+ placeholder="बजार, मौसम, रोग, मूल्य..."></textarea>
+
+<label>न्यूनीकरण उपाय</label>
+<textarea id="mitigation"
+ placeholder="बीमा, विविधीकरण, तालिम, व्यवस्थापन..."></textarea>
+
+<!-- ================= LEGAL / COMPLIANCE ================= -->
+<h2>७. कानुनी तथा वातावरणीय पक्ष</h2>
+
+<label>कानुनी अनुपालन</label>
+<textarea id="legal"
+ placeholder="दर्ता, कर, अनुमति, मापदण्ड..."></textarea>
+
+<label>वातावरणीय प्रभाव</label>
+<textarea id="environment"
+ placeholder="फोहर व्यवस्थापन, वातावरण संरक्षण..."></textarea>
+
+<p class="note">
+✔️ यो पेजले व्यवसायको व्यवहारिकता देखाउँछ ।<br>
+✔️ Financial पेजहरू यही कथनको आधारमा विश्वासिलो हुन्छन् ।
+</p>
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <a href="short-info.html">⬅️ संक्षिप्त विवरण</a>
+  <span>Farmerbase BP Engine- Business Detail</span>
+  <a href="production.html">उत्पादन विवरण ➡️</a>
+</footer>
+
+<script>
+/* ===== AUTO SAVE ===== */
+const fields=[
+ "bizDescription","bizJustification",
+ "productService","productFeature",
+ "marketTarget","marketDemand","competition",
+ "operationPlan","manpower",
+ "infrastructure","technology",
+ "risk","mitigation",
+ "legal","environment"
+];
+
+fields.forEach(id=>{
+ const el=document.getElementById(id);
+ el.value=localStorage.getItem(id)||"";
+ el.onchange=()=>localStorage.setItem(id,el.value);
+});
+</script>
+
+</body>
+</html>

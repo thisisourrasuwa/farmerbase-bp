@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Full Business Proposal</title>
+
+<style>
+body{
+ font-family:Arial, sans-serif;
+ background:#f5f5f5;
+ margin:0;
+ line-height:1.6
+}
+header,footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:14px 22px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center
+}
+header a, footer a{
+ color:#fff;
+ text-decoration:none;
+ font-weight:bold
+}
+.container{
+ max-width:1200px;
+ margin:auto;
+ background:#fff;
+ padding:30px;
+ min-height:70vh
+}
+h1{
+ text-align:center;
+ color:#2e7d32;
+ font-size:34px;
+ margin-bottom:5px
+}
+h2{
+ color:#2e7d32;
+ margin-top:35px;
+ border-bottom:2px solid #e0e0e0;
+ padding-bottom:6px
+}
+h3{
+ color:#333;
+ margin-top:20px
+}
+p{
+ margin:6px 0
+}
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:10px
+}
+th,td{
+ border:1px solid #ccc;
+ padding:8px;
+ text-align:left;
+ vertical-align:top
+}
+th{
+ background:#f1f8e9;
+ width:30%
+}
+.section{
+ margin-top:25px
+}
+.small{
+ font-size:13px;
+ color:#555
+}
+.print-btn{
+ background:#2e7d32;
+ color:#fff;
+ border:none;
+ padding:10px 16px;
+ cursor:pointer;
+ margin-top:15px
+}
+@media print{
+ header,footer,.print-btn{display:none}
+ body{background:#fff}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <a href="index.html">⬅️ Home</a>
+  <span>FarmerBase BP Engine</span>
+  <a href="#" onclick="window.print()">🖨️ Print</a>
+</header>
+
+<div class="container">
+
+<h1 id="projectTitle">Business Proposal</h1>
+<p class="small" id="meta"></p>
+
+<!-- ================= EXECUTIVE SUMMARY ================= -->
+<h2>१. कार्यकारी सारांश (Executive Summary)</h2>
+<p id="summary"></p>
+
+<!-- ================= BASIC INFO ================= -->
+<h2>२. आधारभूत जानकारी</h2>
+<table>
+<tr><th>फर्म / व्यवसायको नाम</th><td id="firmName"></td></tr>
+<tr><th>परियोजनाको नाम</th><td id="projectName"></td></tr>
+<tr><th>व्यवसायको क्षेत्र</th><td id="bizSector"></td></tr>
+<tr><th>व्यवसायको स्वरूप</th><td id="bizStage"></td></tr>
+<tr><th>स्थान</th><td id="location"></td></tr>
+<tr><th>बजार क्षेत्र</th><td id="marketArea"></td></tr>
+<tr><th>संचालक</th><td id="promoter"></td></tr>
+<tr><th>अनुभव (वर्ष)</th><td id="experience"></td></tr>
+</table>
+
+<!-- ================= LEGAL ================= -->
+<h2>३. कानुनी स्थिति</h2>
+<table>
+<tr><th>दर्ता स्थिति</th><td id="registrationStatus"></td></tr>
+<tr><th>दर्ता निकाय</th><td id="registrationAuthority"></td></tr>
+<tr><th>दर्ता नं</th><td id="registrationNumber"></td></tr>
+<tr><th>PAN / VAT</th><td id="panNumber"></td></tr>
+<tr><th>अन्य आवद्धता</th><td id="affiliation"></td></tr>
+</table>
+
+<!-- ================= BUSINESS DETAIL ================= -->
+<h2>४. व्यवसाय विवरण</h2>
+<div class="section">
+<h3>व्यवसायको विवरण</h3>
+<p id="bizDescription"></p>
+
+<h3>व्यवसायको औचित्य</h3>
+<p id="bizJustification"></p>
+
+<h3>उत्पादन / सेवा</h3>
+<p id="productService"></p>
+
+<h3>विशेषता</h3>
+<p id="productFeature"></p>
+</div>
+
+<!-- ================= MARKET ================= -->
+<h2>५. बजार तथा सञ्चालन</h2>
+<div class="section">
+<h3>लक्षित बजार</h3>
+<p id="marketTarget"></p>
+
+<h3>माग अवस्था</h3>
+<p id="marketDemand"></p>
+
+<h3>प्रतिस्पर्धा</h3>
+<p id="competition"></p>
+
+<h3>सञ्चालन योजना</h3>
+<p id="operationPlan"></p>
+
+<h3>जनशक्ति</h3>
+<p id="manpower"></p>
+</div>
+
+<!-- ================= RESOURCE & RISK ================= -->
+<h2>६. स्रोत साधन, जोखिम र वातावरण</h2>
+<div class="section">
+<h3>पूर्वाधार</h3>
+<p id="infrastructure"></p>
+
+<h3>प्रविधि</h3>
+<p id="technology"></p>
+
+<h3>जोखिम</h3>
+<p id="risk"></p>
+
+<h3>न्यूनीकरण</h3>
+<p id="mitigation"></p>
+
+<h3>कानुनी / वातावरणीय पक्ष</h3>
+<p id="legal"></p>
+<p id="environment"></p>
+</div>
+
+<!-- ================= FINANCIAL SUMMARY ================= -->
+<h2>७. वित्तीय सारांश</h2>
+<table>
+<tr><th>कुल आम्दानी (वार्षिक)</th><td id="totalIncome"></td></tr>
+<tr><th>कुल खर्च (वार्षिक)</th><td id="totalExpense"></td></tr>
+<tr><th>शुद्ध नाफा</th><td id="netProfit"></td></tr>
+</table>
+
+<p class="small">
+✔️ सबै वित्तीय विवरण प्रणालीबाट अटो गणना गरिएको हो ।
+</p>
+
+<button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <span>FarmerBase BP Engine – Full Proposal</span>
+</footer>
+
+<script>
+/* ================= HELPER ================= */
+function val(id){
+ return localStorage.getItem(id) || "—";
+}
+
+/* ================= TITLE ================= */
+const project = localStorage.getItem("projectName") || "Business Proposal";
+document.getElementById("projectTitle").innerText = project;
+document.getElementById("meta").innerText =
+ "Generated on: " + new Date().toLocaleDateString();
+
+/* ================= SHORT INFO ================= */
+[
+ "firmName","projectName","bizSector","bizStage",
+ "location","marketArea","promoter","experience",
+ "registrationStatus","registrationAuthority",
+ "registrationNumber","panNumber","affiliation",
+ "summary"
+].forEach(id=>{
+ const el=document.getElementById(id);
+ if(el) el.innerText = val(id);
+});
+
+/* ================= BUSINESS DETAIL ================= */
+[
+ "bizDescription","bizJustification",
+ "productService","productFeature",
+ "marketTarget","marketDemand","competition",
+ "operationPlan","manpower",
+ "infrastructure","technology",
+ "risk","mitigation","legal","environment"
+].forEach(id=>{
+ const el=document.getElementById(id);
+ if(el) el.innerText = val(id);
+});
+
+/* ================= FINANCIAL ================= */
+document.getElementById("totalIncome").innerText =
+ localStorage.getItem("totalIncome") || "—";
+document.getElementById("totalExpense").innerText =
+ localStorage.getItem("totalExpense") || "—";
+document.getElementById("netProfit").innerText =
+ localStorage.getItem("netProfit") || "—";
+</script>
+
+</body>
+</html>

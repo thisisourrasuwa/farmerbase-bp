@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Profit & Loss (Demo)</title>
+
+<style>
+body{font-family:Arial;background:#f5f5f5;margin:0}
+header,footer{
+ background:#2e7d32;color:#fff;padding:12px 20px;
+ display:flex;justify-content:space-between;align-items:center
+}
+header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
+
+.container{
+ max-width:1200px;
+ margin:auto;
+ background:#fff;
+ padding:20px;
+ min-height:70vh
+}
+
+h1{text-align:center;font-size:32px;color:#2e7d32;margin:15px 0}
+h2{margin-top:25px;color:#333}
+
+.summary{
+ background:#f1f8e9;
+ padding:15px;
+ font-size:16px;
+ margin-bottom:20px
+}
+
+table{
+ width:100%;
+ border-collapse:collapse;
+ table-layout:fixed
+}
+th,td{
+ border:1px solid #ccc;
+ padding:8px;
+ text-align:right;
+ font-size:14px
+}
+th:first-child,td:first-child{text-align:left}
+th{background:#e8f5e9}
+
+.pos{color:#2e7d32;font-weight:bold}
+.neg{color:#c62828;font-weight:bold}
+.note{font-size:13px;color:#555;margin-top:10px}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="income-demo.html">⬅️ आम्दानी विवरण</a>
+  <span>नाफा/नोक्सान हिशाव</span>
+  <a href="profit-distribution.html">नाफा वितरण</a>
+</header>
+
+<div class="container">
+
+<!-- ================= SUMMARY ================= -->
+<div class="summary">
+  🔹 <b>कुल आम्दानी:</b>
+  <span id="totalIncome">0</span><br>
+
+  🔹 <b>कुल चालु खर्च:</b>
+  <span id="totalVariable">0</span><br>
+
+  🔹 <b>कुल वार्षिक ह्रास:</b>
+  <span id="totalDep">0</span><br>
+
+  <hr>
+
+  🔹 <b>सञ्चालन नाफा (Operating Profit):</b>
+  <span id="operatingProfit">0</span><br>
+
+  🔹 <b>व्याज खर्च:</b>
+  <span id="totalInterest">0</span><br>
+
+  <hr>
+
+  🔹 <b>शुद्ध नाफा / नोक्सान:</b>
+  <span id="netProfit" class="pos">0</span>
+</div>
+
+<h2>विवरण</h2>
+<table>
+<thead>
+<tr>
+  <th>शीर्षक</th>
+  <th>रकम</th>
+</tr>
+</thead>
+<tbody id="plBody"></tbody>
+</table>
+
+<div class="note">
+✔️ यो Demo view हो — सबै गणना वास्तविक डेटा बाट आएको हो ।<br>
+✔️ चालु खर्च = वास्तविक खर्च ।<br>
+✔️ स्थिर खर्च = वार्षिक ह्रासकट्टी मात्र ।<br>
+✔️ व्याज = Financing Cost (उत्पादन लागत होइन) ।
+</div>
+</div>
+
+<footer>
+ <a href="income-demo.html">⬅️ आम्दानी विवरण</a>
+  <span>Farmerbase BP Engine-Profit-Loss Detail</span>
+  <a href="profit-distribution.html">नाफा वितरण</a>
+</footer>
+
+<script>
+/* ================= LOAD DATA ================= */
+const productions = JSON.parse(localStorage.getItem("productions")) || [];
+const expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+const incomes = JSON.parse(localStorage.getItem("incomes")) || {};
+const capitalSources = JSON.parse(localStorage.getItem("capitalSources")) || [];
+
+/* ================= INTEREST ================= */
+function totalInterest(){
+ let sum = 0;
+ capitalSources.forEach(s=>{
+  if(s.interestRate){
+   sum += (Number(s.amount)||0) * Number(s.interestRate)/100;
+  }
+ });
+ return sum;
+}
+
+/* ================= CALCULATION ================= */
+function calculatePL(){
+ let totalIncome = 0;
+ let totalVariable = 0;
+ let totalDep = 0;
+
+ productions.forEach(p=>{
+  const inc = incomes[p.id];
+  if(!inc) return;
+
+  const qty = Number(p.quantity)||0;
+  const profitPct = inc.profitPct||0;
+
+  let prodCost = 0;
+
+  expenses.forEach(e=>{
+   if(!e.map || !e.map[p.id]) return;
+
+   if(e.type==="variable"){
+    const c = (e.qty*e.rate)||0;
+    prodCost += c;
+    totalVariable += c;
+   }else{
+    const d = (e.qty*e.rate)/(e.life||1);
+    prodCost += d;
+    totalDep += d;
+   }
+  });
+
+  const costPerUnit = qty ? prodCost/qty : 0;
+  const sellingRate = costPerUnit * (1 + profitPct/100);
+  const sales = sellingRate * qty;
+
+  totalIncome += sales;
+ });
+
+ const operatingProfit = totalIncome - totalVariable - totalDep;
+ const interest = totalInterest();
+ const netProfit = operatingProfit - interest;
+
+ return {
+  totalIncome,
+  totalVariable,
+  totalDep,
+  operatingProfit,
+  interest,
+  netProfit
+ };
+}
+
+/* ================= RENDER ================= */
+function render(){
+ const r = calculatePL();
+
+ document.getElementById("totalIncome").innerText = r.totalIncome.toFixed(2);
+ document.getElementById("totalVariable").innerText = r.totalVariable.toFixed(2);
+ document.getElementById("totalDep").innerText = r.totalDep.toFixed(2);
+ document.getElementById("operatingProfit").innerText = r.operatingProfit.toFixed(2);
+ document.getElementById("totalInterest").innerText = r.interest.toFixed(2);
+
+ const np = document.getElementById("netProfit");
+ np.innerText = r.netProfit.toFixed(2);
+ np.className = r.netProfit >= 0 ? "pos" : "neg";
+
+ document.getElementById("plBody").innerHTML = `
+<tr><td>कुल आम्दानी</td><td>${r.totalIncome.toFixed(2)}</td></tr>
+<tr><td>कुल चालु खर्च</td><td>${r.totalVariable.toFixed(2)}</td></tr>
+<tr><td>कुल वार्षिक ह्रास</td><td>${r.totalDep.toFixed(2)}</td></tr>
+<tr><th>सञ्चालन नाफा</th><th>${r.operatingProfit.toFixed(2)}</th></tr>
+<tr><td>व्याज खर्च</td><td>${r.interest.toFixed(2)}</td></tr>
+<tr><th>शुद्ध नाफा / नोक्सान</th><th>${r.netProfit.toFixed(2)}</th></tr>
+`;
+}
+
+render();
+</script>
+
+</body>
+</html>

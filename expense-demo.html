@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Expenses – Final Stable</title>
+
+<style>
+body{font-family:Arial;background:#f5f5f5;margin:0}
+header,footer{
+ background:#2e7d32;color:#fff;
+ padding:12px 20px;
+ display:flex;justify-content:space-between;align-items:center
+}
+header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
+
+.container{
+ max-width:1400px;margin:auto;background:#fff;
+ padding:20px;min-height:70vh
+}
+
+h2{margin-top:30px}
+
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{
+ border:1px solid #ccc;padding:6px;
+ text-align:center;font-size:14px
+}
+th{background:#e8f5e9}
+
+input{width:100%;box-sizing:border-box}
+
+.mapBox{text-align:left;font-size:13px}
+.mapNote{font-size:12px;color:#777}
+
+.btn{padding:6px 10px;border:none;cursor:pointer}
+.add{background:#2e7d32;color:#fff}
+.del{background:#c62828;color:#fff}
+
+.preview{
+ background:#f1f8e9;
+ padding:12px;
+ margin-top:20px;
+ font-size:14px
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <a href="production.html">⬅️ उत्पादन विवरण</a>
+ <span>खर्च विवरण (FINAL)</span>
+ <a href="capital-source.html">पुँजिको स्रोत ➡️</a>
+</header>
+
+<div class="container">
+
+<!-- ================= VARIABLE ================= -->
+<h2>🔄 चालु खर्च</h2>
+<table>
+<thead>
+<tr>
+ <th>खर्च शीर्षक</th>
+ <th>इकाई</th>
+ <th>परिमाण</th>
+ <th>दर</th>
+ <th>जम्मा</th>
+ <th>कुन उत्पादनमा</th>
+ <th>🗑️</th>
+</tr>
+</thead>
+<tbody id="varBody"></tbody>
+</table>
+<button class="btn add" id="addVar">➕ चालु खर्च थप्नुहोस्</button>
+
+<!-- ================= FIXED ================= -->
+<h2>🏗️ स्थिर खर्च</h2>
+<table>
+<thead>
+<tr>
+ <th>खर्च शीर्षक</th>
+ <th>इकाई</th>
+ <th>परिमाण</th>
+ <th>दर</th>
+ <th>आयु</th>
+ <th>वार्षिक ह्रास</th>
+ <th>कुन उत्पादनमा</th>
+ <th>🗑️</th>
+</tr>
+</thead>
+<tbody id="fixBody"></tbody>
+</table>
+<button class="btn add" id="addFix">➕ स्थिर खर्च थप्नुहोस्</button>
+
+<div class="preview" id="previewBox"></div>
+
+</div>
+
+<footer>
+ <span>FarmerBase BP Engine – Expenses Final Stable</span>
+</footer>
+
+<script>
+/* =================================================
+   SINGLE SOURCE OF TRUTH
+================================================= */
+const productions =
+ JSON.parse(localStorage.getItem("productions")) || [];
+
+let expenses =
+ JSON.parse(localStorage.getItem("expenses")) || [];
+
+/* =================================================
+   SAVE
+================================================= */
+function save(){
+ localStorage.setItem("expenses", JSON.stringify(expenses));
+}
+
+/* =================================================
+   ADD
+================================================= */
+document.getElementById("addVar").onclick = () => {
+ expenses.push({
+  id: Date.now(),
+  type: "variable",
+  title:"",
+  unit:"",
+  qty:0,
+  rate:0,
+  life:null,
+  map:{}
+ });
+ save();
+ render();
+};
+
+document.getElementById("addFix").onclick = () => {
+ expenses.push({
+  id: Date.now(),
+  type: "fixed",
+  title:"",
+  unit:"",
+  qty:0,
+  rate:0,
+  life:1,
+  map:{}
+ });
+ save();
+ render();
+};
+
+/* =================================================
+   DELETE
+================================================= */
+function deleteExpense(id){
+ expenses = expenses.filter(e => e.id !== id);
+ save();
+ render();
+}
+
+/* =================================================
+   MAP (कुन उत्पादनमा)
+================================================= */
+function mapUI(exp){
+ if(!productions.length){
+  return `<span class="mapNote">पहिले उत्पादन थप्नुहोस्</span>`;
+ }
+ return productions.map(p=>{
+  const chk = exp.map[p.id] ? "checked" : "";
+  return `
+<label>
+ <input type="checkbox" ${chk}
+  onchange="toggleMap(${exp.id},'${p.id}',this.checked)">
+ ${p.name}
+</label><br>`;
+ }).join("");
+}
+
+function toggleMap(eid,pid,val){
+ const e = expenses.find(x=>x.id===eid);
+ if(!e.map) e.map = {};
+ if(val) e.map[pid] = true;
+ else delete e.map[pid];
+ save();
+}
+
+/* =================================================
+   RENDER (NO RE-RENDER ON TYPING)
+================================================= */
+function render(){
+ let varTotal = 0;
+ let fixedDep = 0;
+ let fixedCapital = 0;
+
+ const vb = document.getElementById("varBody");
+ const fb = document.getElementById("fixBody");
+ vb.innerHTML = "";
+ fb.innerHTML = "";
+
+ expenses.forEach(e=>{
+  if(e.type==="variable"){
+   const total = (e.qty * e.rate) || 0;
+   varTotal += total;
+
+   const tr = document.createElement("tr");
+   tr.innerHTML = `
+<td><input></td>
+<td><input></td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+<td>${total.toFixed(2)}</td>
+<td class="mapBox">${mapUI(e)}</td>
+<td><button class="btn del">🗑️</button></td>`;
+
+   const ins = tr.querySelectorAll("input");
+   ins[0].value = e.title;
+   ins[1].value = e.unit;
+   ins[2].value = e.qty;
+   ins[3].value = e.rate;
+
+   ins[0].oninput = ()=>{e.title=ins[0].value;save()};
+   ins[1].oninput = ()=>{e.unit=ins[1].value;save()};
+   ins[2].oninput = ()=>{e.qty=+ins[2].value||0;save()};
+   ins[3].oninput = ()=>{e.rate=+ins[3].value||0;save()};
+
+   tr.querySelector("button").onclick = ()=>deleteExpense(e.id);
+   vb.appendChild(tr);
+  }
+
+  if(e.type==="fixed"){
+   const cap = (e.qty * e.rate) || 0;
+   const dep = cap / (e.life || 1);
+   fixedCapital += cap;
+   fixedDep += dep;
+
+   const tr = document.createElement("tr");
+   tr.innerHTML = `
+<td><input></td>
+<td><input></td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+<td>${dep.toFixed(2)}</td>
+<td class="mapBox">${mapUI(e)}</td>
+<td><button class="btn del">🗑️</button></td>`;
+
+   const ins = tr.querySelectorAll("input");
+   ins[0].value = e.title;
+   ins[1].value = e.unit;
+   ins[2].value = e.qty;
+   ins[3].value = e.rate;
+   ins[4].value = e.life;
+
+   ins[0].oninput = ()=>{e.title=ins[0].value;save()};
+   ins[1].oninput = ()=>{e.unit=ins[1].value;save()};
+   ins[2].oninput = ()=>{e.qty=+ins[2].value||0;save()};
+   ins[3].oninput = ()=>{e.rate=+ins[3].value||0;save()};
+   ins[4].oninput = ()=>{e.life=+ins[4].value||1;save()};
+
+   tr.querySelector("button").onclick = ()=>deleteExpense(e.id);
+   fb.appendChild(tr);
+  }
+ });
+
+ /* ===== PREVIEW ===== */
+ document.getElementById("previewBox").innerHTML =
+  `<b>Expense Summary</b><br>
+   कुल चालु खर्च: ${varTotal.toFixed(2)}<br>
+   कुल स्थिर पूँजी: ${fixedCapital.toFixed(2)}<br>
+   कुल वार्षिक ह्रास: ${fixedDep.toFixed(2)}`;
+
+ /* ===== FOR CAPITAL SOURCE ===== */
+ localStorage.setItem("variable_annual_cost", varTotal.toFixed(2));
+ localStorage.setItem("fixed_total_capital", fixedCapital.toFixed(2));
+}
+
+render();
+</script>
+
+</body>
+</html>
