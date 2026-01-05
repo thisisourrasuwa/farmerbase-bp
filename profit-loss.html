@@ -5,74 +5,30 @@
 <title>नाफा / नोक्सान सारांश</title>
 
 <style>
-body{
- font-family:Arial;
- background:#f5f5f5;
- margin:0
-}
+body{font-family:Arial;background:#f5f5f5;margin:0}
 header,footer{
- background:#2e7d32;
- color:#fff;
+ background:#2e7d32;color:#fff;
  padding:12px 20px;
- display:flex;
- justify-content:space-between;
- align-items:center
+ display:flex;justify-content:space-between;align-items:center
 }
-header a,footer a{
- color:#fff;
- text-decoration:none;
- font-weight:bold
-}
+header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
 .container{
- max-width:1200px;
- margin:auto;
- background:#fff;
- padding:20px;
- min-height:70vh
+ max-width:1200px;margin:auto;background:#fff;
+ padding:20px;min-height:70vh
 }
-h1{
- text-align:center;
- color:#2e7d32;
- margin:15px 0 25px
-}
+h1{text-align:center;color:#2e7d32;margin:15px 0 25px}
 .summary{
- background:#f1f8e9;
- padding:18px;
- font-size:16px;
- line-height:1.8;
- margin-bottom:20px
+ background:#f1f8e9;padding:16px;margin-bottom:20px
 }
-table{
- width:100%;
- border-collapse:collapse;
- margin-top:10px
-}
-th,td{
- border:1px solid #ccc;
- padding:10px
-}
-th{
- background:#e8f5e9;
- text-align:center
-}
-td.label{
- font-weight:bold;
- text-align:left
-}
-td.amount{
- text-align:right
-}
-.net{
- font-size:18px;
- font-weight:bold
-}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:10px}
+th{background:#e8f5e9}
+td.label{font-weight:bold}
+td.amount{text-align:right}
+.net{font-size:18px;font-weight:bold}
 .profit{color:#2e7d32}
 .loss{color:#c62828}
-.note{
- margin-top:15px;
- font-size:14px;
- color:#444
-}
+.note{margin-top:15px;font-size:14px}
 </style>
 </head>
 
@@ -89,18 +45,12 @@ td.amount{
 <h1>नाफा / नोक्सान सारांश (Profit / Loss)</h1>
 
 <div class="summary">
- ✔️ यो पेजले आम्दानी, चालु खर्च र ऋणको ब्याजका आधारमा  
- <b>शुद्ध नाफा / नोक्सान स्वतः</b> गणना गर्छ ।
+ ✔️ आम्दानी, चालु खर्च र ब्याजका आधारमा  
+ <b>शुद्ध नाफा / नोक्सान स्वतः</b> गणना हुन्छ ।
 </div>
 
 <table>
-<thead>
-<tr>
- <th>शीर्षक</th>
- <th>रकम (Rs.)</th>
-</tr>
-</thead>
-<tbody>
+<tr><th>शीर्षक</th><th>रकम (Rs.)</th></tr>
 
 <tr>
  <td class="label">कुल आम्दानी (Total Income)</td>
@@ -112,7 +62,6 @@ td.amount{
  <td class="amount" id="annualVar">0.00</td>
 </tr>
 
-<!-- 🔹 ब्याज पहिलो ठाउँ -->
 <tr>
  <td class="label">वार्षिक ब्याज खर्च</td>
  <td class="amount" id="interestExpense">0.00</td>
@@ -127,13 +76,11 @@ td.amount{
  <td class="label">कुल शुद्ध नाफा / नोक्सान</td>
  <td class="amount" id="netProfit">0.00</td>
 </tr>
-
-</tbody>
 </table>
 
 <p class="note">
-✔️ ब्याज खर्च <b>Capital Source</b> बाट स्वतः आउँछ ।<br>
-✔️ यही शुद्ध नाफा <b>नाफा वितरण</b> र <b>5-Year Projection</b> मा प्रयोग हुन्छ ।
+✔️ ब्याज खर्च Capital Source बाट आउँछ ।<br>
+✔️ यही शुद्ध नाफा Profit Distribution र 5-Year Projection मा प्रयोग हुन्छ ।
 </p>
 
 </div>
@@ -146,60 +93,52 @@ td.amount{
 
 <script>
 /* ================= TOTAL INCOME ================= */
-const incomeData =
- JSON.parse(localStorage.getItem("productionData")) || [];
+/* Priority: direct total → array fallback */
+let totalIncome =
+ Number(localStorage.getItem("totalIncome")) || 0;
 
-let totalIncome = 0;
-incomeData.forEach(p=>{
- totalIncome +=
-  (Number(p.qty)||0) * (Number(p.rate)||0);
-});
+if(totalIncome === 0){
+ const incomeArr =
+  JSON.parse(localStorage.getItem("incomeData")) || [];
+ incomeArr.forEach(i=>{
+  totalIncome += (Number(i.qty)||0) * (Number(i.rate)||0);
+ });
+}
 
 /* ================= VARIABLE EXPENSE ================= */
-const varExp =
- JSON.parse(localStorage.getItem("varExp")) || [];
-
 let annualVar = 0;
-varExp.forEach(e=>{
- annualVar +=
-  (Number(e.qty)||0) * (Number(e.rate)||0);
+const expArr =
+ JSON.parse(localStorage.getItem("expenseData")) || [];
+expArr.forEach(e=>{
+ if(e.type === "चालु"){
+  annualVar += (Number(e.qty)||0) * (Number(e.rate)||0);
+ }
 });
 
 /* ================= INTEREST EXPENSE ================= */
-/* Capital Source बाट आएको */
 const interestExpense =
  Number(localStorage.getItem("annual_interest_cost")) || 0;
 
-/* ================= TOTAL EXPENSE ================= */
+/* ================= TOTAL & NET ================= */
 const totalExpense = annualVar + interestExpense;
-
-/* ================= NET PROFIT ================= */
 const netProfit = totalIncome - totalExpense;
 
 /* ================= RENDER ================= */
 document.getElementById("totalIncome").innerText =
  totalIncome.toFixed(2);
-
 document.getElementById("annualVar").innerText =
  annualVar.toFixed(2);
-
 document.getElementById("interestExpense").innerText =
  interestExpense.toFixed(2);
-
 document.getElementById("totalExpense").innerText =
  totalExpense.toFixed(2);
 
-const npEl = document.getElementById("netProfit");
-npEl.innerText = netProfit.toFixed(2);
+const np=document.getElementById("netProfit");
+np.innerText = netProfit.toFixed(2);
+np.className = "amount net " +
+ (netProfit < 0 ? "loss":"profit");
 
-if(netProfit < 0){
- npEl.classList.add("loss");
- npEl.classList.remove("profit");
-}else{
- npEl.classList.add("profit");
-}
-
-/* ================= SAVE FOR NEXT PAGES ================= */
+/* ================= SAVE FOR NEXT ================= */
 localStorage.setItem("totalIncome", totalIncome);
 localStorage.setItem("totalExpense", totalExpense);
 localStorage.setItem("netProfit", netProfit);
