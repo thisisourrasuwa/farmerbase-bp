@@ -1,174 +1,57 @@
-<!DOCTYPE html>
-<html lang="ne">
-<head>
-<meta charset="UTF-8">
-<title>नाफा / नोक्सान सारांश</title>
-
-<style>
-body{font-family:Arial;background:#f5f5f5;margin:0}
-header,footer{
- background:#2e7d32;color:#fff;
- padding:12px 20px;
- display:flex;justify-content:space-between;align-items:center
-}
-header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
-.container{
- max-width:1200px;margin:auto;background:#fff;
- padding:20px;min-height:70vh
-}
-h1{text-align:center;color:#2e7d32;margin:15px 0 25px}
-.summary{
- background:#f1f8e9;padding:16px;margin-bottom:20px
-}
-table{width:100%;border-collapse:collapse}
-th,td{border:1px solid #ccc;padding:10px}
-th{background:#e8f5e9}
-td.label{font-weight:bold}
-td.amount{text-align:right}
-.net{font-size:18px;font-weight:bold}
-.profit{color:#2e7d32}
-.loss{color:#c62828}
-.note{margin-top:15px;font-size:14px}
-</style>
-</head>
-
-<body>
-
-<header>
- <a href="income-demo.html">⬅️ आम्दानी</a>
- <span>नाफा / नोक्सान हिसाब</span>
- <a href="profit-distribution.html">नाफा वितरण ➡️</a>
-</header>
-
-<div class="container">
-
-<h1>नाफा / नोक्सान सारांश (Profit / Loss)</h1>
-
-<div class="summary">
- ✔️ आम्दानी, चालु खर्च र ब्याजका आधारमा  
- <b>शुद्ध नाफा / नोक्सान स्वतः</b> गणना हुन्छ ।
-</div>
-
-<table>
-<tr><th>शीर्षक</th><th>रकम (Rs.)</th></tr>
-
-<tr>
- <td class="label">कुल आम्दानी (Total Income)</td>
- <td class="amount" id="totalIncome">0.00</td>
-</tr>
-
-<tr>
- <td class="label">वार्षिक चालु खर्च</td>
- <td class="amount" id="annualVar">0.00</td>
-</tr>
-
-<tr>
- <td class="label">वार्षिक ब्याज खर्च</td>
- <td class="amount" id="interestExpense">0.00</td>
-</tr>
-
-<tr>
- <td class="label">कुल खर्च (चालु + ब्याज)</td>
- <td class="amount" id="totalExpense">0.00</td>
-</tr>
-
-<tr class="net">
- <td class="label">कुल शुद्ध नाफा / नोक्सान</td>
- <td class="amount" id="netProfit">0.00</td>
-</tr>
-</table>
-
-<p class="note">
-✔️ ब्याज खर्च Capital Source बाट स्वतः आउँछ ।<br>
-✔️ यही शुद्ध नाफा Profit Distribution र 5-Year Projection मा प्रयोग हुन्छ ।
-</p>
-
-</div>
-
-<footer>
- <a href="income-demo.html">⬅️ आम्दानी</a>
- <span>FarmerBase BP Engine – Profit / Loss</span>
- <a href="profit-distribution.html">नाफा वितरण ➡️</a>
-</footer>
-
 <script>
-/* =====================================================
-   UNIVERSAL INCOME LOADER (FINAL FIX)
-===================================================== */
-function calcIncome(){
- let total = 0;
+/* =================================================
+   1️⃣ TOTAL INCOME — ONLY FROM PRODUCTIONS
+================================================= */
+let totalIncome = 0;
+const productions =
+ JSON.parse(localStorage.getItem("productions")) || [];
 
- const possibleKeys = [
-  "incomeRows",
-  "incomeData",
-  "productionData",
-  "income-demo"
- ];
+productions.forEach(p=>{
+ totalIncome += Number(p.total || 0);
+});
 
- possibleKeys.forEach(key=>{
-  const arr = JSON.parse(localStorage.getItem(key)) || [];
-  arr.forEach(r=>{
-   total += (Number(r.qty)||0) * (Number(r.rate)||0);
-  });
- });
+/* =================================================
+   2️⃣ VARIABLE EXPENSE — DIRECT ANNUAL VALUE
+================================================= */
+const annualVar =
+ Number(localStorage.getItem("variable_annual_cost")) || 0;
 
- return total;
-}
-
-/* =====================================================
-   UNIVERSAL EXPENSE LOADER (FINAL FIX)
-===================================================== */
-function calcVariableExpense(){
- let total = 0;
-
- const possibleKeys = [
-  "expenseRows",
-  "expenseData",
-  "varExp",
-  "expense-demo"
- ];
-
- possibleKeys.forEach(key=>{
-  const arr = JSON.parse(localStorage.getItem(key)) || [];
-  arr.forEach(e=>{
-   if(e.type === "चालु" || e.category === "चालु"){
-    total += (Number(e.qty)||0) * (Number(e.rate)||0);
-   }
-  });
- });
-
- return total;
-}
-
-/* ================= CALCULATION ================= */
-const totalIncome = calcIncome();
-const annualVar   = calcVariableExpense();
+/* =================================================
+   3️⃣ INTEREST EXPENSE
+================================================= */
 const interestExpense =
  Number(localStorage.getItem("annual_interest_cost")) || 0;
 
+/* =================================================
+   4️⃣ TOTAL & NET
+================================================= */
 const totalExpense = annualVar + interestExpense;
-const netProfit    = totalIncome - totalExpense;
+const netProfit = totalIncome - totalExpense;
 
-/* ================= RENDER ================= */
+/* =================================================
+   5️⃣ RENDER
+================================================= */
 document.getElementById("totalIncome").innerText =
  totalIncome.toFixed(2);
+
 document.getElementById("annualVar").innerText =
  annualVar.toFixed(2);
+
 document.getElementById("interestExpense").innerText =
  interestExpense.toFixed(2);
+
 document.getElementById("totalExpense").innerText =
  totalExpense.toFixed(2);
 
-const np = document.getElementById("netProfit");
+const np=document.getElementById("netProfit");
 np.innerText = netProfit.toFixed(2);
-np.className = "amount net " +
- (netProfit < 0 ? "loss":"profit");
+np.className =
+ "amount net " + (netProfit < 0 ? "loss":"profit");
 
-/* ================= SAVE FOR NEXT ================= */
+/* =================================================
+   6️⃣ SAVE CLEAN VALUES FOR NEXT PAGES
+================================================= */
 localStorage.setItem("totalIncome", totalIncome);
 localStorage.setItem("totalExpense", totalExpense);
 localStorage.setItem("netProfit", netProfit);
 </script>
-
-</body>
-</html>
