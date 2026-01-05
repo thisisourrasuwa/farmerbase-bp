@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>FarmerBase – Business Plan Management System</title>
+
+<style>
+body{
+ font-family:Arial, sans-serif;
+ background:#f5f5f5;
+ margin:0
+}
+header{
+ background:#fff;
+ padding:18px 24px;
+ border-bottom:1px solid #ddd
+}
+h1{
+ margin:0;
+ color:#2e7d32;
+ font-size:32px
+}
+.section{
+ max-width:1200px;
+ margin:20px auto;
+ background:#e8f5e9;
+ padding:20px;
+ border-radius:8px
+}
+.btn{
+ padding:8px 14px;
+ border:none;
+ cursor:pointer;
+ font-size:14px;
+ border-radius:4px
+}
+.btn-green{background:#2e7d32;color:#fff}
+.btn-purple{background:#6a1b9a;color:#fff}
+.btn-outline{
+ background:#fff;
+ color:#2e7d32;
+ border:1px solid #2e7d32;
+ text-decoration:none
+}
+.btn-outline:hover{
+ background:#2e7d32;
+ color:#fff
+}
+.menu-tabs{
+ margin-top:20px;
+ padding:12px;
+ background:#e8f5e9;
+ border-radius:6px
+}
+.menu-tabs a{
+ margin-right:14px;
+ text-decoration:none;
+ font-weight:bold;
+ color:#000
+}
+.menu-tabs a:hover{
+ color:#2e7d32;
+ text-decoration:underline
+}
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:15px
+}
+th,td{
+ border:1px solid #ccc;
+ padding:8px;
+ text-align:center
+}
+th{background:#f0f0f0}
+</style>
+</head>
+
+<body>
+
+<header>
+ <h1>🌾 FarmerBase — Business Plan Management System</h1>
+</header>
+
+<!-- ================= BUSINESS / PROJECT MANAGEMENT ================= -->
+<div class="section">
+ <h3>📁 Business / Project Management</h3>
+
+ <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+  <input
+    type="text"
+    id="newBizName"
+    placeholder="नयाँ व्यवसाय / परियोजनाको नाम"
+    style="padding:8px;width:260px"
+  >
+
+  <button class="btn btn-green" onclick="createNewBusiness()">
+    ➕ Create New
+  </button>
+
+  <button class="btn btn-purple">⬆️ Import</button>
+  <button class="btn btn-purple">⬇️ Export</button>
+
+  <a href="pdf-merge.html" class="btn btn-outline">📄 PDF Merge</a>
+  <a href="user-guide.html" class="btn btn-outline">📘 User Guide</a>
+ </div>
+</div>
+
+<!-- ================= PROGRESS ================= -->
+<div class="section">
+ <h3>📊 Project Progress : <span id="progressPct">0%</span></h3>
+ <div style="background:#ddd;height:12px;border-radius:6px">
+  <div id="progressBar"
+   style="height:12px;width:0%;background:#2e7d32;border-radius:6px">
+  </div>
+ </div>
+</div>
+
+<!-- ================= MENU ================= -->
+<div class="section menu-tabs">
+ <a href="short-info.html">Short Info</a>
+ <a href="business-detail.html">Business Detail</a>
+ <a href="existing-status.html">Existing Status</a>
+ <a href="production.html">Production</a>
+ <a href="expense-demo.html">Expense</a>
+ <a href="capital-source.html">Capital Source</a>
+ <a href="income-demo.html">Income</a>
+ <a href="profit-loss-demo.html">Profit/Loss</a>
+ <a href="profit-distribution.html">Profit Utilization</a>
+ <a href="roi-irr-payback.html">5-Year ROI</a>
+ <a href="full-proposal.html">Full Proposal</a>
+</div>
+
+<!-- ================= MY PROJECTS ================= -->
+<div class="section">
+ <h3>📂 My Projects</h3>
+
+ <table>
+  <thead>
+   <tr>
+    <th>Name</th>
+    <th>Status</th>
+    <th>Ver</th>
+    <th>Last Edited</th>
+    <th>Action</th>
+   </tr>
+  </thead>
+  <tbody id="projectBody">
+   <!-- dynamic -->
+  </tbody>
+ </table>
+</div>
+
+<script>
+/* ===== CREATE NEW BUSINESS ===== */
+function createNewBusiness(){
+ const name=document.getElementById("newBizName").value.trim();
+ if(!name){
+  alert("पहिला व्यवसाय / परियोजनाको नाम लेख्नुहोस् ।");
+  return;
+ }
+ localStorage.setItem("newBusinessName", name);
+ window.location.href="short-info.html";
+}
+
+/* ===== PROJECT LIST (SIMPLE DEMO) ===== */
+function renderProjectList(){
+ const tbody=document.getElementById("projectBody");
+ tbody.innerHTML="";
+
+ const name=localStorage.getItem("bizName");
+ if(!name){
+  tbody.innerHTML="<tr><td colspan='5'>No project yet</td></tr>";
+  return;
+ }
+
+ tbody.innerHTML=`
+<tr>
+ <td>${name}</td>
+ <td>draft</td>
+ <td>1.0</td>
+ <td>${new Date().toLocaleString()}</td>
+ <td>
+  <button onclick="location.href='short-info.html'">Open</button>
+ </td>
+</tr>`;
+}
+
+renderProjectList();
+</script>
+
+</body>
+</html>
