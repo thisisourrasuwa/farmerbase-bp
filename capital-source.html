@@ -20,8 +20,6 @@ header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
  min-height:70vh
 }
 
-h1{text-align:center;font-size:32px;color:#2e7d32;margin:15px 0}
-
 .summary{
  background:#f1f8e9;
  padding:15px;
@@ -29,10 +27,7 @@ h1{text-align:center;font-size:32px;color:#2e7d32;margin:15px 0}
  font-size:15px
 }
 
-select,input{
- padding:5px;
- margin-left:5px
-}
+select,input{padding:5px;margin-left:5px}
 
 table{
  width:100%;
@@ -47,15 +42,12 @@ th,td{
 }
 th{background:#e8f5e9}
 
-.col-name{width:300px}
+.col-name{width:320px}
 .col-amount{width:200px}
 .col-percent{width:150px}
 .col-action{width:80px}
 
-td input{
- width:100%;
- box-sizing:border-box
-}
+td input{width:100%;box-sizing:border-box}
 
 .btn{padding:6px 12px;border:none;cursor:pointer}
 .add{background:#2e7d32;color:#fff}
@@ -69,16 +61,15 @@ td input{
 <body>
 
 <header>
-  <a href="expense-demo.html">⬅️ खर्च विवरण</a>
-  <span>पुँजिको स्रोत</span>
-  <a href="income-demo.html">आम्दानी विवरण ➡️</a>
+ <a href="expense-demo.html">⬅️ खर्च विवरण</a>
+ <span>पुँजिको स्रोत</span>
+ <a href="income-demo.html">आम्दानी विवरण ➡️</a>
 </header>
 
 <div class="container">
 
 <!-- ================= SUMMARY ================= -->
 <div class="summary">
-
 <b>स्थिर पूँजी:</b> <span id="fixedCap">0</span><br>
 <b>वार्षिक चालु खर्च:</b> <span id="annualVar">0</span><br><br>
 
@@ -100,14 +91,14 @@ td input{
 <span id="status"></span>
 </div>
 
-<!-- ================= SOURCE TABLE ================= -->
+<!-- ================= TABLE ================= -->
 <table>
 <thead>
 <tr>
-  <th class="col-name">स्रोत / विवरण</th>
-  <th class="col-amount">रकम</th>
-  <th class="col-percent">%</th>
-  <th class="col-action">🗑️</th>
+ <th class="col-name">स्रोत / विवरण</th>
+ <th class="col-amount">रकम</th>
+ <th class="col-percent">%</th>
+ <th class="col-action">🗑️</th>
 </tr>
 </thead>
 <tbody id="capBody"></tbody>
@@ -118,39 +109,38 @@ td input{
 
 <footer>
  <a href="expense-demo.html">⬅️ खर्च विवरण</a>
- <span>Farmerbase BP Engine – Capital Source</span>
+ <span>FarmerBase BP Engine – Capital Source</span>
  <a href="income-demo.html">आम्दानी विवरण ➡️</a>
 </footer>
 
 <script>
-/* ================= LOAD (NO LOGIC CHANGE) ================= */
-const varExp =
- JSON.parse(localStorage.getItem("varExp")) || [];
+/* ================= SAFE LOAD (SINGLE SOURCE OF TRUTH) ================= */
+const fbData =
+ JSON.parse(localStorage.getItem("farmerBaseData")) || {};
 
-const fixExp =
- JSON.parse(localStorage.getItem("fixExp")) || [];
-
-let sources =
- JSON.parse(localStorage.getItem("capitalSources")) || [];
+let varExp = fbData.varExp || [];
+let fixExp = fbData.fixExp || [];
+let sources = fbData.capitalSources || [];
 
 /* ================= CALC ================= */
 function fixedCapital(){
- return fixExp.reduce(
-  (s,e)=>s+(e.qty*e.rate||0),0
- );
+ return fixExp.reduce((s,e)=>s+(e.qty*e.rate||0),0);
 }
 
 function annualVariable(){
- return varExp.reduce(
-  (s,e)=>s+(e.qty*e.rate||0),0
- );
+ return varExp.reduce((s,e)=>s+(e.qty*e.rate||0),0);
 }
 
-/* ================= SAVE ================= */
+/* ================= SAVE (CRITICAL FIX) ================= */
 function save(){
+ const data =
+  JSON.parse(localStorage.getItem("farmerBaseData")) || {};
+
+ data.capitalSources = sources;
+
  localStorage.setItem(
-  "capitalSources",
-  JSON.stringify(sources)
+  "farmerBaseData",
+  JSON.stringify(data)
  );
 }
 
@@ -183,17 +173,17 @@ function calcWorkingCap(annual){
  const mode=document.getElementById("wcMode").value;
 
  if(mode==="months"){
-  const m=Number(document.getElementById("wcMonths").value)||3;
+  const m=Number(document.getElementById("wcMonths")?.value)||3;
   return (annual/12)*m;
  }
 
  if(mode==="percent"){
-  const p=Number(document.getElementById("wcPercent").value)||0;
+  const p=Number(document.getElementById("wcPercent")?.value)||0;
   return annual*p/100;
  }
 
  if(mode==="manual"){
-  return Number(document.getElementById("wcManual").value)||0;
+  return Number(document.getElementById("wcManual")?.value)||0;
  }
 
  return 0;
@@ -204,11 +194,8 @@ function render(){
  const fixed=fixedCapital();
  const annual=annualVariable();
 
- document.getElementById("fixedCap").innerText =
-  fixed.toFixed(2);
-
- document.getElementById("annualVar").innerText =
-  annual.toFixed(2);
+ document.getElementById("fixedCap").innerText=fixed.toFixed(2);
+ document.getElementById("annualVar").innerText=annual.toFixed(2);
 
  const mode=document.getElementById("wcMode").value;
  let opt="";
@@ -223,12 +210,12 @@ function render(){
  if(mode==="percent"){
   opt=` %:
   <input type="number" id="wcPercent" value="20"
-         onchange="render()" style="width:80px">`;
+   onchange="render()" style="width:80px">`;
  }
  if(mode==="manual"){
   opt=` रकम:
   <input type="number" id="wcManual"
-         onchange="render()" style="width:120px">`;
+   onchange="render()" style="width:120px">`;
  }
 
  document.getElementById("wcOptions").innerHTML=opt;
@@ -236,33 +223,24 @@ function render(){
  const working=calcWorkingCap(annual);
  const totalCap=fixed+working;
 
- document.getElementById("workingCap").innerText =
-  working.toFixed(2);
-
- document.getElementById("totalCapital").innerText =
-  totalCap.toFixed(2);
+ document.getElementById("workingCap").innerText=working.toFixed(2);
+ document.getElementById("totalCapital").innerText=totalCap.toFixed(2);
 
  const tb=document.getElementById("capBody");
  tb.innerHTML="";
 
- const totalSrc=sources.reduce(
-  (s,x)=>s+(Number(x.amount)||0),0
- );
+ const totalSrc=sources.reduce((s,x)=>s+(x.amount||0),0);
 
  sources.forEach(s=>{
-  const pct=totalCap
-   ?((s.amount/totalCap)*100).toFixed(1)
-   :"0";
+  const pct=totalCap?((s.amount/totalCap)*100).toFixed(1):"0";
 
   tb.innerHTML+=`
 <tr>
 <td>
- <input value="${s.name}"
-  placeholder="स्रोत नाम"
+ <input value="${s.name}" placeholder="स्रोत नाम"
   onchange="update('${s.id}','name',this.value)">
  <br>
- <input value="${s.narration||''}"
-  placeholder="न्यारेसन / विवरण"
+ <input value="${s.narration||''}" placeholder="न्यारेसन / विवरण"
   onchange="update('${s.id}','narration',this.value)"
   style="margin-top:4px;font-size:12px">
 </td>
@@ -281,15 +259,10 @@ function render(){
 </tr>`;
  });
 
- document.getElementById("totalSource").innerText =
-  totalSrc.toFixed(2);
+ document.getElementById("totalSource").innerText=totalSrc.toFixed(2);
 
- const pct=totalCap
-  ?((totalSrc/totalCap)*100).toFixed(1)
-  :"0";
-
- document.getElementById("totalPercent").innerText =
-  pct+"%";
+ const pct=totalCap?((totalSrc/totalCap)*100).toFixed(1):"0";
+ document.getElementById("totalPercent").innerText=pct+"%";
 
  document.getElementById("status").innerHTML=
   pct==100
