@@ -14,7 +14,7 @@ header,footer{
 header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
 
 .container{
- max-width:1200px;margin:auto;background:#fff;
+ max-width:1250px;margin:auto;background:#fff;
  padding:20px;min-height:70vh
 }
 
@@ -23,11 +23,12 @@ header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
  font-size:15px
 }
 
-select,input{padding:5px;margin-left:5px}
+select,input{padding:5px}
 
 table{width:100%;border-collapse:collapse}
 th,td{
- border:1px solid #ccc;padding:8px;text-align:center
+ border:1px solid #ccc;padding:8px;text-align:center;
+ font-size:14px
 }
 th{background:#e8f5e9}
 
@@ -46,7 +47,7 @@ td input{width:100%;box-sizing:border-box}
 
 <header>
  <a href="expense-demo.html">⬅️ खर्च विवरण</a>
- <span>पुँजिको स्रोत</span>
+ <span>पुँजिको स्रोत (Loan Interest सहित)</span>
  <a href="income-demo.html">आम्दानी विवरण ➡️</a>
 </header>
 
@@ -71,8 +72,12 @@ td input{width:100%;box-sizing:border-box}
 
 <b>कार्यशील पूँजी:</b> <span id="workingCap">0</span><br>
 <b>कुल आवश्यक पूँजी:</b> <span id="totalCapital">0</span><br>
+
 <b>कुल %:</b> <span id="totalPercent">0%</span>
-<span id="status"></span>
+<span id="status"></span><br>
+
+<b>वार्षिक ब्याज खर्च (Auto):</b>
+<span id="totalInterest">0</span>
 
 </div>
 
@@ -80,9 +85,12 @@ td input{width:100%;box-sizing:border-box}
 <table>
 <thead>
 <tr>
- <th>स्रोत</th>
+ <th>स्रोत प्रकार</th>
+ <th>स्रोत नाम</th>
  <th>%</th>
  <th>रकम (Auto)</th>
+ <th>ब्याज %</th>
+ <th>वार्षिक ब्याज</th>
  <th>🗑️</th>
 </tr>
 </thead>
@@ -98,167 +106,160 @@ td input{width:100%;box-sizing:border-box}
 </footer>
 
 <script>
-/* =================================================
-   LOAD FROM EXPENSES (FINAL CONTRACT)
-================================================= */
+/* ================= LOAD FROM EXPENSES ================= */
 const annualVar =
  Number(localStorage.getItem("variable_annual_cost")) || 0;
 
 const fixedCap =
  Number(localStorage.getItem("fixed_total_capital")) || 0;
 
-/* =================================================
-   WORKING CAPITAL STATE (AUTO LOAD)
-================================================= */
+/* ================= WORKING CAPITAL STATE ================= */
 let wcState =
  JSON.parse(localStorage.getItem("wcState")) || {
-  mode: "months",
-  months: 3,
-  percent: 20,
-  manual: 0
- };
+  mode:"months",months:3,percent:20,manual:0
+};
 
 function saveWC(){
- localStorage.setItem("wcState", JSON.stringify(wcState));
+ localStorage.setItem("wcState",JSON.stringify(wcState));
+}
+function changeWCMode(m){
+ wcState.mode=m; saveWC(); render();
 }
 
-function changeWCMode(mode){
- wcState.mode = mode;
- saveWC();
- render();
-}
-
-/* =================================================
-   CAPITAL SOURCES (% driven)
-================================================= */
+/* ================= CAPITAL SOURCES ================= */
 let sources =
  JSON.parse(localStorage.getItem("capitalSources")) || [];
 
 function saveSources(){
- localStorage.setItem("capitalSources", JSON.stringify(sources));
+ localStorage.setItem("capitalSources",JSON.stringify(sources));
 }
 
 function addSource(){
- sources.push({id:Date.now(),name:"",pct:0});
+ sources.push({
+  id:Date.now(),
+  type:"self",   // self | grant | loan | other
+  name:"",
+  pct:0,
+  interest:0
+ });
  saveSources(); render();
 }
 
-function updateSource(id,field,val){
- const s = sources.find(x=>x.id===id);
- s[field] = field==="pct" ? Number(val)||0 : val;
+function update(id,f,v){
+ const s=sources.find(x=>x.id===id);
+ s[f]=f==="pct"||f==="interest"?Number(v)||0:v;
  saveSources(); render();
 }
 
 function removeSource(id){
  if(confirm("हटाउने हो ?")){
-  sources = sources.filter(s=>s.id!==id);
+  sources=sources.filter(s=>s.id!==id);
   saveSources(); render();
  }
 }
 
-/* =================================================
-   WORKING CAPITAL CALC
-================================================= */
+/* ================= WORKING CAPITAL ================= */
 function calcWorkingCap(){
- if(wcState.mode==="months"){
-  return (annualVar/12) * (wcState.months || 3);
- }
- if(wcState.mode==="percent"){
-  return annualVar * (wcState.percent || 0) / 100;
- }
- if(wcState.mode==="manual"){
-  return wcState.manual || 0;
- }
+ if(wcState.mode==="months")
+  return (annualVar/12)*(wcState.months||3);
+ if(wcState.mode==="percent")
+  return annualVar*(wcState.percent||0)/100;
+ if(wcState.mode==="manual")
+  return wcState.manual||0;
  return 0;
 }
 
-/* =================================================
-   RENDER
-================================================= */
+/* ================= RENDER ================= */
 function render(){
- document.getElementById("fixedCap").innerText =
-  fixedCap.toFixed(2);
- document.getElementById("annualVar").innerText =
-  annualVar.toFixed(2);
+ document.getElementById("fixedCap").innerText=fixedCap.toFixed(2);
+ document.getElementById("annualVar").innerText=annualVar.toFixed(2);
 
- /* restore wcMode */
- const modeSel = document.getElementById("wcMode");
- modeSel.value = wcState.mode;
-
- /* wcOptions */
- let opt = "";
+ document.getElementById("wcMode").value=wcState.mode;
+ let opt="";
  if(wcState.mode==="months"){
-  opt = ` महिना:
-  <select onchange="
-    wcState.months=this.value;
-    saveWC();render()">
-   <option value="3" ${wcState.months==3?"selected":""}>3</option>
-   <option value="6" ${wcState.months==6?"selected":""}>6</option>
-   <option value="9" ${wcState.months==9?"selected":""}>9</option>
-   <option value="12" ${wcState.months==12?"selected":""}>12</option>
+  opt=` महिना:
+  <select onchange="wcState.months=this.value;saveWC();render()">
+   <option ${wcState.months==3?"selected":""}>3</option>
+   <option ${wcState.months==6?"selected":""}>6</option>
+   <option ${wcState.months==9?"selected":""}>9</option>
+   <option ${wcState.months==12?"selected":""}>12</option>
   </select>`;
  }
  if(wcState.mode==="percent"){
-  opt = ` %:
+  opt=` %:
   <input type="number" value="${wcState.percent}"
-   onchange="
-    wcState.percent=this.value;
-    saveWC();render()"
+   onchange="wcState.percent=this.value;saveWC();render()"
    style="width:80px">`;
  }
  if(wcState.mode==="manual"){
-  opt = ` रकम:
+  opt=` रकम:
   <input type="number" value="${wcState.manual}"
-   onchange="
-    wcState.manual=this.value;
-    saveWC();render()"
+   onchange="wcState.manual=this.value;saveWC();render()"
    style="width:120px">`;
  }
+ document.getElementById("wcOptions").innerHTML=opt;
 
- document.getElementById("wcOptions").innerHTML = opt;
+ const workingCap=calcWorkingCap();
+ const totalCapital=fixedCap+workingCap;
 
- const workingCap = calcWorkingCap();
- const totalCapital = fixedCap + workingCap;
+ document.getElementById("workingCap").innerText=workingCap.toFixed(2);
+ document.getElementById("totalCapital").innerText=totalCapital.toFixed(2);
 
- document.getElementById("workingCap").innerText =
-  workingCap.toFixed(2);
- document.getElementById("totalCapital").innerText =
-  totalCapital.toFixed(2);
-
- /* table */
- const tb = document.getElementById("capBody");
- tb.innerHTML = "";
- let sumPct = 0;
+ const tb=document.getElementById("capBody");
+ tb.innerHTML="";
+ let sumPct=0;
+ let totalInterest=0;
 
  sources.forEach(s=>{
-  sumPct += s.pct;
-  const amt = totalCapital * s.pct / 100;
+  sumPct+=s.pct;
+  const amt=totalCapital*s.pct/100;
+  const interestAmt =
+   (s.type==="loan"||s.type==="other")
+    ? amt*(s.interest||0)/100
+    : 0;
 
-  tb.innerHTML += `
+  totalInterest+=interestAmt;
+
+  tb.innerHTML+=`
 <tr>
 <td>
- <input value="${s.name}"
-  onchange="updateSource(${s.id},'name',this.value)">
+ <select onchange="update(${s.id},'type',this.value)">
+  <option value="self" ${s.type==="self"?"selected":""}>स्वलगानी</option>
+  <option value="grant" ${s.type==="grant"?"selected":""}>अनुदान</option>
+  <option value="loan" ${s.type==="loan"?"selected":""}>बैंक/सहकारी ऋण</option>
+  <option value="other" ${s.type==="other"?"selected":""}>अन्य</option>
+ </select>
 </td>
-<td>
- <input type="number" value="${s.pct}"
-  onchange="updateSource(${s.id},'pct',this.value)">
-</td>
+<td><input value="${s.name}"
+ onchange="update(${s.id},'name',this.value)"></td>
+<td><input type="number" value="${s.pct}"
+ onchange="update(${s.id},'pct',this.value)"></td>
 <td>${amt.toFixed(2)}</td>
 <td>
- <button class="btn del"
-  onclick="removeSource(${s.id})">🗑️</button>
+ <input type="number" value="${s.interest}"
+  ${s.type==="loan"||s.type==="other"?"":"disabled"}
+  onchange="update(${s.id},'interest',this.value)">
 </td>
+<td>${interestAmt.toFixed(2)}</td>
+<td><button class="btn del"
+ onclick="removeSource(${s.id})">🗑️</button></td>
 </tr>`;
  });
 
- document.getElementById("totalPercent").innerText =
-  sumPct + "%";
+ document.getElementById("totalPercent").innerText=sumPct+"%";
+ document.getElementById("totalInterest").innerText=
+  totalInterest.toFixed(2);
 
- document.getElementById("status").innerHTML =
+ document.getElementById("status").innerHTML=
   sumPct===100
    ?'<span class="ok"> ✔️ 100% मिल्यो</span>'
    :'<span class="warn"> ❗ 100% हुनुपर्छ</span>';
+
+ /* SAVE INTEREST FOR PROFIT-LOSS */
+ localStorage.setItem(
+  "annual_interest_cost",
+  totalInterest.toFixed(2)
+ );
 }
 
 render();
