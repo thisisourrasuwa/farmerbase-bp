@@ -6,50 +6,36 @@
 
 <style>
 body{
- font-family:Arial, sans-serif;
- background:#f5f5f5;
- margin:0;
- line-height:1.6
+ font-family:Arial;
+ background:#f4f6f8;
+ margin:0
 }
 header,footer{
  background:#2e7d32;
  color:#fff;
- padding:14px 22px;
- display:flex;
- justify-content:space-between;
- align-items:center
-}
-header a, footer a{
- color:#fff;
- text-decoration:none;
- font-weight:bold
+ padding:14px 20px;
+ text-align:center
 }
 .container{
- max-width:1200px;
+ max-width:900px;
  margin:auto;
+ padding:25px
+}
+.paper{
  background:#fff;
  padding:30px;
- min-height:70vh
+ box-shadow:0 2px 8px rgba(0,0,0,.1)
 }
-h1{
- text-align:center;
- color:#2e7d32;
- font-size:34px;
- margin-bottom:5px
+h1,h2{
+ color:#2e7d32
 }
+h1{text-align:center}
 h2{
- color:#2e7d32;
- margin-top:35px;
- border-bottom:2px solid #e0e0e0;
- padding-bottom:6px
+ border-bottom:2px solid #2e7d32;
+ padding-bottom:6px;
+ margin-top:35px
 }
-h3{
- color:#333;
- margin-top:20px
-}
-p{
- margin:6px 0
-}
+p{line-height:1.7}
 table{
  width:100%;
  border-collapse:collapse;
@@ -58,196 +44,198 @@ table{
 th,td{
  border:1px solid #ccc;
  padding:8px;
- text-align:left;
- vertical-align:top
+ text-align:center;
+ font-size:14px
 }
-th{
+th{background:#e8f5e9}
+.meta{
  background:#f1f8e9;
- width:30%
+ padding:12px;
+ margin-bottom:20px
 }
-.section{
- margin-top:25px
+.actions{
+ text-align:right;
+ margin-bottom:20px
 }
-.small{
- font-size:13px;
- color:#555
-}
-.print-btn{
+button{
+ padding:8px 14px;
+ border:none;
  background:#2e7d32;
  color:#fff;
- border:none;
- padding:10px 16px;
  cursor:pointer;
- margin-top:15px
+ border-radius:4px
 }
+
+/* ===== PRINT ===== */
 @media print{
- header,footer,.print-btn{display:none}
  body{background:#fff}
+ header,footer,.actions{display:none}
+ .paper{box-shadow:none}
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================= HEADER ================= -->
 <header>
-  <a href="index.html">⬅️ Home</a>
-  <span>FarmerBase BP Engine</span>
-  <a href="#" onclick="window.print()">🖨️ Print</a>
+ 📄 Full Business Proposal – FarmerBase BP Engine
 </header>
 
 <div class="container">
 
-<h1 id="projectTitle">Business Proposal</h1>
-<p class="small" id="meta"></p>
-
-<!-- ================= EXECUTIVE SUMMARY ================= -->
-<h2>१. कार्यकारी सारांश (Executive Summary)</h2>
-<p id="summary"></p>
-
-<!-- ================= BASIC INFO ================= -->
-<h2>२. आधारभूत जानकारी</h2>
-<table>
-<tr><th>फर्म / व्यवसायको नाम</th><td id="firmName"></td></tr>
-<tr><th>परियोजनाको नाम</th><td id="projectName"></td></tr>
-<tr><th>व्यवसायको क्षेत्र</th><td id="bizSector"></td></tr>
-<tr><th>व्यवसायको स्वरूप</th><td id="bizStage"></td></tr>
-<tr><th>स्थान</th><td id="location"></td></tr>
-<tr><th>बजार क्षेत्र</th><td id="marketArea"></td></tr>
-<tr><th>संचालक</th><td id="promoter"></td></tr>
-<tr><th>अनुभव (वर्ष)</th><td id="experience"></td></tr>
-</table>
-
-<!-- ================= LEGAL ================= -->
-<h2>३. कानुनी स्थिति</h2>
-<table>
-<tr><th>दर्ता स्थिति</th><td id="registrationStatus"></td></tr>
-<tr><th>दर्ता निकाय</th><td id="registrationAuthority"></td></tr>
-<tr><th>दर्ता नं</th><td id="registrationNumber"></td></tr>
-<tr><th>PAN / VAT</th><td id="panNumber"></td></tr>
-<tr><th>अन्य आवद्धता</th><td id="affiliation"></td></tr>
-</table>
-
-<!-- ================= BUSINESS DETAIL ================= -->
-<h2>४. व्यवसाय विवरण</h2>
-<div class="section">
-<h3>व्यवसायको विवरण</h3>
-<p id="bizDescription"></p>
-
-<h3>व्यवसायको औचित्य</h3>
-<p id="bizJustification"></p>
-
-<h3>उत्पादन / सेवा</h3>
-<p id="productService"></p>
-
-<h3>विशेषता</h3>
-<p id="productFeature"></p>
+<div class="actions">
+ <button onclick="window.print()">🖨️ Print / Save as PDF</button>
 </div>
 
-<!-- ================= MARKET ================= -->
-<h2>५. बजार तथा सञ्चालन</h2>
-<div class="section">
-<h3>लक्षित बजार</h3>
-<p id="marketTarget"></p>
+<div class="paper">
 
-<h3>माग अवस्था</h3>
-<p id="marketDemand"></p>
+<h1 id="firmName">व्यवसायको नाम</h1>
 
-<h3>प्रतिस्पर्धा</h3>
-<p id="competition"></p>
-
-<h3>सञ्चालन योजना</h3>
-<p id="operationPlan"></p>
-
-<h3>जनशक्ति</h3>
-<p id="manpower"></p>
+<div class="meta">
+<b>सञ्चालक:</b> <span id="proprietor"></span><br>
+<b>ठेगाना:</b> <span id="location"></span><br>
+<b>व्यवसायको प्रकार:</b> <span id="bizType"></span>
 </div>
 
-<!-- ================= RESOURCE & RISK ================= -->
-<h2>६. स्रोत साधन, जोखिम र वातावरण</h2>
-<div class="section">
-<h3>पूर्वाधार</h3>
-<p id="infrastructure"></p>
-
-<h3>प्रविधि</h3>
-<p id="technology"></p>
-
-<h3>जोखिम</h3>
-<p id="risk"></p>
-
-<h3>न्यूनीकरण</h3>
-<p id="mitigation"></p>
-
-<h3>कानुनी / वातावरणीय पक्ष</h3>
-<p id="legal"></p>
-<p id="environment"></p>
-</div>
-
-<!-- ================= FINANCIAL SUMMARY ================= -->
-<h2>७. वित्तीय सारांश</h2>
-<table>
-<tr><th>कुल आम्दानी (वार्षिक)</th><td id="totalIncome"></td></tr>
-<tr><th>कुल खर्च (वार्षिक)</th><td id="totalExpense"></td></tr>
-<tr><th>शुद्ध नाफा</th><td id="netProfit"></td></tr>
-</table>
-
-<p class="small">
-✔️ सबै वित्तीय विवरण प्रणालीबाट अटो गणना गरिएको हो ।
+<!-- ================= INTRO ================= -->
+<h2>१. परिचय</h2>
+<p>
+यो व्यवसाय योजना स्थानीय स्रोत–साधन, बजार अवस्था र
+यथार्थपरक लागत–आम्दानीको आधारमा तयार गरिएको हो।
+यसको उद्देश्य व्यवसायको सम्भाव्यता देखाउनु तथा
+अनुदान/ऋण/लगानीका लागि स्पष्ट प्रस्ताव प्रस्तुत गर्नु हो।
 </p>
 
-<button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+<!-- ================= PRODUCTION ================= -->
+<h2>२. उत्पादन विवरण</h2>
+<table id="prodTable">
+<tr><th>उत्पादन</th><th>इकाई</th><th>परिमाण</th><th>दर</th><th>वार्षिक आम्दानी</th></tr>
+</table>
+
+<!-- ================= EXPENSES ================= -->
+<h2>३. खर्च विवरण</h2>
+<table id="expTable">
+<tr><th>प्रकार</th><th>खर्च शीर्षक</th><th>रकम</th></tr>
+</table>
+
+<p>
+<b>स्थिर पूँजी:</b> Rs. <span id="fixedCap"></span><br>
+<b>वार्षिक चालु खर्च:</b> Rs. <span id="annualVar"></span>
+</p>
+
+<!-- ================= CAPITAL ================= -->
+<h2>४. पूँजीको स्रोत</h2>
+<table id="capTable">
+<tr><th>स्रोत</th><th>%</th><th>रकम</th><th>वार्षिक ब्याज</th></tr>
+</table>
+
+<p>
+<b>कुल आवश्यक पूँजी:</b> Rs. <span id="totalCapital"></span><br>
+<b>वार्षिक ब्याज खर्च:</b> Rs. <span id="interest"></span>
+</p>
+
+<!-- ================= PROFIT ================= -->
+<h2>५. नाफा–नोक्सान सारांश</h2>
+<p>
+<b>कुल आम्दानी:</b> Rs. <span id="totalIncome"></span><br>
+<b>कुल खर्च:</b> Rs. <span id="totalExpense"></span><br>
+<b>शुद्ध नाफा:</b> Rs. <span id="netProfit"></span>
+</p>
+
+<h2>६. निष्कर्ष</h2>
+<p>
+उपरोक्त विवरणका आधारमा यो व्यवसाय आर्थिक रूपमा
+सम्भाव्य देखिन्छ। उचित व्यवस्थापन र बजार पहुँच भएमा
+यसबाट दिगो आम्दानी प्राप्त गर्न सकिन्छ।
+</p>
 
 </div>
+</div>
 
-<!-- ================= FOOTER ================= -->
 <footer>
-  <span>FarmerBase BP Engine – Full Proposal</span>
+ FarmerBase BP Engine – कृषकमैत्री व्यवसाय योजना प्रणाली
 </footer>
 
 <script>
-/* ================= HELPER ================= */
-function val(id){
- return localStorage.getItem(id) || "—";
-}
+/* ================= LOAD ACTIVE BUSINESS ================= */
+const id = localStorage.getItem("activeBusinessId");
+const list = JSON.parse(localStorage.getItem("businessList")) || [];
+const b = list.find(x=>x.id===id) || {};
 
-/* ================= TITLE ================= */
-const project = localStorage.getItem("projectName") || "Business Proposal";
-document.getElementById("projectTitle").innerText = project;
-document.getElementById("meta").innerText =
- "Generated on: " + new Date().toLocaleDateString();
+/* ================= BASIC INFO ================= */
+document.getElementById("firmName").innerText = b.name || "";
+document.getElementById("proprietor").innerText = b.proprietor || "";
+document.getElementById("location").innerText = b.location || "";
+document.getElementById("bizType").innerText = b.type || "";
 
-/* ================= SHORT INFO ================= */
-[
- "firmName","projectName","bizSector","bizStage",
- "location","marketArea","promoter","experience",
- "registrationStatus","registrationAuthority",
- "registrationNumber","panNumber","affiliation",
- "summary"
-].forEach(id=>{
- const el=document.getElementById(id);
- if(el) el.innerText = val(id);
+/* ================= PRODUCTION ================= */
+const prod = JSON.parse(localStorage.getItem("productionData")) || [];
+const pt = document.getElementById("prodTable");
+let totalIncome = 0;
+prod.forEach(p=>{
+ const amt = (p.qty||0)*(p.rate||0);
+ totalIncome += amt;
+ pt.innerHTML += `
+ <tr>
+  <td>${p.name||""}</td>
+  <td>${p.unit||""}</td>
+  <td>${p.qty||0}</td>
+  <td>${p.rate||0}</td>
+  <td>${amt.toFixed(2)}</td>
+ </tr>`;
+});
+document.getElementById("totalIncome").innerText = totalIncome.toFixed(2);
+
+/* ================= EXPENSES ================= */
+const varExp = JSON.parse(localStorage.getItem("varExp")) || [];
+const fixExp = JSON.parse(localStorage.getItem("fixExp")) || [];
+const et = document.getElementById("expTable");
+
+let annualVar = 0, fixedCap = 0;
+
+varExp.forEach(e=>{
+ const amt=(e.qty||0)*(e.rate||0);
+ annualVar += amt;
+ et.innerHTML += `
+ <tr><td>चालु</td><td>${e.title||""}</td><td>${amt.toFixed(2)}</td></tr>`;
+});
+fixExp.forEach(e=>{
+ const amt=(e.qty||0)*(e.rate||0);
+ fixedCap += amt;
+ et.innerHTML += `
+ <tr><td>स्थिर</td><td>${e.title||""}</td><td>${amt.toFixed(2)}</td></tr>`;
 });
 
-/* ================= BUSINESS DETAIL ================= */
-[
- "bizDescription","bizJustification",
- "productService","productFeature",
- "marketTarget","marketDemand","competition",
- "operationPlan","manpower",
- "infrastructure","technology",
- "risk","mitigation","legal","environment"
-].forEach(id=>{
- const el=document.getElementById(id);
- if(el) el.innerText = val(id);
+document.getElementById("fixedCap").innerText = fixedCap.toFixed(2);
+document.getElementById("annualVar").innerText = annualVar.toFixed(2);
+
+/* ================= CAPITAL ================= */
+const sources = JSON.parse(localStorage.getItem("capitalSources")) || [];
+const ct = document.getElementById("capTable");
+let totalCap = fixedCap + (annualVar/12*3);
+let interest = 0;
+
+sources.forEach(s=>{
+ const amt = totalCap*(s.pct||0)/100;
+ const intAmt = (s.interest||0)*amt/100;
+ interest += intAmt;
+ ct.innerHTML += `
+ <tr>
+  <td>${s.type}</td>
+  <td>${s.pct||0}%</td>
+  <td>${amt.toFixed(2)}</td>
+  <td>${intAmt.toFixed(2)}</td>
+ </tr>`;
 });
 
-/* ================= FINANCIAL ================= */
-document.getElementById("totalIncome").innerText =
- localStorage.getItem("totalIncome") || "—";
-document.getElementById("totalExpense").innerText =
- localStorage.getItem("totalExpense") || "—";
+document.getElementById("totalCapital").innerText = totalCap.toFixed(2);
+document.getElementById("interest").innerText = interest.toFixed(2);
+
+/* ================= PROFIT ================= */
+const totalExpense = annualVar + interest;
+document.getElementById("totalExpense").innerText = totalExpense.toFixed(2);
 document.getElementById("netProfit").innerText =
- localStorage.getItem("netProfit") || "—";
+ (totalIncome-totalExpense).toFixed(2);
 </script>
 
 </body>
