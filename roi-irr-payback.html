@@ -30,7 +30,7 @@ table{
 }
 th,td{
  border:1px solid #ccc;
- padding:10px;
+ padding:12px;
  text-align:right
 }
 th{
@@ -86,7 +86,7 @@ td.label{
 
 <tr class="highlight">
  <td class="label">ROI (%)</td>
- <td id="roi" class="good">0%</td>
+ <td id="roi">0%</td>
 </tr>
 
 <tr class="highlight">
@@ -96,13 +96,13 @@ td.label{
 
 <tr class="highlight">
  <td class="label">IRR (%)</td>
- <td id="irr" class="good">0%</td>
+ <td id="irr">0%</td>
 </tr>
 </table>
 
 <div class="note">
 ✔️ ROI = (वार्षिक नाफा ÷ कुल लगानी) × 100<br>
-✔️ Payback = लगानी ÷ वार्षिक नाफा<br>
+✔️ Payback = कुल लगानी ÷ वार्षिक नाफा<br>
 ✔️ IRR = 5-Year Cash Flow को आधारमा
 </div>
 
@@ -116,10 +116,10 @@ td.label{
 
 <script>
 /* =====================================================
-   LOAD REQUIRED DATA
+   LOAD DATA (FIXED KEYS)
 ===================================================== */
 const investment =
- Number(localStorage.getItem("totalCapital")) || 0;
+ Number(localStorage.getItem("fixed_total_capital")) || 0;
 
 const netProfit =
  Number(localStorage.getItem("netProfit")) || 0;
@@ -133,7 +133,7 @@ if(investment > 0){
 }
 
 /* =====================================================
-   PAYBACK PERIOD
+   PAYBACK
 ===================================================== */
 let payback = "Not Recoverable";
 if(netProfit > 0){
@@ -141,7 +141,7 @@ if(netProfit > 0){
 }
 
 /* =====================================================
-   IRR CALCULATION (Simple Newton-Raphson)
+   IRR (5-Year Cash Flow)
 ===================================================== */
 function calcIRR(cashFlows){
  let rate = 0.1;
@@ -157,16 +157,13 @@ function calcIRR(cashFlows){
  return rate * 100;
 }
 
-/* =====================================================
-   BUILD CASH FLOW (5 YEARS)
-===================================================== */
 let cashFlows = [-investment];
 for(let i=0;i<5;i++){
  cashFlows.push(netProfit);
 }
 
 let irr = 0;
-if(netProfit > 0 && investment > 0){
+if(investment > 0 && netProfit > 0){
  irr = calcIRR(cashFlows);
 }
 
@@ -188,12 +185,16 @@ document.getElementById("payback").innerText =
 document.getElementById("irr").innerText =
  irr.toFixed(2) + "%";
 
-/* Color logic */
 if(roi < 15){
  document.getElementById("roi").className="warn";
+}else{
+ document.getElementById("roi").className="good";
 }
+
 if(irr < 12){
  document.getElementById("irr").className="warn";
+}else{
+ document.getElementById("irr").className="good";
 }
 </script>
 
