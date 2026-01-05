@@ -44,16 +44,19 @@ th{background:#e8f5e9}
 .col-sales{width:140px}
 .col-profit{width:140px}
 
-td input{
- width:100%;
- box-sizing:border-box;
- padding:5px
-}
-
 .note{
  font-size:13px;
  color:#555;
  margin-top:10px
+}
+
+.summary{
+ background:#f1f8e9;
+ padding:14px;
+ margin-top:15px;
+ font-size:16px;
+ font-weight:bold;
+ text-align:right
 }
 </style>
 </head>
@@ -67,6 +70,7 @@ td input{
 </header>
 
 <div class="container">
+
 <table>
 <thead>
 <tr>
@@ -83,10 +87,17 @@ td input{
 <tbody id="incomeBody"></tbody>
 </table>
 
+<!-- ✅ TOTAL DISPLAY -->
+<div class="summary">
+ कुल आम्दानी (Grand Total): 
+ <span id="grandTotal">0.00</span>
+</div>
+
 <div class="note">
 ✔️ उत्पादन, इकाई, परिमाण र लागत Expense बाट अटो आएको हो ।<br>
 ✔️ यहाँ <b>नाफा % मात्र</b> हाल्नुहोस् — बिक्री दर र नाफा सिस्टमले निकाल्छ ।
 </div>
+
 </div>
 
 <footer>
@@ -145,7 +156,7 @@ function render(){
  tb.innerHTML = "";
 
  const costMap = productionCostMap();
- let grandTotal = 0;   // 🔥 TOTAL SALES (NEW)
+ let grandTotal = 0;
 
  productions.forEach(p=>{
   const totalCost = costMap[p.id] || 0;
@@ -159,7 +170,7 @@ function render(){
   const sales = sellingRate * qty;
   const profit = sales - totalCost;
 
-  grandTotal += sales; // 🔥 ADD TO TOTAL
+  grandTotal += sales;
 
   tb.innerHTML += `
 <tr>
@@ -168,8 +179,8 @@ function render(){
 <td>${qty}</td>
 <td>${costPerUnit.toFixed(2)}</td>
 <td>
-  <input type="number" value="${profitPct}"
-    onchange="updateProfit('${p.id}', this.value)">
+ <input type="number" value="${profitPct}"
+  onchange="updateProfit('${p.id}', this.value)">
 </td>
 <td>${sellingRate.toFixed(2)}</td>
 <td>${sales.toFixed(2)}</td>
@@ -177,7 +188,11 @@ function render(){
 </tr>`;
  });
 
- // 🔥 PUBLISH TOTAL INCOME (FOR PROFIT-LOSS)
+ /* ✅ SHOW TOTAL */
+ document.getElementById("grandTotal").innerText =
+  grandTotal.toFixed(2);
+
+ /* ✅ PUBLISH FOR PROFIT-LOSS */
  localStorage.setItem("totalIncome", grandTotal);
 }
 
@@ -193,4 +208,3 @@ render();
 
 </body>
 </html>
-
