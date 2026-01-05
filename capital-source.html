@@ -1,1 +1,223 @@
-लमकउवकलउ
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Expenses</title>
+
+<style>
+body{font-family:Arial;background:#f5f5f5;margin:0}
+header,footer{
+ background:#2e7d32;color:#fff;padding:12px 20px;
+ display:flex;justify-content:space-between;align-items:center
+}
+header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
+
+.container{
+ max-width:1200px;
+ margin:auto;
+ background:#fff;
+ padding:20px;
+ min-height:70vh
+}
+
+h2{color:#2e7d32;margin-top:30px}
+
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:10px
+}
+th,td{
+ border:1px solid #ccc;
+ padding:8px;
+ text-align:center
+}
+th{background:#e8f5e9}
+
+input,select{padding:5px;width:100%}
+.btn{padding:6px 12px;border:none;cursor:pointer}
+.add{background:#2e7d32;color:#fff}
+.del{background:#c62828;color:#fff}
+.summary{
+ background:#f1f8e9;
+ padding:15px;
+ margin-top:20px
+}
+textarea{
+ width:100%;
+ min-height:60px;
+ padding:8px;
+ box-sizing:border-box
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <a href="production.html">⬅️ उत्पादन</a>
+ <span>खर्च विवरण (Expenses)</span>
+ <a href="capital-source.html">पुँजिको स्रोत ➡️</a>
+</header>
+
+<div class="container">
+
+<h2>खर्च विवरण (एकीकृत)</h2>
+
+<table>
+<thead>
+<tr>
+ <th>प्रकार</th>
+ <th>खर्च शीर्षक</th>
+ <th>इकाई</th>
+ <th>परिमाण</th>
+ <th>दर</th>
+ <th>रकम</th>
+ <th>🗑️</th>
+</tr>
+</thead>
+<tbody id="expBody"></tbody>
+</table>
+
+<button class="btn add" onclick="addExp()">➕ खर्च थप्नुहोस्</button>
+
+<!-- ================= NARRATION ================= -->
+<div class="summary">
+<b>खर्च सम्बन्धी समग्र विवरण / Narration</b>
+<textarea id="expNarration"
+ placeholder="उदाहरण: यस व्यवसायमा प्रयोग हुने सबै स्थिर तथा चालु खर्च स्थानीय बजार मूल्यको आधारमा अनुमान गरिएको हो।"
+ onchange="saveNarration()"></textarea>
+</div>
+
+<!-- ================= SUMMARY ================= -->
+<div class="summary">
+<b>स्थिर खर्च (Fixed Capital):</b> Rs. <span id="fixTotal">0</span><br>
+<b>वार्षिक चालु खर्च (Variable):</b> Rs. <span id="varTotal">0</span>
+</div>
+
+</div>
+
+<footer>
+ <a href="production.html">⬅️ उत्पादन</a>
+ <span>FarmerBase BP Engine – Expenses</span>
+ <a href="capital-source.html">पुँजिको स्रोत ➡️</a>
+</footer>
+
+<script>
+/* ================= SINGLE SOURCE OF TRUTH ================= */
+let fbData =
+ JSON.parse(localStorage.getItem("farmerBaseData")) || {
+  expenses:[],
+  expenseNarration:""
+ };
+
+let expenses = fbData.expenses || [];
+
+/* ================= CRUD ================= */
+function addExp(){
+ expenses.push({
+  id:"e"+Date.now(),
+  type:"variable",   // variable | fixed
+  title:"",
+  unit:"",
+  qty:0,
+  rate:0
+ });
+ save(); render();
+}
+
+function update(id,f,v){
+ const e=expenses.find(x=>x.id===id);
+ e[f]=f==="qty"||f==="rate"?Number(v)||0:v;
+ save(); render();
+}
+
+function removeExp(id){
+ if(confirm("हटाउने हो ?")){
+  expenses=expenses.filter(e=>e.id!==id);
+  save(); render();
+ }
+}
+
+/* ================= SAVE ================= */
+function save(){
+ fbData.expenses=expenses;
+ localStorage.setItem(
+  "farmerBaseData",
+  JSON.stringify(fbData)
+ );
+}
+
+/* ================= NARRATION ================= */
+function saveNarration(){
+ fbData.expenseNarration=
+  document.getElementById("expNarration").value;
+
+ localStorage.setItem(
+  "farmerBaseData",
+  JSON.stringify(fbData)
+ );
+}
+
+/* ================= RENDER ================= */
+function render(){
+ const tb=document.getElementById("expBody");
+ tb.innerHTML="";
+
+ let fix=0,varr=0;
+
+ expenses.forEach(e=>{
+  const amt=e.qty*e.rate;
+  if(e.type==="fixed") fix+=amt;
+  else varr+=amt;
+
+  tb.innerHTML+=`
+<tr>
+<td>
+ <select onchange="update('${e.id}','type',this.value)">
+  <option value="variable" ${e.type==="variable"?"selected":""}>चालु</option>
+  <option value="fixed" ${e.type==="fixed"?"selected":""}>स्थिर</option>
+ </select>
+</td>
+
+<td>
+ <input value="${e.title}"
+  onchange="update('${e.id}','title',this.value)">
+</td>
+
+<td>
+ <input value="${e.unit}"
+  onchange="update('${e.id}','unit',this.value)">
+</td>
+
+<td>
+ <input type="number" value="${e.qty}"
+  onchange="update('${e.id}','qty',this.value)">
+</td>
+
+<td>
+ <input type="number" value="${e.rate}"
+  onchange="update('${e.id}','rate',this.value)">
+</td>
+
+<td>Rs. ${amt.toFixed(2)}</td>
+
+<td>
+ <button class="btn del"
+  onclick="removeExp('${e.id}')">🗑️</button>
+</td>
+</tr>`;
+ });
+
+ document.getElementById("fixTotal").innerText=fix.toFixed(2);
+ document.getElementById("varTotal").innerText=varr.toFixed(2);
+
+ document.getElementById("expNarration").value =
+  fbData.expenseNarration || "";
+}
+
+render();
+</script>
+
+</body>
+</html>
