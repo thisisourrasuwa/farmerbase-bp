@@ -10,24 +10,40 @@ body{
  background:#f4f6f8;
  margin:0
 }
-header,footer{
+
+/* ===== HEADER / MENU ===== */
+header{
  background:#2e7d32;
  color:#fff;
- padding:14px 20px;
+ padding:12px 20px;
  display:flex;
  justify-content:space-between;
  align-items:center
 }
+header .left{
+ display:flex;
+ align-items:center;
+ gap:20px
+}
 header h1{
- font-size:20px;
+ font-size:18px;
  margin:0
 }
+nav a{
+ color:#fff;
+ text-decoration:none;
+ margin-right:15px;
+ font-size:14px;
+ font-weight:bold
+}
+nav a:hover{text-decoration:underline}
+
+/* ===== COMMON ===== */
 .container{
  max-width:1200px;
  margin:auto;
  padding:20px
 }
-
 .btn{
  padding:8px 14px;
  border:none;
@@ -39,55 +55,96 @@ header h1{
 .open{background:#0277bd;color:#fff}
 .del{background:#c62828;color:#fff}
 
+/* ===== INTRO ===== */
+.intro{
+ background:#ffffff;
+ border-left:6px solid #2e7d32;
+ padding:20px;
+ margin-bottom:25px
+}
+.intro h2{
+ margin-top:0;
+ color:#2e7d32
+}
+.intro p{
+ margin:6px 0;
+ color:#444;
+ line-height:1.6
+}
+
+/* ===== BUSINESS LIST ===== */
 .grid{
  display:grid;
  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
  gap:16px
 }
-
 .card{
  background:#fff;
  border-radius:6px;
  padding:16px;
  box-shadow:0 2px 6px rgba(0,0,0,.08)
 }
-
 .card h3{
  margin:0 0 8px;
  color:#2e7d32
 }
-
 .meta{
  font-size:13px;
  color:#555;
  margin-bottom:10px
 }
-
 .actions{
  display:flex;
  justify-content:space-between;
  margin-top:10px
 }
 
+/* ===== EMPTY ===== */
 .empty{
  text-align:center;
  padding:60px 20px;
  color:#777
+}
+
+/* ===== FOOTER ===== */
+footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ text-align:center;
+ font-size:14px
 }
 </style>
 </head>
 
 <body>
 
+<!-- ================= HEADER ================= -->
 <header>
- <h1>🌱 FarmerBase BP Engine</h1>
- <button class="btn add" onclick="createNew()">
-  ➕ नयाँ व्यवसाय बनाउनुहोस्
- </button>
+ <div class="left">
+  <h1>🌱 FarmerBase BP Engine</h1>
+  <nav>
+   <a href="index.html">🏠 होम</a>
+   <a href="#" onclick="createNew()">➕ नयाँ व्यवसाय</a>
+   <a href="#list">📄 मेरा व्यवसाय</a>
+   <a href="#about">ℹ️ प्रणाली</a>
+  </nav>
+ </div>
+ <button class="btn add" onclick="createNew()">➕ नयाँ व्यवसाय</button>
 </header>
 
 <div class="container">
 
+<!-- ================= INTRO ================= -->
+<div class="intro" id="about">
+ <h2>FarmerBase BP Engine के हो ?</h2>
+ <p>✔️ किसान तथा साना उद्यमीका लागि <b>व्यवसायिक योजना (Business Plan)</b> बनाउने डिजिटल प्रणाली हो।</p>
+ <p>✔️ उत्पादन, आम्दानी, खर्च, पुँजी स्रोत, नाफा–नोक्सान सबै <b>स्वतः गणना</b> हुन्छ।</p>
+ <p>✔️ अनुदान, बैंक ऋण, सहकारी तथा लगानी प्रस्तावका लागि <b>यथार्थपरक योजना</b> तयार गर्न सहयोग गर्छ।</p>
+ <p>👉 सुरु गर्न “नयाँ व्यवसाय बनाउनुहोस्” मा क्लिक गर्नुहोस्।</p>
+</div>
+
+<!-- ================= BUSINESS LIST ================= -->
 <h2>📂 मेरा व्यवसायहरू</h2>
 
 <div id="list" class="grid"></div>
@@ -102,7 +159,7 @@ header h1{
 </div>
 
 <footer>
- <span>FarmerBase BP Engine – कृषकमैत्री व्यवसाय योजना प्रणाली</span>
+ FarmerBase BP Engine – कृषकमैत्री व्यवसाय योजना प्रणाली
 </footer>
 
 <script>
@@ -110,10 +167,9 @@ header h1{
 let businessList =
  JSON.parse(localStorage.getItem("businessList")) || [];
 
-/* ===== BACKWARD COMPATIBILITY (one-time migrate) ===== */
+/* ===== BACKWARD COMPATIBILITY ===== */
 const single =
  JSON.parse(localStorage.getItem("businessProfile"));
-
 if(single){
  const exists = businessList.find(b=>b.id===single.id);
  if(!exists){
@@ -126,7 +182,6 @@ if(single){
 function render(){
  const box=document.getElementById("list");
  const empty=document.getElementById("empty");
-
  box.innerHTML="";
 
  if(businessList.length===0){
@@ -150,16 +205,9 @@ function render(){
    : "सिर्जना: "+new Date(b.createdAt).toLocaleString()
  }
 </div>
-
 <div class="actions">
- <button class="btn open"
-  onclick="openBusiness('${b.id}')">
-  खोल्नुहोस्
- </button>
- <button class="btn del"
-  onclick="deleteBusiness('${b.id}')">
-  हटाउनुहोस्
- </button>
+ <button class="btn open" onclick="openBusiness('${b.id}')">खोल्नुहोस्</button>
+ <button class="btn del" onclick="deleteBusiness('${b.id}')">हटाउनुहोस्</button>
 </div>`;
    box.appendChild(div);
   });
@@ -169,12 +217,10 @@ function render(){
 function createNew(){
  window.location.href="business-create.html";
 }
-
 function openBusiness(id){
  localStorage.setItem("activeBusinessId",id);
  window.location.href="production.html";
 }
-
 function deleteBusiness(id){
  if(!confirm("यो व्यवसाय हटाउने हो ?")) return;
  businessList = businessList.filter(b=>b.id!==id);
@@ -182,7 +228,6 @@ function deleteBusiness(id){
  render();
 }
 
-/* ================= INIT ================= */
 render();
 </script>
 
