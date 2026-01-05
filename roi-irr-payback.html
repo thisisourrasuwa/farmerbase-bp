@@ -2,186 +2,199 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>ROI • IRR • Payback</title>
+<title>ROI / IRR / Payback</title>
 
 <style>
 body{font-family:Arial;background:#f5f5f5;margin:0}
 header,footer{
- background:#2e7d32;color:#fff;padding:12px 20px;
+ background:#2e7d32;color:#fff;
+ padding:12px 20px;
  display:flex;justify-content:space-between;align-items:center
 }
 header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
 
 .container{
- max-width:1100px;
+ max-width:1000px;
  margin:auto;
  background:#fff;
  padding:20px;
  min-height:70vh
 }
 
-h1{text-align:center;color:#2e7d32}
-h2{margin-top:30px;color:#333}
-
-.card{
- background:#f1f8e9;
- padding:15px;
- margin-top:15px;
- font-size:16px
-}
-
-.value{font-size:22px;font-weight:bold}
+h1{text-align:center;color:#2e7d32;margin:15px 0}
 
 table{
  width:100%;
  border-collapse:collapse;
- margin-top:15px
+ margin-top:20px
 }
 th,td{
  border:1px solid #ccc;
- padding:8px;
+ padding:10px;
+ text-align:right
+}
+th{
+ background:#e8f5e9;
  text-align:center
 }
-th{background:#e8f5e9}
-
-.note{font-size:13px;color:#555;margin-top:10px}
-.pos{color:#2e7d32;font-weight:bold}
-.neg{color:#c62828;font-weight:bold}
+td.label{
+ text-align:left;
+ font-weight:bold
+}
+.highlight{
+ font-size:18px;
+ font-weight:bold
+}
+.good{color:#2e7d32}
+.warn{color:#c62828}
+.note{
+ background:#f1f8e9;
+ padding:12px;
+ margin-top:20px;
+ font-size:14px
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <a href="projection-5yr.html">⬅️ ५ वर्षे प्रक्षेपण</a>
-  <span>लगानी विश्लेषण (ROI • IRR • Payback)</span>
-  <a href="full-proposal.html">पुरा प्रपोजल➡️</a>
+ <a href="profit-loss.html">⬅️ नाफा/नोक्सान</a>
+ <span>ROI • IRR • Payback</span>
+ <a href="projection-5yr.html">५ वर्ष प्रक्षेपण ➡️</a>
 </header>
 
 <div class="container">
-<div class="card">
-<b>कुल प्रारम्भिक लगानी (Auto):</b>
-<div class="value" id="investment">0</div>
-</div>
 
-<div class="card">
-<b>औसत वार्षिक नाफा:</b>
-<div class="value" id="avgProfit">0</div>
-</div>
+<h1>ROI / IRR / Payback विश्लेषण</h1>
 
-<div class="card">
-<b>ROI (Return on Investment):</b>
-<div class="value" id="roi">0%</div>
-</div>
-
-<div class="card">
-<b>Payback Period:</b>
-<div class="value" id="payback">N/A</div>
-</div>
-
-<div class="card">
-<b>IRR (Internal Rate of Return):</b>
-<div class="value" id="irr">0%</div>
-</div>
-
-<h2>Year-wise Cash Flow</h2>
 <table>
-<thead>
 <tr>
-<th>वर्ष</th>
-<th>Cash Flow</th>
-<th>Cumulative</th>
+ <th>सूचक</th>
+ <th>नतिजा</th>
 </tr>
-</thead>
-<tbody id="cfBody"></tbody>
+
+<tr>
+ <td class="label">कुल लगानी (Total Investment)</td>
+ <td id="investment">0.00</td>
+</tr>
+
+<tr>
+ <td class="label">वार्षिक शुद्ध नाफा</td>
+ <td id="netProfit">0.00</td>
+</tr>
+
+<tr class="highlight">
+ <td class="label">ROI (%)</td>
+ <td id="roi" class="good">0%</td>
+</tr>
+
+<tr class="highlight">
+ <td class="label">Payback Period (वर्ष)</td>
+ <td id="payback">0</td>
+</tr>
+
+<tr class="highlight">
+ <td class="label">IRR (%)</td>
+ <td id="irr" class="good">0%</td>
+</tr>
 </table>
 
 <div class="note">
-✔️ Cash Flow = Net Profit (after all expenses & interest)<br>
-✔️ IRR approximation based on 5-year cash flow<br>
-✔️ ROI & Payback BP / Bank standard
+✔️ ROI = (वार्षिक नाफा ÷ कुल लगानी) × 100<br>
+✔️ Payback = लगानी ÷ वार्षिक नाफा<br>
+✔️ IRR = 5-Year Cash Flow को आधारमा
 </div>
+
 </div>
 
 <footer>
- <a href="projection-5yr.html">⬅️ ५ वर्षे प्रक्षेपण</a>
-  <span>Farmerbase BP Engine- (ROI • IRR • Payback)</span>
-  <a href="full-proposal.html">पुरा प्रपोजल➡️</a>
+ <a href="profit-loss.html">⬅️ नाफा/नोक्सान</a>
+ <span>FarmerBase BP Engine – ROI / IRR / Payback</span>
+ <a href="projection-5yr.html">५ वर्ष प्रक्षेपण ➡️</a>
 </footer>
 
 <script>
-/* ================= LOAD DATA ================= */
-const capital = Number(
-  document.getElementById("investment")?.innerText
-) || Number(localStorage.getItem("totalCapital")) || 0;
+/* =====================================================
+   LOAD REQUIRED DATA
+===================================================== */
+const investment =
+ Number(localStorage.getItem("totalCapital")) || 0;
 
-const projection = JSON.parse(localStorage.getItem("projectionData")) || [];
-// fallback from growth logic
-let baseIncome = Number(localStorage.getItem("totalIncome")) || 0;
-let baseExpense = Number(localStorage.getItem("totalExpense")) || 0;
-let growth = JSON.parse(localStorage.getItem("growthRates")) ||
- [{i:10,e:8},{i:10,e:8},{i:10,e:8},{i:10,e:8},{i:10,e:8}];
+const netProfit =
+ Number(localStorage.getItem("netProfit")) || 0;
 
-/* ================= BUILD CASH FLOW ================= */
-let cashFlows = [-capital];
-let incomes = baseIncome;
-let expenses = baseExpense;
-
-for(let y=0;y<5;y++){
- if(y>0){
-  incomes += incomes * growth[y].i/100;
-  expenses += expenses * growth[y].e/100;
- }
- cashFlows.push(incomes - expenses);
+/* =====================================================
+   ROI
+===================================================== */
+let roi = 0;
+if(investment > 0){
+ roi = (netProfit / investment) * 100;
 }
 
-/* ================= ROI ================= */
-const avgProfit =
- cashFlows.slice(1).reduce((s,v)=>s+v,0) / 5;
-const roi = capital ? (avgProfit / capital) * 100 : 0;
-
-/* ================= PAYBACK ================= */
-let cum = -capital;
-let payback = "N/A";
-const tb = document.getElementById("cfBody");
-tb.innerHTML="";
-
-for(let i=1;i<cashFlows.length;i++){
- cum += cashFlows[i];
- tb.innerHTML += `
-<tr>
-<td>${i}</td>
-<td>${cashFlows[i].toFixed(2)}</td>
-<td>${cum.toFixed(2)}</td>
-</tr>`;
- if(cum>=0 && payback==="N/A"){
-  payback = i + " वर्ष";
- }
+/* =====================================================
+   PAYBACK PERIOD
+===================================================== */
+let payback = "Not Recoverable";
+if(netProfit > 0){
+ payback = (investment / netProfit).toFixed(2);
 }
 
-/* ================= IRR (Iteration) ================= */
-function calcIRR(flows){
+/* =====================================================
+   IRR CALCULATION (Simple Newton-Raphson)
+===================================================== */
+function calcIRR(cashFlows){
  let rate = 0.1;
  for(let i=0;i<1000;i++){
   let npv = 0;
   let dnpv = 0;
-  for(let t=0;t<flows.length;t++){
-   npv += flows[t] / Math.pow(1+rate,t);
-   dnpv -= t*flows[t] / Math.pow(1+rate,t+1);
+  for(let t=0;t<cashFlows.length;t++){
+   npv += cashFlows[t] / Math.pow(1+rate,t);
+   dnpv += -t * cashFlows[t] / Math.pow(1+rate,t+1);
   }
-  rate -= npv/dnpv;
+  rate = rate - npv/dnpv;
  }
- return rate;
+ return rate * 100;
 }
 
-const irr = calcIRR(cashFlows);
+/* =====================================================
+   BUILD CASH FLOW (5 YEARS)
+===================================================== */
+let cashFlows = [-investment];
+for(let i=0;i<5;i++){
+ cashFlows.push(netProfit);
+}
 
-/* ================= RENDER ================= */
-document.getElementById("investment").innerText = capital.toFixed(2);
-document.getElementById("avgProfit").innerText = avgProfit.toFixed(2);
-document.getElementById("roi").innerText = roi.toFixed(1) + "%";
-document.getElementById("payback").innerText = payback;
-document.getElementById("irr").innerText = (irr*100).toFixed(1) + "%";
+let irr = 0;
+if(netProfit > 0 && investment > 0){
+ irr = calcIRR(cashFlows);
+}
+
+/* =====================================================
+   RENDER
+===================================================== */
+document.getElementById("investment").innerText =
+ investment.toFixed(2);
+
+document.getElementById("netProfit").innerText =
+ netProfit.toFixed(2);
+
+document.getElementById("roi").innerText =
+ roi.toFixed(2) + "%";
+
+document.getElementById("payback").innerText =
+ payback;
+
+document.getElementById("irr").innerText =
+ irr.toFixed(2) + "%";
+
+/* Color logic */
+if(roi < 15){
+ document.getElementById("roi").className="warn";
+}
+if(irr < 12){
+ document.getElementById("irr").className="warn";
+}
 </script>
 
 </body>
