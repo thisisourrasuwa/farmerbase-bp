@@ -32,6 +32,10 @@ input{width:100%;box-sizing:border-box}
 .mapBox{text-align:left;font-size:13px}
 .mapNote{font-size:12px;color:#777}
 
+.percentBox{
+ width:55px;font-size:12px
+}
+
 .btn{padding:6px 10px;border:none;cursor:pointer}
 .add{background:#2e7d32;color:#fff}
 .del{background:#c62828;color:#fff}
@@ -41,6 +45,13 @@ input{width:100%;box-sizing:border-box}
  padding:12px;
  margin-top:20px;
  font-size:14px
+}
+
+textarea{
+ width:100%;
+ min-height:70px;
+ box-sizing:border-box;
+ padding:8px
 }
 </style>
 </head>
@@ -65,7 +76,7 @@ input{width:100%;box-sizing:border-box}
  <th>परिमाण</th>
  <th>दर</th>
  <th>जम्मा</th>
- <th>कुन उत्पादनमा</th>
+ <th>कुन उत्पादनमा (% सहित)</th>
  <th>🗑️</th>
 </tr>
 </thead>
@@ -84,13 +95,21 @@ input{width:100%;box-sizing:border-box}
  <th>दर</th>
  <th>आयु</th>
  <th>वार्षिक ह्रास</th>
- <th>कुन उत्पादनमा</th>
+ <th>कुन उत्पादनमा (% सहित)</th>
  <th>🗑️</th>
 </tr>
 </thead>
 <tbody id="fixBody"></tbody>
 </table>
 <button class="btn add" id="addFix">➕ स्थिर खर्च थप्नुहोस्</button>
+
+<!-- ================= NARRATION ================= -->
+<div class="preview">
+<b>खर्च सम्बन्धी समग्र Narration</b>
+<textarea id="expenseNarration"
+ placeholder="उदाहरण: यस व्यवसायका सबै चालु तथा स्थिर खर्चहरू स्थानीय बजार मूल्य, प्राविधिक सिफारिस तथा उत्पादन अनुपातको आधारमा अनुमान गरिएको हो।"
+ oninput="saveNarration()"></textarea>
+</div>
 
 <div class="preview" id="previewBox"></div>
 
@@ -102,7 +121,7 @@ input{width:100%;box-sizing:border-box}
 
 <script>
 /* =================================================
-   SINGLE SOURCE OF TRUTH
+   DATA LOAD (UNCHANGED LOGIC)
 ================================================= */
 const productions =
  JSON.parse(localStorage.getItem("productions")) || [];
@@ -110,11 +129,21 @@ const productions =
 let expenses =
  JSON.parse(localStorage.getItem("expenses")) || [];
 
+let expenseNarration =
+ localStorage.getItem("expenseNarration") || "";
+
 /* =================================================
    SAVE
 ================================================= */
 function save(){
  localStorage.setItem("expenses", JSON.stringify(expenses));
+}
+
+function saveNarration(){
+ localStorage.setItem(
+  "expenseNarration",
+  document.getElementById("expenseNarration").value
+ );
 }
 
 /* =================================================
@@ -131,8 +160,7 @@ document.getElementById("addVar").onclick = () => {
   life:null,
   map:{}
  });
- save();
- render();
+ save(); render();
 };
 
 document.getElementById("addFix").onclick = () => {
@@ -146,8 +174,7 @@ document.getElementById("addFix").onclick = () => {
   life:1,
   map:{}
  });
- save();
- render();
+ save(); render();
 };
 
 /* =================================================
@@ -155,38 +182,41 @@ document.getElementById("addFix").onclick = () => {
 ================================================= */
 function deleteExpense(id){
  expenses = expenses.filter(e => e.id !== id);
- save();
- render();
+ save(); render();
 }
 
 /* =================================================
-   MAP (कुन उत्पादनमा)
+   MAP UI (PRODUCT + %)
 ================================================= */
 function mapUI(exp){
  if(!productions.length){
   return `<span class="mapNote">पहिले उत्पादन थप्नुहोस्</span>`;
  }
+
  return productions.map(p=>{
-  const chk = exp.map[p.id] ? "checked" : "";
+  const obj = exp.map[p.id] || {};
   return `
+<div>
 <label>
- <input type="checkbox" ${chk}
-  onchange="toggleMap(${exp.id},'${p.id}',this.checked)">
  ${p.name}
-</label><br>`;
+ <input class="percentBox" type="number" min="0" max="100"
+  value="${obj.percent || ''}"
+  onchange="setPercent(${exp.id},'${p.id}',this.value)"> %
+</label>
+</div>`;
  }).join("");
 }
 
-function toggleMap(eid,pid,val){
+function setPercent(eid,pid,val){
  const e = expenses.find(x=>x.id===eid);
  if(!e.map) e.map = {};
- if(val) e.map[pid] = true;
+ if(val>0) e.map[pid] = {percent:+val};
  else delete e.map[pid];
  save();
 }
 
 /* =================================================
-   RENDER (NO RE-RENDER ON TYPING)
+   RENDER
 ================================================= */
 function render(){
  let varTotal = 0;
@@ -263,16 +293,17 @@ function render(){
   }
  });
 
- /* ===== PREVIEW ===== */
  document.getElementById("previewBox").innerHTML =
   `<b>Expense Summary</b><br>
    कुल चालु खर्च: ${varTotal.toFixed(2)}<br>
    कुल स्थिर पूँजी: ${fixedCapital.toFixed(2)}<br>
    कुल वार्षिक ह्रास: ${fixedDep.toFixed(2)}`;
 
- /* ===== FOR CAPITAL SOURCE ===== */
+ /* ===== FOR CAPITAL SOURCE (UNCHANGED CONTRACT) ===== */
  localStorage.setItem("variable_annual_cost", varTotal.toFixed(2));
  localStorage.setItem("fixed_total_capital", fixedCapital.toFixed(2));
+
+ document.getElementById("expenseNarration").value = expenseNarration;
 }
 
 render();
