@@ -18,17 +18,17 @@ header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
 }
 h1{text-align:center;color:#2e7d32;margin:15px 0 25px}
 .summary{
- background:#f1f8e9;padding:16px;margin-bottom:20px
+ background:#f1f8e9;padding:16px;margin-bottom:20px;font-size:16px
 }
 table{width:100%;border-collapse:collapse}
 th,td{border:1px solid #ccc;padding:10px}
-th{background:#e8f5e9}
+th{background:#e8f5e9;text-align:center}
 td.label{font-weight:bold}
 td.amount{text-align:right}
 .net{font-size:18px;font-weight:bold}
 .profit{color:#2e7d32}
 .loss{color:#c62828}
-.note{margin-top:15px;font-size:14px}
+.note{margin-top:15px;font-size:14px;color:#444}
 </style>
 </head>
 
@@ -45,15 +45,19 @@ td.amount{text-align:right}
 <h1>नाफा / नोक्सान सारांश (Profit / Loss)</h1>
 
 <div class="summary">
- ✔️ आम्दानी, चालु खर्च र ऋणको ब्याजका आधारमा  
+ ✔️ Income page बाट आएको <b>कुल आम्दानी</b>,  
+ चालु खर्च र ऋणको ब्याजका आधारमा  
  <b>शुद्ध नाफा / नोक्सान स्वतः</b> गणना हुन्छ ।
 </div>
 
 <table>
+<thead>
 <tr>
  <th>शीर्षक</th>
  <th>रकम (Rs.)</th>
 </tr>
+</thead>
+<tbody>
 
 <tr>
  <td class="label">कुल आम्दानी (Total Income)</td>
@@ -65,6 +69,7 @@ td.amount{text-align:right}
  <td class="amount" id="annualVar">0.00</td>
 </tr>
 
+<!-- ब्याज पहिलो ठाउँ -->
 <tr>
  <td class="label">वार्षिक ब्याज खर्च</td>
  <td class="amount" id="interestExpense">0.00</td>
@@ -79,11 +84,14 @@ td.amount{text-align:right}
  <td class="label">कुल शुद्ध नाफा / नोक्सान</td>
  <td class="amount" id="netProfit">0.00</td>
 </tr>
+
+</tbody>
 </table>
 
 <p class="note">
-✔️ ब्याज खर्च Capital Source बाट स्वतः आउँछ ।<br>
-✔️ यही शुद्ध नाफा Profit Distribution र 5-Year Projection मा प्रयोग हुन्छ ।
+✔️ आम्दानी <b>Income page</b> बाट publish भएको हो ।<br>
+✔️ ब्याज <b>Capital Source</b> बाट स्वतः आएको हो ।<br>
+✔️ यही शुद्ध नाफा <b>नाफा वितरण</b> र <b>5-Year Projection</b> मा प्रयोग हुन्छ ।
 </p>
 
 </div>
@@ -94,26 +102,25 @@ td.amount{text-align:right}
  <a href="profit-distribution.html">नाफा वितरण ➡️</a>
 </footer>
 
+<!-- ================= SCRIPT (BOTTOM ONLY) ================= -->
 <script>
 /* =====================================================
-   1️⃣ TOTAL INCOME — FROM INCOME PAGE (FINAL SOURCE)
+   1️⃣ TOTAL INCOME (SINGLE SOURCE OF TRUTH)
+   — Income page ले publish गरेको value
 ===================================================== */
-let totalIncome = 0;
-const incomes =
- JSON.parse(localStorage.getItem("incomes")) || {};
-
-Object.values(incomes).forEach(i=>{
- totalIncome += Number(i.total || 0);
-});
+const totalIncome =
+ Number(localStorage.getItem("totalIncome")) || 0;
 
 /* =====================================================
    2️⃣ VARIABLE (ANNUAL) EXPENSE
+   — Expense page बाट आएको annual sum
 ===================================================== */
 const annualVar =
  Number(localStorage.getItem("variable_annual_cost")) || 0;
 
 /* =====================================================
    3️⃣ INTEREST EXPENSE
+   — Capital Source बाट आएको
 ===================================================== */
 const interestExpense =
  Number(localStorage.getItem("annual_interest_cost")) || 0;
@@ -129,26 +136,26 @@ const netProfit = totalIncome - totalExpense;
 ===================================================== */
 document.getElementById("totalIncome").innerText =
  totalIncome.toFixed(2);
+
 document.getElementById("annualVar").innerText =
  annualVar.toFixed(2);
+
 document.getElementById("interestExpense").innerText =
  interestExpense.toFixed(2);
+
 document.getElementById("totalExpense").innerText =
  totalExpense.toFixed(2);
 
-const np=document.getElementById("netProfit");
-np.innerText = netProfit.toFixed(2);
-np.className =
- "amount net " + (netProfit < 0 ? "loss":"profit");
+const npEl = document.getElementById("netProfit");
+npEl.innerText = netProfit.toFixed(2);
+npEl.classList.add(netProfit < 0 ? "loss" : "profit");
 
 /* =====================================================
-   6️⃣ SAVE CLEAN VALUES
+   6️⃣ SAVE FOR NEXT MODULES
 ===================================================== */
-localStorage.setItem("totalIncome", totalIncome);
 localStorage.setItem("totalExpense", totalExpense);
 localStorage.setItem("netProfit", netProfit);
 </script>
 
 </body>
 </html>
-
