@@ -104,7 +104,7 @@ td input{
 <table>
 <thead>
 <tr>
-  <th class="col-name">स्रोत</th>
+  <th class="col-name">स्रोत / विवरण</th>
   <th class="col-amount">रकम</th>
   <th class="col-percent">%</th>
   <th class="col-action">🗑️</th>
@@ -118,12 +118,12 @@ td input{
 
 <footer>
  <a href="expense-demo.html">⬅️ खर्च विवरण</a>
-  <span>Farmerbase BP Engine-Capital Source</span>
-  <a href="income-demo.html">आम्दानी विवरण ➡️</a>
+ <span>Farmerbase BP Engine – Capital Source</span>
+ <a href="income-demo.html">आम्दानी विवरण ➡️</a>
 </footer>
 
 <script>
-/* ================= LOAD (EXPENSES FIRST) ================= */
+/* ================= LOAD (NO LOGIC CHANGE) ================= */
 const varExp =
  JSON.parse(localStorage.getItem("varExp")) || [];
 
@@ -156,13 +156,18 @@ function save(){
 
 /* ================= CRUD ================= */
 function addSource(){
- sources.push({id:"c"+Date.now(),name:"",amount:0});
+ sources.push({
+  id:"c"+Date.now(),
+  name:"",
+  narration:"",
+  amount:0
+ });
  save(); render();
 }
 
 function update(id,f,v){
  const s=sources.find(x=>x.id===id);
- s[f]=Number(v)||v;
+ s[f]=f==="amount"?Number(v)||0:v;
  save(); render();
 }
 
@@ -248,15 +253,31 @@ function render(){
   const pct=totalCap
    ?((s.amount/totalCap)*100).toFixed(1)
    :"0";
+
   tb.innerHTML+=`
 <tr>
-<td><input value="${s.name}"
- onchange="update('${s.id}','name',this.value)"></td>
-<td><input type="number" value="${s.amount}"
- onchange="update('${s.id}','amount',this.value)"></td>
+<td>
+ <input value="${s.name}"
+  placeholder="स्रोत नाम"
+  onchange="update('${s.id}','name',this.value)">
+ <br>
+ <input value="${s.narration||''}"
+  placeholder="न्यारेसन / विवरण"
+  onchange="update('${s.id}','narration',this.value)"
+  style="margin-top:4px;font-size:12px">
+</td>
+
+<td>
+ <input type="number" value="${s.amount}"
+  onchange="update('${s.id}','amount',this.value)">
+</td>
+
 <td>${pct}%</td>
-<td><button class="btn del"
- onclick="removeSource('${s.id}')">🗑️</button></td>
+
+<td>
+ <button class="btn del"
+  onclick="removeSource('${s.id}')">🗑️</button>
+</td>
 </tr>`;
  });
 
