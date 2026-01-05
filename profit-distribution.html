@@ -1,1 +1,188 @@
-मब
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>नाफा / नोक्सान – FarmerBase BP Engine</title>
+
+<style>
+body{
+ font-family:Arial;
+ background:#f5f5f5;
+ margin:0
+}
+header,footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center
+}
+header a,footer a{
+ color:#fff;
+ text-decoration:none;
+ font-weight:bold
+}
+.container{
+ max-width:1200px;
+ margin:auto;
+ background:#fff;
+ padding:20px;
+ min-height:70vh
+}
+h1{
+ text-align:center;
+ color:#2e7d32;
+ margin:15px 0 25px
+}
+.summary{
+ background:#f1f8e9;
+ padding:18px;
+ font-size:16px;
+ line-height:1.8
+}
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:20px
+}
+th,td{
+ border:1px solid #ccc;
+ padding:10px;
+ text-align:right
+}
+th{
+ background:#e8f5e9;
+ text-align:center
+}
+td.label{
+ text-align:left;
+ font-weight:bold
+}
+.net{
+ font-size:18px;
+ font-weight:bold
+}
+.profit{color:#2e7d32}
+.loss{color:#c62828}
+</style>
+</head>
+
+<body>
+
+<header>
+ <a href="income-demo.html">⬅️ आम्दानी</a>
+ <span>नाफा / नोक्सान विवरण</span>
+ <a href="profit-distribution.html">नाफा वितरण ➡️</a>
+</header>
+
+<div class="container">
+
+<h1>नाफा / नोक्सान सारांश (Profit / Loss)</h1>
+
+<div class="summary">
+ ✔️ यो पेजले आम्दानी, खर्च र ब्याजका आधारमा
+ <b>शुद्ध नाफा स्वतः</b> गणना गर्छ।
+</div>
+
+<table>
+<tr>
+ <th>शीर्षक</th>
+ <th>रकम (Rs.)</th>
+</tr>
+
+<tr>
+ <td class="label">कुल आम्दानी (Total Income)</td>
+ <td id="totalIncome">0.00</td>
+</tr>
+
+<tr>
+ <td class="label">वार्षिक चालु खर्च</td>
+ <td id="annualVar">0.00</td>
+</tr>
+
+<tr>
+ <td class="label">वार्षिक ब्याज खर्च</td>
+ <td id="interestCost">0.00</td>
+</tr>
+
+<tr>
+ <td class="label">कुल खर्च (Total Expense)</td>
+ <td id="totalExpense">0.00</td>
+</tr>
+
+<tr class="net">
+ <td class="label">कुल शुद्ध नाफा (Net Profit)</td>
+ <td id="netProfit" class="profit">0.00</td>
+</tr>
+</table>
+
+</div>
+
+<footer>
+ <a href="income-demo.html">⬅️ आम्दानी</a>
+ <span>FarmerBase BP Engine – Profit / Loss</span>
+ <a href="profit-distribution.html">नाफा वितरण ➡️</a>
+</footer>
+
+<script>
+/* ================= TOTAL INCOME ================= */
+/* Production बाट आएको आम्दानी */
+const production =
+ JSON.parse(localStorage.getItem("productionData")) || [];
+
+let totalIncome = 0;
+production.forEach(p=>{
+ totalIncome += (Number(p.qty)||0) * (Number(p.rate)||0);
+});
+
+/* ================= EXPENSES ================= */
+/* चालु खर्च */
+const varExp =
+ JSON.parse(localStorage.getItem("varExp")) || [];
+
+let annualVar = 0;
+varExp.forEach(e=>{
+ annualVar += (Number(e.qty)||0) * (Number(e.rate)||0);
+});
+
+/* ब्याज खर्च (Capital Source बाट) */
+const interestCost =
+ Number(localStorage.getItem("annual_interest_cost")) || 0;
+
+/* ================= TOTAL EXPENSE ================= */
+const totalExpense = annualVar + interestCost;
+
+/* ================= NET PROFIT ================= */
+const netProfit = totalIncome - totalExpense;
+
+/* ================= RENDER ================= */
+document.getElementById("totalIncome").innerText =
+ totalIncome.toFixed(2);
+
+document.getElementById("annualVar").innerText =
+ annualVar.toFixed(2);
+
+document.getElementById("interestCost").innerText =
+ interestCost.toFixed(2);
+
+document.getElementById("totalExpense").innerText =
+ totalExpense.toFixed(2);
+
+const npEl = document.getElementById("netProfit");
+npEl.innerText = netProfit.toFixed(2);
+
+if(netProfit < 0){
+ npEl.classList.remove("profit");
+ npEl.classList.add("loss");
+}
+
+/* ================= PATCH (CRITICAL) ================= */
+/* Profit Distribution page का लागि */
+localStorage.setItem("totalIncome", totalIncome);
+localStorage.setItem("totalExpense", totalExpense);
+localStorage.setItem("netProfit", netProfit);
+</script>
+
+</body>
+</html>
