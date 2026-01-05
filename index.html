@@ -1,1 +1,313 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>FarmerBase BP Engine</title>
 
+<style>
+body{
+ font-family:Arial;
+ background:#f4f6f8;
+ margin:0
+}
+
+/* ===== HEADER ===== */
+header{
+ background:#2e7d32;
+ color:#fff;
+ padding:14px 20px;
+ font-size:18px;
+ font-weight:bold
+}
+
+/* ===== LAYOUT ===== */
+.container{
+ max-width:1200px;
+ margin:auto;
+ padding:30px 20px
+}
+.row{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:30px
+}
+
+/* ===== CARD ===== */
+.card{
+ background:#fff;
+ padding:22px;
+ border-radius:6px;
+ box-shadow:0 2px 6px rgba(0,0,0,.08)
+}
+.card h2,h3{
+ margin-top:0;
+ color:#2e7d32
+}
+
+/* ===== FORM ===== */
+label{
+ font-weight:bold;
+ display:block;
+ margin-top:12px
+}
+input{
+ width:100%;
+ padding:8px;
+ margin-top:6px;
+ box-sizing:border-box
+}
+.btn{
+ margin-top:14px;
+ padding:8px 14px;
+ border:none;
+ border-radius:4px;
+ cursor:pointer;
+ font-size:14px
+}
+.add{background:#2e7d32;color:#fff}
+.open{background:#0277bd;color:#fff}
+.del{background:#c62828;color:#fff}
+
+/* ===== BUSINESS LIST (LEFT) ===== */
+.business{
+ background:#f9fbfc;
+ padding:14px;
+ border-radius:5px;
+ margin-top:12px;
+ border:1px solid #ddd
+}
+.business h4{
+ margin:0 0 4px;
+ color:#2e7d32
+}
+.actions{
+ margin-top:6px;
+ display:flex;
+ justify-content:space-between
+}
+
+/* ===== INFO ===== */
+.info p{
+ line-height:1.7;
+ color:#444;
+ margin:8px 0
+}
+.info ul{
+ padding-left:18px;
+ line-height:1.7
+}
+
+/* ===== MENU (RIGHT – 2 COLUMN) ===== */
+.menuGrid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:20px;
+ margin-top:10px
+}
+.menu h4{
+ margin:0 0 8px;
+ color:#2e7d32
+}
+.menu ul{
+ list-style:none;
+ padding-left:0
+}
+.menu li{
+ margin:6px 0
+}
+.menu a{
+ text-decoration:none;
+ color:#333;
+ font-weight:bold
+}
+.menu a:hover{
+ color:#2e7d32;
+ text-decoration:underline
+}
+
+/* ===== FOOTER ===== */
+footer{
+ margin-top:50px;
+ background:#2e7d32;
+ color:#fff;
+ padding:16px 20px;
+ font-size:14px;
+ line-height:1.6
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+ .row{grid-template-columns:1fr}
+ .menuGrid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ 🌱 FarmerBase BP Engine
+</header>
+
+<div class="container">
+
+<div class="row">
+
+<!-- ================= LEFT COLUMN ================= -->
+<div>
+
+<!-- ===== CREATE BUSINESS ===== -->
+<div class="card">
+ <h2>➕ नयाँ व्यवसाय सुरु गर्नुहोस्</h2>
+
+ <label>👤 सञ्चालक / प्रोपाइटरको नाम</label>
+ <input id="proprietor" placeholder="जस्तै: शिवचन्द्र रोक्का">
+
+ <label>🏷️ फर्म / व्यवसायको नाम</label>
+ <input id="firm" placeholder="जस्तै: ईशान मल्टिपर्पज हब">
+
+ <button class="btn add" onclick="startBusiness()">
+  🚀 सुरु गरौं
+ </button>
+</div>
+
+<!-- ===== MY BUSINESSES (IMMEDIATELY BELOW) ===== -->
+<div class="card" style="margin-top:20px">
+ <h3>📂 मेरा व्यवसायहरू</h3>
+ <div id="list"></div>
+</div>
+
+</div>
+
+<!-- ================= RIGHT COLUMN ================= -->
+<div class="card info">
+
+ <h2>FarmerBase BP Engine के हो ?</h2>
+ <p>
+ किसान, सहकारी र साना उद्यमीका लागि
+ <b>व्यवसायिक योजना (Business Plan)</b>
+ तयार गर्ने कृषकमैत्री डिजिटल प्रणाली हो।
+ </p>
+
+ <ul>
+  <li>उत्पादन, खर्च, आम्दानी, पूँजी, नाफा–नोक्सान स्वतः गणना</li>
+  <li>अनुदान, बैंक/सहकारी ऋण प्रस्तावका लागि उपयुक्त</li>
+  <li>५ वर्षे प्रक्षेपण र ROI विश्लेषण</li>
+ </ul>
+
+ <hr>
+
+ <div class="menuGrid">
+
+  <!-- Utilities -->
+  <div class="menu">
+   <h4>🧰 Utilities</h4>
+   <ul>
+    <li><a href="full-proposal.html">🖨️ Full Proposal PDF</a></li>
+    <li><a href="pdf-merge.html">📄 PDF Merge</a></li>
+    <li><a href="summary.html">📊 Summary Report</a></li>
+    <li><a href="backup.html">📥 Backup Data</a></li>
+    <li><a href="restore.html">📤 Restore Data</a></li>
+   </ul>
+  </div>
+
+  <!-- Help -->
+  <div class="menu">
+   <h4>📘 User Help</h4>
+   <ul>
+    <li><a href="user-guide.html">📖 User Guide</a></li>
+    <li><a href="how-to.html">🎥 How to Use</a></li>
+    <li><a href="faq.html">❓ FAQ</a></li>
+    <li><a href="support.html">📞 Support</a></li>
+   </ul>
+  </div>
+
+ </div>
+
+</div>
+
+</div>
+</div>
+
+<footer>
+ <b>Concept Development By :</b> Prem Prassad Paudel, Rasuwa<br>
+ <b>Mob / WhatsApp :</b> 9843508470<br>
+ <b>Email :</b> paudelprem@gmail.com
+</footer>
+
+<script>
+/* ================= LOAD LIST ================= */
+let businessList =
+ JSON.parse(localStorage.getItem("businessList")) || [];
+
+/* ================= CREATE ================= */
+function startBusiness(){
+ const proprietor =
+  document.getElementById("proprietor").value.trim();
+ const firm =
+  document.getElementById("firm").value.trim();
+
+ if(!proprietor || !firm){
+  alert("सञ्चालक र फर्म दुवै नाम आवश्यक छ");
+  return;
+ }
+
+ const id="b_"+Date.now();
+ const business={
+  id:id,
+  proprietor:proprietor,
+  name:firm,
+  createdAt:Date.now(),
+  updatedAt:Date.now()
+ };
+
+ businessList.push(business);
+ localStorage.setItem("businessList",JSON.stringify(businessList));
+ localStorage.setItem("activeBusinessId",id);
+
+ window.location.href="short-info.html";
+}
+
+/* ================= RENDER ================= */
+function render(){
+ const box=document.getElementById("list");
+ box.innerHTML="";
+
+ if(businessList.length===0){
+  box.innerHTML="<p style='color:#777'>अहिलेसम्म कुनै व्यवसाय छैन</p>";
+  return;
+ }
+
+ businessList.forEach(b=>{
+  const d=document.createElement("div");
+  d.className="business";
+  d.innerHTML=`
+<h4>${b.name}</h4>
+<div>👤 ${b.proprietor}</div>
+<div class="actions">
+ <button class="btn open"
+  onclick="openBusiness('${b.id}')">खोल्नुहोस्</button>
+ <button class="btn del"
+  onclick="deleteBusiness('${b.id}')">हटाउनुहोस्</button>
+</div>`;
+  box.appendChild(d);
+ });
+}
+
+function openBusiness(id){
+ localStorage.setItem("activeBusinessId",id);
+ window.location.href="short-info.html";
+}
+
+function deleteBusiness(id){
+ if(!confirm("यो व्यवसाय हटाउने हो ?")) return;
+ businessList=businessList.filter(b=>b.id!==id);
+ localStorage.setItem("businessList",JSON.stringify(businessList));
+ render();
+}
+
+render();
+</script>
+
+</body>
+</html>
