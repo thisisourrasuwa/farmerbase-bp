@@ -1,1 +1,181 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Short Info – FarmerBase BP Engine</title>
+
+<style>
+body{
+ font-family:Arial;
+ background:#f4f6f8;
+ margin:0
+}
+
+/* ===== HEADER / FOOTER ===== */
+header,footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px
+}
+header{
+ font-size:16px;
+ font-weight:bold
+}
+
+/* ===== LAYOUT ===== */
+.container{
+ max-width:900px;
+ margin:auto;
+ padding:25px
+}
+.card{
+ background:#fff;
+ padding:22px;
+ border-radius:6px;
+ box-shadow:0 2px 6px rgba(0,0,0,.08)
+}
+
+/* ===== META ===== */
+.meta{
+ background:#e8f5e9;
+ padding:14px;
+ border-radius:4px;
+ margin-bottom:20px;
+ line-height:1.6
+}
+.meta b{
+ color:#2e7d32
+}
+
+/* ===== FORM ===== */
+h2{
+ margin-top:0;
+ color:#2e7d32
+}
+label{
+ font-weight:bold;
+ display:block;
+ margin-top:14px
+}
+input, textarea{
+ width:100%;
+ padding:8px;
+ margin-top:6px;
+ box-sizing:border-box;
+ font-family:Arial
+}
+textarea{
+ min-height:70px
+}
+
+/* ===== BUTTON ===== */
+.btn{
+ margin-top:20px;
+ padding:10px 16px;
+ border:none;
+ border-radius:4px;
+ cursor:pointer;
+ font-size:15px;
+ background:#2e7d32;
+ color:#fff
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ 🌱 FarmerBase BP Engine → Short Info
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<!-- ================= AUTO BUSINESS META ================= -->
+<div class="meta">
+ <b>सञ्चालक (Proprietor):</b>
+ <span id="showProprietor"></span><br>
+
+ <b>व्यवसाय / फर्म:</b>
+ <span id="showFirm"></span>
+</div>
+
+<h2>संक्षिप्त विवरण (Short Information)</h2>
+
+<label>📍 व्यवसायको ठेगाना</label>
+<input id="location" placeholder="जिल्ला, गाउँपालिका, वडा">
+
+<label>🏷️ व्यवसायको प्रकार</label>
+<input id="bizType" placeholder="कृषि, पशुपालन, उद्योग, सेवा">
+
+<label>📝 व्यवसायको संक्षिप्त परिचय</label>
+<textarea id="intro"
+ placeholder="यो व्यवसाय के हो ? किन सुरु गरिएको ?"></textarea>
+
+<button class="btn" onclick="saveAndNext()">
+ Next ➡️
+</button>
+
+</div>
+
+</div>
+
+<footer>
+ FarmerBase BP Engine – कृषकमैत्री व्यवसाय योजना प्रणाली
+</footer>
+
+<script>
+/* ================= LOAD ACTIVE BUSINESS ================= */
+const activeId = localStorage.getItem("activeBusinessId");
+let list = JSON.parse(localStorage.getItem("businessList")) || [];
+
+const business = list.find(b => b.id === activeId);
+
+if(!business){
+ alert("Active business भेटिएन। कृपया index बाट पुनः सुरु गर्नुहोस्।");
+}
+
+/* ================= SHOW META ================= */
+document.getElementById("showProprietor").innerText =
+ business.proprietor || "";
+
+document.getElementById("showFirm").innerText =
+ business.name || "";
+
+/* ================= LOAD EXISTING SHORT INFO ================= */
+document.getElementById("location").value =
+ business.location || "";
+
+document.getElementById("bizType").value =
+ business.type || "";
+
+document.getElementById("intro").value =
+ business.intro || "";
+
+/* ================= SAVE & NEXT ================= */
+function saveAndNext(){
+ business.location =
+  document.getElementById("location").value.trim();
+
+ business.type =
+  document.getElementById("bizType").value.trim();
+
+ business.intro =
+  document.getElementById("intro").value.trim();
+
+ business.updatedAt = Date.now();
+
+ localStorage.setItem(
+  "businessList",
+  JSON.stringify(list)
+ );
+
+ // 👉 NEXT PAGE
+ window.location.href = "production.html";
+}
+</script>
+
+</body>
+</html>
 
