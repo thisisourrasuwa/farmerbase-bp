@@ -7,7 +7,8 @@
 <style>
 body{font-family:Arial;background:#f5f5f5;margin:0}
 header,footer{
- background:#2e7d32;color:#fff;padding:12px 20px;
+ background:#2e7d32;color:#fff;
+ padding:12px 20px;
  display:flex;justify-content:space-between;align-items:center
 }
 header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
@@ -114,40 +115,31 @@ td input{width:100%;box-sizing:border-box}
 </footer>
 
 <script>
-/* ================= LOAD (ALIGNED WITH EXPENSES) ================= */
-const fbData =
- JSON.parse(localStorage.getItem("farmerBaseData")) || {};
+/* =================================================
+   LOAD FROM EXPENSES (FINAL CONTRACT)
+================================================= */
+const annualVar =
+ Number(localStorage.getItem("variable_annual_cost")) || 0;
 
-const expenses = fbData.expenses || [];
+const fixedCap =
+ Number(localStorage.getItem("fixed_total_capital")) || 0;
+
 let sources =
- fbData.capitalSources || [];
+ JSON.parse(localStorage.getItem("capitalSources")) || [];
 
-/* ================= CALC ================= */
-function fixedCapital(){
- return expenses
-  .filter(e=>e.type==="fixed")
-  .reduce((s,e)=>s+(e.qty*e.rate||0),0);
-}
-
-function annualVariable(){
- return expenses
-  .filter(e=>e.type==="variable")
-  .reduce((s,e)=>s+(e.qty*e.rate||0),0);
-}
-
-/* ================= SAVE ================= */
+/* =================================================
+   SAVE
+================================================= */
 function save(){
- const data =
-  JSON.parse(localStorage.getItem("farmerBaseData")) || {};
- data.capitalSources = sources;
-
  localStorage.setItem(
-  "farmerBaseData",
-  JSON.stringify(data)
+  "capitalSources",
+  JSON.stringify(sources)
  );
 }
 
-/* ================= CRUD ================= */
+/* =================================================
+   CRUD
+================================================= */
 function addSource(){
  sources.push({
   id:"c"+Date.now(),
@@ -170,7 +162,9 @@ function removeSource(id){
  }
 }
 
-/* ================= WORKING CAPITAL ================= */
+/* =================================================
+   WORKING CAPITAL
+================================================= */
 function calcWorkingCap(annual){
  const mode=document.getElementById("wcMode").value;
 
@@ -178,23 +172,28 @@ function calcWorkingCap(annual){
   const m=Number(document.getElementById("wcMonths").value)||3;
   return (annual/12)*m;
  }
+
  if(mode==="percent"){
   const p=Number(document.getElementById("wcPercent").value)||0;
   return annual*p/100;
  }
+
  if(mode==="manual"){
   return Number(document.getElementById("wcManual").value)||0;
  }
+
  return 0;
 }
 
-/* ================= RENDER ================= */
+/* =================================================
+   RENDER
+================================================= */
 function render(){
- const fixed=fixedCapital();
- const annual=annualVariable();
+ document.getElementById("fixedCap").innerText =
+  fixedCap.toFixed(2);
 
- document.getElementById("fixedCap").innerText=fixed.toFixed(2);
- document.getElementById("annualVar").innerText=annual.toFixed(2);
+ document.getElementById("annualVar").innerText =
+  annualVar.toFixed(2);
 
  const mode=document.getElementById("wcMode").value;
  let opt="";
@@ -219,19 +218,26 @@ function render(){
 
  document.getElementById("wcOptions").innerHTML=opt;
 
- const working=calcWorkingCap(annual);
- const totalCap=fixed+working;
+ const working=calcWorkingCap(annualVar);
+ const totalCap=fixedCap+working;
 
- document.getElementById("workingCap").innerText=working.toFixed(2);
- document.getElementById("totalCapital").innerText=totalCap.toFixed(2);
+ document.getElementById("workingCap").innerText =
+  working.toFixed(2);
+
+ document.getElementById("totalCapital").innerText =
+  totalCap.toFixed(2);
 
  const tb=document.getElementById("capBody");
  tb.innerHTML="";
 
- const totalSrc=sources.reduce((s,x)=>s+(Number(x.amount)||0),0);
+ const totalSrc=sources.reduce(
+  (s,x)=>s+(Number(x.amount)||0),0
+ );
 
  sources.forEach(s=>{
-  const pct=totalCap?((s.amount/totalCap)*100).toFixed(1):"0";
+  const pct=totalCap
+   ?((s.amount/totalCap)*100).toFixed(1)
+   :"0";
 
   tb.innerHTML+=`
 <tr>
@@ -251,10 +257,15 @@ function render(){
 </tr>`;
  });
 
- document.getElementById("totalSource").innerText=totalSrc.toFixed(2);
+ document.getElementById("totalSource").innerText =
+  totalSrc.toFixed(2);
 
- const pct=totalCap?((totalSrc/totalCap)*100).toFixed(1):"0";
- document.getElementById("totalPercent").innerText=pct+"%";
+ const pct=totalCap
+  ?((totalSrc/totalCap)*100).toFixed(1)
+  :"0";
+
+ document.getElementById("totalPercent").innerText =
+  pct+"%";
 
  document.getElementById("status").innerHTML=
   pct==100
