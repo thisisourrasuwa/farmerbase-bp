@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>PDF Merge – FarmerBase BP Engine</title>
+
+<style>
+body{
+ font-family:Arial;
+ background:#f4f6f8;
+ margin:0
+}
+header,footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:14px 20px;
+ text-align:center
+}
+.container{
+ max-width:900px;
+ margin:auto;
+ padding:25px
+}
+.card{
+ background:#fff;
+ padding:25px;
+ border-radius:6px;
+ box-shadow:0 2px 8px rgba(0,0,0,.1)
+}
+h1,h2{color:#2e7d32;margin-top:0}
+input[type=file]{
+ margin:10px 0
+}
+button{
+ padding:10px 18px;
+ border:none;
+ border-radius:4px;
+ cursor:pointer;
+ background:#2e7d32;
+ color:#fff;
+ font-size:15px
+}
+.note{
+ background:#f1f8e9;
+ padding:12px;
+ border-left:5px solid #2e7d32;
+ margin:15px 0
+}
+ul{
+ line-height:1.7
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ 📄 PDF Merge – FarmerBase BP Engine
+</header>
+
+<div class="container">
+<div class="card">
+
+<h1>PDF Merge Tool</h1>
+
+<p>
+यहाँबाट तपाईंले <b>धेरैवटा PDF फाइलहरू</b> छानेर
+<b>एकै PDF</b> मा Merge गर्न सक्नुहुन्छ।
+</p>
+
+<div class="note">
+✔️ फाइलहरू तपाईंको कम्प्युटरमै merge हुन्छन्<br>
+✔️ कुनै पनि PDF बाहिर upload हुँदैन (100% safe)
+</div>
+
+<h2>📂 PDF फाइलहरू छान्नुहोस्</h2>
+<input type="file" id="pdfFiles" multiple accept="application/pdf">
+
+<p style="font-size:14px;color:#555">
+👉 फाइल छानेको क्रममै merge हुन्छ।
+</p>
+
+<button onclick="mergePDFs()">🔗 Merge PDFs</button>
+
+</div>
+</div>
+
+<footer>
+ FarmerBase BP Engine – PDF Utilities
+</footer>
+
+<!-- ===== PDF-LIB (Client Side) ===== -->
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<script>
+async function mergePDFs(){
+ const input = document.getElementById("pdfFiles");
+ const files = input.files;
+
+ if(!files.length){
+  alert("कम्तिमा एक PDF छान्नुहोस्");
+  return;
+ }
+
+ const mergedPdf = await PDFLib.PDFDocument.create();
+
+ for(const file of files){
+  const bytes = await file.arrayBuffer();
+  const pdf = await PDFLib.PDFDocument.load(bytes);
+  const pages = await mergedPdf.copyPages(
+   pdf,
+   pdf.getPageIndices()
+  );
+  pages.forEach(p => mergedPdf.addPage(p));
+ }
+
+ const mergedBytes = await mergedPdf.save();
+ const blob = new Blob([mergedBytes], {type:"application/pdf"});
+ const url = URL.createObjectURL(blob);
+
+ // auto download
+ const a = document.createElement("a");
+ a.href = url;
+ a.download = "Merged_Proposal.pdf";
+ a.click();
+
+ URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
