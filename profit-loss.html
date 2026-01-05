@@ -45,12 +45,15 @@ td.amount{text-align:right}
 <h1>नाफा / नोक्सान सारांश (Profit / Loss)</h1>
 
 <div class="summary">
- ✔️ आम्दानी, चालु खर्च र ब्याजका आधारमा  
+ ✔️ उत्पादन, चालु खर्च र ऋणको ब्याजका आधारमा  
  <b>शुद्ध नाफा / नोक्सान स्वतः</b> गणना हुन्छ ।
 </div>
 
 <table>
-<tr><th>शीर्षक</th><th>रकम (Rs.)</th></tr>
+<tr>
+ <th>शीर्षक</th>
+ <th>रकम (Rs.)</th>
+</tr>
 
 <tr>
  <td class="label">कुल आम्दानी (Total Income)</td>
@@ -91,45 +94,63 @@ td.amount{text-align:right}
  <a href="profit-distribution.html">नाफा वितरण ➡️</a>
 </footer>
 
-<!-- ✅ SCRIPT MUST BE HERE -->
+<!-- ================= SCRIPT (MUST BE HERE) ================= -->
 <script>
-/* ===== TOTAL INCOME (FROM PRODUCTIONS) ===== */
+/* =====================================================
+   1️⃣ TOTAL INCOME — FROM PRODUCTIONS (REAL STRUCTURE)
+===================================================== */
 let totalIncome = 0;
+
 const productions =
  JSON.parse(localStorage.getItem("productions")) || [];
 
 productions.forEach(p=>{
- totalIncome += Number(p.total || 0);
+ const qty = Number(p.qty) || 0;
+ const sellRate = Number(p.sellRate || p.rate || 0);
+ totalIncome += qty * sellRate;
 });
 
-/* ===== VARIABLE EXPENSE ===== */
+/* =====================================================
+   2️⃣ VARIABLE (ANNUAL) EXPENSE
+===================================================== */
 const annualVar =
  Number(localStorage.getItem("variable_annual_cost")) || 0;
 
-/* ===== INTEREST ===== */
+/* =====================================================
+   3️⃣ INTEREST EXPENSE
+===================================================== */
 const interestExpense =
  Number(localStorage.getItem("annual_interest_cost")) || 0;
 
-/* ===== TOTAL & NET ===== */
+/* =====================================================
+   4️⃣ TOTAL EXPENSE & NET PROFIT
+===================================================== */
 const totalExpense = annualVar + interestExpense;
 const netProfit = totalIncome - totalExpense;
 
-/* ===== RENDER ===== */
+/* =====================================================
+   5️⃣ RENDER TO UI
+===================================================== */
 document.getElementById("totalIncome").innerText =
  totalIncome.toFixed(2);
+
 document.getElementById("annualVar").innerText =
  annualVar.toFixed(2);
+
 document.getElementById("interestExpense").innerText =
  interestExpense.toFixed(2);
+
 document.getElementById("totalExpense").innerText =
  totalExpense.toFixed(2);
 
-const np=document.getElementById("netProfit");
+const np = document.getElementById("netProfit");
 np.innerText = netProfit.toFixed(2);
 np.className =
- "amount net " + (netProfit < 0 ? "loss":"profit");
+ "amount net " + (netProfit < 0 ? "loss" : "profit");
 
-/* ===== SAVE ===== */
+/* =====================================================
+   6️⃣ SAVE FOR NEXT PAGES
+===================================================== */
 localStorage.setItem("totalIncome", totalIncome);
 localStorage.setItem("totalExpense", totalExpense);
 localStorage.setItem("netProfit", netProfit);
