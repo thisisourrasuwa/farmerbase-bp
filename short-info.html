@@ -57,7 +57,7 @@ label{
  display:block;
  margin-top:14px
 }
-input, textarea{
+input, textarea, select{
  width:100%;
  padding:8px;
  margin-top:6px;
@@ -113,6 +113,18 @@ textarea{
 <textarea id="intro"
  placeholder="यो व्यवसाय के हो ? किन सुरु गरिएको ?"></textarea>
 
+<label>📄 दर्ता प्रकृया सम्बन्धि विवरण</label>
+<select id="registrationStatus">
+ <option value="">-- दर्ता स्थिति छान्नुहोस् --</option>
+ <option value="दर्ता भइसकेको">दर्ता भइसकेको</option>
+ <option value="दर्ता प्रकृयामा">दर्ता प्रकृयामा</option>
+ <option value="दर्ता गर्न बाँकी">दर्ता गर्न बाँकी</option>
+</select>
+
+<label>🧾 दर्ता सम्बन्धि थप विवरण</label>
+<textarea id="registrationDetail"
+ placeholder="कहाँ दर्ता गरिएको/गरिने (वडा, पालिका, उद्योग कार्यालय, सहकारी, आदि)"></textarea>
+
 <button class="btn" onclick="saveAndNext()">
  Next ➡️
 </button>
@@ -153,6 +165,12 @@ document.getElementById("bizType").value =
 document.getElementById("intro").value =
  business.intro || "";
 
+document.getElementById("registrationStatus").value =
+ business.registrationStatus || "";
+
+document.getElementById("registrationDetail").value =
+ business.registrationDetail || "";
+
 /* ================= SAVE & NEXT ================= */
 function saveAndNext(){
  business.location =
@@ -163,6 +181,12 @@ function saveAndNext(){
 
  business.intro =
   document.getElementById("intro").value.trim();
+
+ business.registrationStatus =
+  document.getElementById("registrationStatus").value;
+
+ business.registrationDetail =
+  document.getElementById("registrationDetail").value.trim();
 
  business.updatedAt = Date.now();
 
@@ -178,4 +202,3 @@ function saveAndNext(){
 
 </body>
 </html>
-
