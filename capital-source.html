@@ -55,7 +55,6 @@ td input{width:100%;box-sizing:border-box}
 
 <!-- ================= SUMMARY ================= -->
 <div class="summary">
-
 <b>स्थिर पूँजी:</b> <span id="fixedCap">0</span><br>
 <b>वार्षिक चालु खर्च:</b> <span id="annualVar">0</span><br><br>
 
@@ -65,22 +64,19 @@ td input{width:100%;box-sizing:border-box}
  <option value="percent">प्रतिशत आधारित</option>
  <option value="manual">Manual</option>
 </select>
-
 <span id="wcOptions"></span>
 
 <hr>
 
 <b>कार्यशील पूँजी:</b> <span id="workingCap">0</span><br>
 <b>कुल आवश्यक पूँजी:</b> <span id="totalCapital">0</span><br>
-
 <b>कुल %:</b> <span id="totalPercent">0%</span>
 <span id="status"></span><br>
 
 <b>वार्षिक ब्याज खर्च:</b> <span id="totalInterest">0</span>
-
 </div>
 
-<!-- ================= SOURCE TABLE ================= -->
+<!-- ================= TABLE ================= -->
 <table>
 <thead>
 <tr>
@@ -109,27 +105,23 @@ const annualVar = parseFloat(localStorage.getItem("variable_annual_cost")) || 0;
 const fixedCap  = parseFloat(localStorage.getItem("fixed_total_capital")) || 0;
 
 /* ================= WORKING CAPITAL STATE ================= */
-let wcState =
- JSON.parse(localStorage.getItem("wcState")) || {
-  mode:"months",
-  months:3,
-  percent:20,
-  manual:0
- };
+let wcState = JSON.parse(localStorage.getItem("wcState")) || {
+ mode:"months", months:3, percent:20, manual:0
+};
 
 function saveWC(){
- localStorage.setItem("wcState",JSON.stringify(wcState));
+ localStorage.setItem("wcState", JSON.stringify(wcState));
 }
 function changeWCMode(m){
- wcState.mode=m; saveWC(); render();
+ wcState.mode = m;
+ saveWC(); render();
 }
 
 /* ================= CAPITAL SOURCES ================= */
-let sources =
- JSON.parse(localStorage.getItem("capitalSources")) || [];
+let sources = JSON.parse(localStorage.getItem("capitalSources")) || [];
 
 function saveSources(){
- localStorage.setItem("capitalSources",JSON.stringify(sources));
+ localStorage.setItem("capitalSources", JSON.stringify(sources));
 }
 
 function addSource(){
@@ -142,45 +134,47 @@ function addSource(){
  saveSources(); render();
 }
 
-function update(id,field,val){
- const s=sources.find(x=>x.id===id);
+/* 🔴 MAIN BUG FIX IS HERE */
+function updateSource(id, field, val){
+ const s = sources.find(x => x.id === id);
 
- if(field==="type"){
-  s.type = val;
-  if(val==="self"||val==="grant"){
-   s.interest = 0;   // auto reset
+ if(field === "type"){
+  s.type = val;                 // KEEP STRING
+  if(val === "self" || val === "grant"){
+   s.interest = 0;              // auto reset interest
   }
  }else{
   s[field] = parseFloat(val) || 0;
  }
 
- saveSources(); render();
+ saveSources();
+ render();
 }
 
 function removeSource(id){
  if(confirm("हटाउने हो ?")){
-  sources=sources.filter(s=>s.id!==id);
+  sources = sources.filter(s => s.id !== id);
   saveSources(); render();
  }
 }
 
 /* ================= WORKING CAPITAL ================= */
 function calcWorkingCap(){
- if(wcState.mode==="months")
-  return (annualVar/12)*(wcState.months||3);
- if(wcState.mode==="percent")
-  return annualVar*(wcState.percent||0)/100;
- if(wcState.mode==="manual")
-  return wcState.manual||0;
+ if(wcState.mode === "months")
+  return (annualVar/12) * (wcState.months || 3);
+ if(wcState.mode === "percent")
+  return annualVar * (wcState.percent || 0) / 100;
+ if(wcState.mode === "manual")
+  return wcState.manual || 0;
  return 0;
 }
 
 /* ================= RENDER ================= */
 function render(){
- document.getElementById("fixedCap").innerText=fixedCap.toFixed(2);
- document.getElementById("annualVar").innerText=annualVar.toFixed(2);
+ document.getElementById("fixedCap").innerText = fixedCap.toFixed(2);
+ document.getElementById("annualVar").innerText = annualVar.toFixed(2);
 
- document.getElementById("wcMode").value=wcState.mode;
+ document.getElementById("wcMode").value = wcState.mode;
  let opt="";
  if(wcState.mode==="months"){
   opt=` महिना:
@@ -203,34 +197,34 @@ function render(){
    onchange="wcState.manual=this.value;saveWC();render()"
    style="width:120px">`;
  }
- document.getElementById("wcOptions").innerHTML=opt;
+ document.getElementById("wcOptions").innerHTML = opt;
 
- const workingCap=calcWorkingCap();
- const totalCapital=fixedCap+workingCap;
+ const workingCap = calcWorkingCap();
+ const totalCapital = fixedCap + workingCap;
 
- document.getElementById("workingCap").innerText=workingCap.toFixed(2);
- document.getElementById("totalCapital").innerText=totalCapital.toFixed(2);
+ document.getElementById("workingCap").innerText = workingCap.toFixed(2);
+ document.getElementById("totalCapital").innerText = totalCapital.toFixed(2);
 
- const tb=document.getElementById("capBody");
+ const tb = document.getElementById("capBody");
  tb.innerHTML="";
- let sumPct=0,totalInterest=0;
+ let sumPct=0, totalInterest=0;
 
  sources.forEach(s=>{
-  const pct=s.pct||0;
-  const amt=totalCapital*pct/100;
+  const pct = s.pct || 0;
+  const amt = totalCapital * pct / 100;
 
   const interestAmt =
    (s.type==="loan"||s.type==="other")
-    ? amt*(s.interest||0)/100
+    ? amt * (s.interest||0) / 100
     : 0;
 
-  sumPct+=pct;
-  totalInterest+=interestAmt;
+  sumPct += pct;
+  totalInterest += interestAmt;
 
-  tb.innerHTML+=`
+  tb.innerHTML += `
 <tr>
 <td>
- <select onchange="update(${s.id},'type',this.value)">
+ <select onchange="updateSource(${s.id},'type',this.value)">
   <option value="self" ${s.type==="self"?"selected":""}>स्वलगानी</option>
   <option value="grant" ${s.type==="grant"?"selected":""}>अनुदान</option>
   <option value="loan" ${s.type==="loan"?"selected":""}>बैंक/सहकारी ऋण</option>
@@ -239,13 +233,13 @@ function render(){
 </td>
 <td>
  <input type="number" value="${pct}"
-  oninput="update(${s.id},'pct',this.value)">
+  oninput="updateSource(${s.id},'pct',this.value)">
 </td>
 <td>${amt.toFixed(2)}</td>
 <td>
  <input type="number" value="${s.interest}"
   ${s.type==="loan"||s.type==="other"?"":"disabled"}
-  oninput="update(${s.id},'interest',this.value)">
+  oninput="updateSource(${s.id},'interest',this.value)">
 </td>
 <td>${interestAmt.toFixed(2)}</td>
 <td>
@@ -255,10 +249,10 @@ function render(){
 </tr>`;
  });
 
- document.getElementById("totalPercent").innerText=sumPct+"%";
- document.getElementById("totalInterest").innerText=totalInterest.toFixed(2);
+ document.getElementById("totalPercent").innerText = sumPct + "%";
+ document.getElementById("totalInterest").innerText = totalInterest.toFixed(2);
 
- document.getElementById("status").innerHTML=
+ document.getElementById("status").innerHTML =
   sumPct===100
    ?'<span class="ok"> ✔️ 100% मिल्यो</span>'
    :'<span class="warn"> ❗ 100% हुनुपर्छ</span>';
