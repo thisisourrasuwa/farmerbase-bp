@@ -15,7 +15,7 @@ body{
 header{
  background:#2e7d32;
  color:#fff;
- padding:12px 20px;
+ padding:14px 20px;
  font-size:18px;
  font-weight:bold
 }
@@ -26,39 +26,36 @@ header{
  margin:auto;
  padding:30px 20px
 }
-
 .row{
  display:grid;
  grid-template-columns:1fr 1fr;
  gap:30px
 }
 
-/* ===== LEFT : CREATE ===== */
+/* ===== CARD ===== */
 .card{
  background:#fff;
  padding:22px;
  border-radius:6px;
  box-shadow:0 2px 6px rgba(0,0,0,.08)
 }
-
-.card h2{
+.card h2,h3{
  margin-top:0;
  color:#2e7d32
 }
 
+/* ===== FORM ===== */
 label{
  font-weight:bold;
  display:block;
  margin-top:12px
 }
-
 input{
  width:100%;
  padding:8px;
  margin-top:6px;
  box-sizing:border-box
 }
-
 .btn{
  margin-top:18px;
  padding:10px 16px;
@@ -68,21 +65,37 @@ input{
  font-size:15px
 }
 .add{background:#2e7d32;color:#fff}
+.open{background:#0277bd;color:#fff}
+.del{background:#c62828;color:#fff}
 
-/* ===== RIGHT : INFO ===== */
-.info h2{
- margin-top:0;
- color:#2e7d32
-}
+/* ===== INFO ===== */
 .info p{
  line-height:1.7;
  color:#444;
  margin:8px 0
 }
 .info ul{
- margin-top:10px;
  padding-left:18px;
- color:#444
+ line-height:1.7
+}
+
+/* ===== MENU ===== */
+.menu{
+ list-style:none;
+ padding-left:0;
+ margin-top:10px
+}
+.menu li{
+ margin:6px 0
+}
+.menu a{
+ text-decoration:none;
+ color:#333;
+ font-weight:bold
+}
+.menu a:hover{
+ color:#2e7d32;
+ text-decoration:underline
 }
 
 /* ===== BUSINESS LIST ===== */
@@ -109,8 +122,6 @@ input{
  display:flex;
  justify-content:space-between
 }
-.open{background:#0277bd;color:#fff}
-.del{background:#c62828;color:#fff}
 
 /* ===== FOOTER ===== */
 footer{
@@ -122,7 +133,7 @@ footer{
  line-height:1.6
 }
 
-@media(max-width:800px){
+@media(max-width:900px){
  .row{grid-template-columns:1fr}
 }
 </style>
@@ -143,36 +154,50 @@ footer{
 <div class="card">
  <h2>➕ नयाँ व्यवसाय सुरु गर्नुहोस्</h2>
 
- <label>👤 प्रोपाइटर / संचालकको नाम</label>
- <input id="proprietor" placeholder="जस्तै: रामबहादुर तामाङ">
+ <label>👤 सञ्चालक / प्रोपाइटरको नाम</label>
+ <input id="proprietor" placeholder="जस्तै: शिवचन्द्र रोक्का">
 
  <label>🏷️ फर्म / व्यवसायको नाम</label>
- <input id="firm" placeholder="जस्तै: राम कृषि फर्म">
+ <input id="firm" placeholder="जस्तै: ईशान मल्टिपर्पज हब प्रा.लि.">
 
  <button class="btn add" onclick="startBusiness()">
   🚀 सुरु गरौं
  </button>
 </div>
 
-<!-- ===== RIGHT : INFO ===== -->
+<!-- ===== RIGHT : INFO + MENU ===== -->
 <div class="card info">
  <h2>FarmerBase BP Engine के हो ?</h2>
  <p>
- FarmerBase BP Engine किसान तथा साना उद्यमीका लागि
- <b>व्यवसायिक योजना (Business Plan)</b> तयार गर्ने
- कृषकमैत्री डिजिटल प्रणाली हो।
+ किसान, सहकारी र साना उद्यमीका लागि
+ <b>व्यवसायिक योजना (Business Plan)</b>
+ तयार गर्ने कृषकमैत्री डिजिटल प्रणाली हो।
  </p>
 
  <ul>
-  <li>उत्पादन, आम्दानी, खर्च, पुँजी र नाफा–नोक्सान स्वतः गणना</li>
+  <li>उत्पादन, खर्च, आम्दानी, पूँजी, नाफा–नोक्सान स्वतः गणना</li>
   <li>अनुदान, बैंक/सहकारी ऋण प्रस्तावका लागि उपयुक्त</li>
   <li>५ वर्षे प्रक्षेपण र ROI विश्लेषण</li>
-  <li>सरल इन्ट्री, यथार्थपरक नतिजा</li>
  </ul>
 
- <p>
- 👉 बायाँतिर आफ्नो विवरण राखेर तुरुन्त योजना सुरु गर्नुस्।
- </p>
+ <hr>
+
+ <h3>🧰 उपयोगी मेनु</h3>
+ <ul class="menu">
+  <li><a href="full-proposal.html">🖨️ Full Proposal PDF</a></li>
+  <li><a href="pdf-merge.html">📄 PDF Merge</a></li>
+  <li><a href="summary.html">📊 Summary Report</a></li>
+  <li><a href="backup.html">📥 Backup Data</a></li>
+  <li><a href="restore.html">📤 Restore Data</a></li>
+ </ul>
+
+ <h3>📘 User Help</h3>
+ <ul class="menu">
+  <li><a href="user-guide.html">📖 User Guide</a></li>
+  <li><a href="how-to.html">🎥 How to Use</a></li>
+  <li><a href="faq.html">❓ FAQ</a></li>
+  <li><a href="support.html">📞 Support</a></li>
+ </ul>
 </div>
 
 </div>
@@ -204,7 +229,7 @@ function startBusiness(){
   document.getElementById("firm").value.trim();
 
  if(!proprietor || !firm){
-  alert("प्रोपाइटर र फर्म दुवै नाम आवश्यक छ");
+  alert("सञ्चालक र फर्म दुवै नाम आवश्यक छ");
   return;
  }
 
@@ -249,6 +274,7 @@ function openBusiness(id){
  localStorage.setItem("activeBusinessId",id);
  window.location.href="short-info.html";
 }
+
 function deleteBusiness(id){
  if(!confirm("यो व्यवसाय हटाउने हो ?")) return;
  businessList=businessList.filter(b=>b.id!==id);
