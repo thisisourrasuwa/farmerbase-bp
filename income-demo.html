@@ -1,1 +1,196 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Income</title>
+
+<style>
+body{font-family:Arial;background:#f5f5f5;margin:0}
+header,footer{
+ background:#2e7d32;color:#fff;padding:12px 20px;
+ display:flex;justify-content:space-between;align-items:center
+}
+header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
+
+.container{
+ max-width:1200px;
+ margin:auto;
+ background:#fff;
+ padding:20px;
+ min-height:70vh
+}
+
+h1{text-align:center;font-size:32px;color:#2e7d32;margin:15px 0}
+
+table{
+ width:100%;
+ border-collapse:collapse;
+ table-layout:fixed
+}
+th,td{
+ border:1px solid #ccc;
+ padding:8px;
+ text-align:center;
+ font-size:14px
+}
+th{background:#e8f5e9}
+
+.col-prod{width:180px}
+.col-unit{width:80px}
+.col-qty{width:110px}
+.col-cost{width:140px}
+.col-profitpct{width:110px}
+.col-rate{width:140px}
+.col-sales{width:140px}
+.col-profit{width:140px}
+
+td input{
+ width:100%;
+ box-sizing:border-box;
+ padding:5px
+}
+
+.note{
+ font-size:13px;
+ color:#555;
+ margin-top:10px
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="capital-source.html">⬅️ पुँजिको स्रोत</a>
+  <span>आम्दानी (यहाँ नाफा % मात्र निर्धारण गर्ने)</span>
+  <a href="profit-loss.html">नाफा-नोक्सान ➡️</a>
+</header>
+
+<div class="container">
+<table>
+<thead>
+<tr>
+  <th class="col-prod">उत्पादन</th>
+  <th class="col-unit">इकाई</th>
+  <th class="col-qty">उत्पादन परिमाण</th>
+  <th class="col-cost">लागत / इकाई (Auto)</th>
+  <th class="col-profitpct">नाफा %</th>
+  <th class="col-rate">बिक्री दर (Auto)</th>
+  <th class="col-sales">कुल आम्दानी</th>
+  <th class="col-profit">नाफा</th>
+</tr>
+</thead>
+<tbody id="incomeBody"></tbody>
+</table>
+
+<div class="note">
+✔️ उत्पादन, इकाई, परिमाण र लागत Expense बाट अटो आएको हो ।<br>
+✔️ यहाँ <b>नाफा % मात्र</b> हाल्नुहोस् — बिक्री दर र नाफा सिस्टमले निकाल्छ ।
+</div>
+</div>
+
+<footer>
+  <a href="capital-source.html">⬅️ पुँजिको स्रोत</a>
+  <span>Farmerbase BP Engine – Income Module</span>
+  <a href="profit-loss.html">नाफा-नोक्सान ➡️</a>
+</footer>
+
+<script>
+/* ================= LOAD DATA ================= */
+const productions = JSON.parse(localStorage.getItem("productions")) || [];
+const expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+let incomes = JSON.parse(localStorage.getItem("incomes")) || {};
+
+/* ================= COST ALLOCATION ================= */
+function allocateExpense(exp){
+ const map = exp.map || {};
+ const keys = Object.keys(map);
+ if(keys.length===0) return {};
+
+ let weightSum = 0;
+ keys.forEach(k=>{
+  weightSum += typeof map[k]==="number" ? map[k] : 1;
+ });
+
+ const baseCost = exp.type==="fixed"
+   ? (exp.qty * exp.rate) / (exp.life || 1)
+   : (exp.qty * exp.rate);
+
+ const out = {};
+ keys.forEach(k=>{
+  const w = typeof map[k]==="number" ? map[k] : 1;
+  out[k] = baseCost * (w / weightSum);
+ });
+ return out;
+}
+
+function productionCostMap(){
+ const map = {};
+ productions.forEach(p=>map[p.id]=0);
+
+ expenses.forEach(e=>{
+  const alloc = allocateExpense(e);
+  Object.keys(alloc).forEach(pid=>{
+   if(map[pid] !== undefined){
+    map[pid] += alloc[pid];
+   }
+  });
+ });
+ return map;
+}
+
+/* ================= RENDER ================= */
+function render(){
+ const tb = document.getElementById("incomeBody");
+ tb.innerHTML = "";
+
+ const costMap = productionCostMap();
+ let grandTotal = 0;   // 🔥 TOTAL SALES (NEW)
+
+ productions.forEach(p=>{
+  const totalCost = costMap[p.id] || 0;
+  const qty = Number(p.quantity) || 1;
+  const costPerUnit = totalCost / qty;
+
+  if(!incomes[p.id]) incomes[p.id] = { profitPct: 0 };
+  const profitPct = incomes[p.id].profitPct || 0;
+
+  const sellingRate = costPerUnit * (1 + profitPct/100);
+  const sales = sellingRate * qty;
+  const profit = sales - totalCost;
+
+  grandTotal += sales; // 🔥 ADD TO TOTAL
+
+  tb.innerHTML += `
+<tr>
+<td>${p.name}</td>
+<td>${p.unit}</td>
+<td>${qty}</td>
+<td>${costPerUnit.toFixed(2)}</td>
+<td>
+  <input type="number" value="${profitPct}"
+    onchange="updateProfit('${p.id}', this.value)">
+</td>
+<td>${sellingRate.toFixed(2)}</td>
+<td>${sales.toFixed(2)}</td>
+<td>${profit.toFixed(2)}</td>
+</tr>`;
+ });
+
+ // 🔥 PUBLISH TOTAL INCOME (FOR PROFIT-LOSS)
+ localStorage.setItem("totalIncome", grandTotal);
+}
+
+/* ================= UPDATE PROFIT % ================= */
+function updateProfit(pid, val){
+ incomes[pid].profitPct = Number(val) || 0;
+ localStorage.setItem("incomes", JSON.stringify(incomes));
+ render();
+}
+
+render();
+</script>
+
+</body>
+</html>
 
