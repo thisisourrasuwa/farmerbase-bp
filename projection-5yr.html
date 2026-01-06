@@ -2,87 +2,162 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>5 Year Projection</title>
+<title>5-Year Projection</title>
+
 <style>
 body{font-family:Arial;background:#f5f5f5;margin:0}
-header,footer{background:#2e7d32;color:#fff;padding:12px 20px;
-display:flex;justify-content:space-between;align-items:center}
+header,footer{
+ background:#2e7d32;color:#fff;
+ padding:12px 20px;
+ display:flex;justify-content:space-between;align-items:center
+}
 header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
-.container{max-width:1200px;margin:auto;background:#fff;padding:20px}
-h1{text-align:center;color:#2e7d32}
-table{width:100%;border-collapse:collapse;margin-top:15px}
-th,td{border:1px solid #ccc;padding:8px;text-align:center}
+
+.container{
+ max-width:1200px;
+ margin:auto;
+ background:#fff;
+ padding:20px;
+ min-height:70vh
+}
+
+h1{text-align:center;color:#2e7d32;margin:15px 0}
+
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:20px
+}
+th,td{
+ border:1px solid #ccc;
+ padding:8px;
+ text-align:center
+}
 th{background:#e8f5e9}
-input{width:80px;padding:4px}
+
+input{
+ width:70px;
+ padding:5px;
+ text-align:center
+}
+
+.note{
+ background:#f1f8e9;
+ border-left:4px solid #2e7d32;
+ padding:15px;
+ margin-top:25px
+}
+
+textarea{
+ width:100%;
+ height:120px;
+ padding:10px;
+ box-sizing:border-box
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<a href="profit-distribution.html">⬅️ मुनाफा वितरण</a>
-<span>५ वर्षे प्रक्षेपण (5-Year Projection)</span>
-<a href="roi-irr-payback.html"> लगानी विश्लेषण➡️</a>
+ <a href="roi-irr-payback.html">⬅️ लगानी विश्लेषण</a>
+ <span>५ वर्ष प्रक्षेपण (5-Year Projection)</span>
+ <a href="executive-summary.html">कार्यकारी सारांश ➡️</a>
 </header>
 
 <div class="container">
+
+<h1>५ वर्ष आम्दानी / खर्च / नाफा प्रक्षेपण</h1>
+
 <table>
 <thead>
 <tr>
-<th>वर्ष</th>
-<th>आम्दानी</th>
-<th>खर्च</th>
-<th>नाफा</th>
-<th>आम्दानी बृद्धि %</th>
-<th>खर्च बृद्धि %</th>
+ <th>वर्ष</th>
+ <th>आम्दानी (Rs.)</th>
+ <th>खर्च (Rs.)</th>
+ <th>नाफा (Rs.)</th>
+ <th>आम्दानी वृद्धि %</th>
+ <th>खर्च वृद्धि %</th>
 </tr>
 </thead>
 <tbody id="projBody"></tbody>
 </table>
+
+<div class="note">
+ <b>समझदारी:</b>
+ <ul>
+  <li>पहिलो वर्षको आम्दानी र खर्च वास्तविक डाटाबाट लिइएको हो।</li>
+  <li>आम्दानी र खर्चको वृद्धि दर परिवर्तन गर्दा सम्पूर्ण तालिका स्वतः गणना हुन्छ।</li>
+  <li>नाफा = आम्दानी − खर्च</li>
+ </ul>
+</div>
+
+<div class="note">
+ <b>समग्र व्याख्या / Narration</b><br><br>
+ <textarea id="projectionNarration" placeholder="उदाहरण: पहिलो वर्षको वास्तविक आम्दानी र खर्चलाई आधार मानी, आम्दानी १०% र खर्च ८% ले वार्षिक वृद्धि हुने अनुमान गरिएको छ।"></textarea>
+</div>
+
 </div>
 
 <footer>
- <a href="profit-distribution.html">⬅️ मुनाफा वितरण</a>
-<span>Farmerbase BP Engine- (5-Year Projection)</span>
-<a href="roi-irr-payback.html"> लगानी विश्लेषण➡️</a>
+ <a href="roi-irr-payback.html">⬅️ लगानी विश्लेषण</a>
+ <span>FarmerBase BP Engine – 5-Year Projection</span>
+ <a href="executive-summary.html">कार्यकारी सारांश ➡️</a>
 </footer>
 
 <script>
-let baseIncome=Number(localStorage.getItem("totalIncome"))||0;
-let baseExpense=Number(localStorage.getItem("totalExpense"))||0;
+/* ================= LOAD BASE DATA ================= */
+const baseIncome =
+ Number(localStorage.getItem("totalIncome")) || 0;
 
-let growth=JSON.parse(localStorage.getItem("growthRates"))||
-[{i:10,e:8},{i:10,e:8},{i:10,e:8},{i:10,e:8},{i:10,e:8}];
+const baseExpense =
+ Number(localStorage.getItem("totalExpense")) || 0;
 
-function save(){localStorage.setItem("growthRates",JSON.stringify(growth));}
+/* default growth rates */
+let incomeGrowth = 10;
+let expenseGrowth = 8;
 
-function render(){
- const tb=document.getElementById("projBody");
- tb.innerHTML="";
- let inc=baseIncome, exp=baseExpense;
+/* ================= RENDER ================= */
+function renderProjection(){
+ const tb = document.getElementById("projBody");
+ tb.innerHTML = "";
 
- for(let y=0;y<5;y++){
-  if(y>0){
-   inc+=inc*growth[y].i/100;
-   exp+=exp*growth[y].e/100;
-  }
-  const prof=inc-exp;
+ let income = baseIncome;
+ let expense = baseExpense;
 
-  tb.innerHTML+=`
+ for(let y=1;y<=5;y++){
+  const profit = income - expense;
+
+  tb.innerHTML += `
 <tr>
-<td>${y+1}</td>
-<td>${inc.toFixed(2)}</td>
-<td>${exp.toFixed(2)}</td>
-<td>${prof.toFixed(2)}</td>
-<td><input type="number" value="${growth[y].i}"
- onchange="growth[${y}].i=this.value;save();render()"></td>
-<td><input type="number" value="${growth[y].e}"
- onchange="growth[${y}].e=this.value;save();render()"></td>
+ <td>${y}</td>
+ <td>${income.toFixed(2)}</td>
+ <td>${expense.toFixed(2)}</td>
+ <td>${profit.toFixed(2)}</td>
+ <td>
+  <input type="number" value="${incomeGrowth}"
+   onchange="updateGrowth(this.value, 'income')">
+ </td>
+ <td>
+  <input type="number" value="${expenseGrowth}"
+   onchange="updateGrowth(this.value, 'expense')">
+ </td>
 </tr>`;
+
+  income = income * (1 + incomeGrowth/100);
+  expense = expense * (1 + expenseGrowth/100);
  }
 }
 
-render();
+function updateGrowth(val,type){
+ if(type==="income") incomeGrowth = Number(val)||0;
+ if(type==="expense") expenseGrowth = Number(val)||0;
+ renderProjection();
+}
+
+/* ================= INIT ================= */
+renderProjection();
 </script>
+
 </body>
 </html>
