@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Summary</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6f7;
+  line-height:1.6;
+}
+html{scroll-behavior:smooth}
+
+/* ===== Header ===== */
+header{
+  background:#2e7d32;
+  color:#fff;
+  padding:16px;
+  text-align:center;
+  font-size:24px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+/* ===== Page Follow Arrows ===== */
+.page-arrow{
+  position:fixed;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:26px;
+  background:#2e7d32;
+  color:#fff;
+  padding:10px 12px;
+  border-radius:50%;
+  text-decoration:none;
+  box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+.page-arrow:hover{background:#1b5e20}
+.prev{left:15px}
+.next{right:15px}
+
+/* ===== Scroll Arrows ===== */
+.scroll-arrow{
+  position:fixed;
+  right:18px;
+  font-size:24px;
+  background:#2e7d32;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:50%;
+  text-decoration:none;
+  box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+.down{top:90px}
+.up{bottom:20px}
+
+/* ===== Layout ===== */
+.container{
+  max-width:900px;
+  margin:auto;
+  background:#fff;
+  padding:30px;
+}
+
+h2{
+  color:#2e7d32;
+  border-bottom:2px solid #e0e0e0;
+  padding-bottom:6px;
+}
+
+.box{
+  background:#f9f9f9;
+  padding:18px;
+  margin:18px 0;
+  border-left:6px solid #2e7d32;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+th,td{
+  border:1px solid #ccc;
+  padding:10px;
+  text-align:right;
+}
+th{
+  background:#e8f5e9;
+  text-align:center;
+}
+td:first-child{text-align:left}
+
+.footer{
+  text-align:center;
+  padding:14px;
+  background:#2e7d32;
+  color:#fff;
+  margin-top:40px;
+}
+</style>
+</head>
+
+<body id="top">
+
+<header>
+  Summary  
+  <div style="font-size:13px;">FarmerBase BP Engine</div>
+</header>
+
+<!-- ===== PAGE FOLLOW ===== -->
+<a href="profit-loss.html" class="page-arrow prev" title="Back to Profit & Loss">⬅️</a>
+<a href="executive-summary.html" class="page-arrow next" title="Go to Executive Summary">➡️</a>
+
+<!-- ===== SCROLL FOLLOW ===== -->
+<a href="#end" class="scroll-arrow down" title="Scroll Down">⬇️</a>
+<a href="#top" class="scroll-arrow up" title="Back to Top">⬆️</a>
+
+<div class="container">
+
+<h2>१. व्यवसायिक झलक</h2>
+<p>
+यो Summary पेजले व्यवसायको
+<strong>आम्दानी, खर्च र नाफा</strong>
+को छोटो र स्पष्ट चित्र प्रस्तुत गर्दछ।
+यो बैंक, अनुदानदाता वा निर्णयकर्ताका लागि
+छिटो बुझिने overview हो।
+</p>
+
+<h2>२. मुख्य वित्तीय तथ्याङ्क</h2>
+
+<div class="box">
+  <p><b>कुल आम्दानी :</b> रु <span id="income">0</span></p>
+  <p><b>कुल खर्च :</b> रु <span id="expense">0</span></p>
+  <p><b>नेट नाफा :</b> रु <span id="profit">0</span></p>
+  <p><b>ROI :</b> <span id="roi">0</span> %</p>
+</div>
+
+<h2>३. 5-Year Snapshot</h2>
+
+<table>
+<thead>
+<tr>
+  <th>वर्ष</th>
+  <th>अनुमानित नाफा (रु)</th>
+</tr>
+</thead>
+<tbody id="projection"></tbody>
+</table>
+
+<h2>४. निष्कर्ष</h2>
+<p>
+उपलब्ध तथ्याङ्कका आधारमा
+यो व्यवसाय <strong>नाफामूलक र सम्भाव्य</strong>
+देखिन्छ। उचित व्यवस्थापन र बजार रणनीतिसहित
+यसले दीर्घकालीन आम्दानी दिने स्पष्ट आधार बनाउँछ।
+</p>
+
+<div id="end"></div>
+
+</div>
+
+<div class="footer">
+FarmerBase BP Engine – कृषकमैत्री व्यवसायिक योजना प्रणाली
+</div>
+
+<script>
+/* ===== Load Data ===== */
+let incomeData = JSON.parse(localStorage.getItem("incomeData") || "[]");
+let expenseData = JSON.parse(localStorage.getItem("expensesData") || "[]");
+
+/* ===== Calculate ===== */
+let income = incomeData.reduce((s,i)=>s+(+i.amount||0),0);
+let expense = expenseData.reduce((s,e)=>s+(+e.amount||0),0);
+let profit = income - expense;
+let roi = expense ? (profit/expense)*100 : 0;
+
+/* ===== Format ===== */
+const fmt = n => n.toLocaleString("en-IN");
+
+/* ===== Display ===== */
+document.getElementById("income").innerText = fmt(income);
+document.getElementById("expense").innerText = fmt(expense);
+document.getElementById("profit").innerText = fmt(profit);
+document.getElementById("roi").innerText = roi.toFixed(2);
+
+/* ===== Projection ===== */
+let tbody = document.getElementById("projection");
+for(let y=1;y<=5;y++){
+  let val = profit * y;
+  let tr = document.createElement("tr");
+  tr.innerHTML = `<td>Year ${y}</td><td>${fmt(val)}</td>`;
+  tbody.appendChild(tr);
+}
+</script>
+
+</body>
+</html>
