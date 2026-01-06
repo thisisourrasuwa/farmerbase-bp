@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Executive Summary</title>
+
+<style>
+body{
+  font-family:Arial, sans-serif;
+  margin:0;
+  background:#f4f6f7;
+  line-height:1.6;
+}
+header{
+  background:#2e7d32;
+  color:#fff;
+  padding:18px;
+  text-align:center;
+  font-size:26px;
+}
+.container{
+  max-width:1000px;
+  margin:auto;
+  background:#fff;
+  padding:30px;
+}
+h2{
+  color:#2e7d32;
+  border-bottom:2px solid #e0e0e0;
+  padding-bottom:6px;
+}
+.summary-box{
+  background:#f9f9f9;
+  padding:20px;
+  margin:20px 0;
+  border-left:6px solid #2e7d32;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+th,td{
+  border:1px solid #ccc;
+  padding:10px;
+  text-align:right;
+}
+th{
+  background:#e8f5e9;
+  text-align:center;
+}
+td:first-child{
+  text-align:left;
+}
+.footer{
+  text-align:center;
+  padding:15px;
+  background:#2e7d32;
+  color:#fff;
+  margin-top:40px;
+}
+.btns{
+  text-align:center;
+  margin-top:30px;
+}
+.btns a{
+  display:inline-block;
+  margin:5px;
+  padding:10px 18px;
+  background:#2e7d32;
+  color:#fff;
+  text-decoration:none;
+  border-radius:4px;
+}
+.btns a:hover{
+  background:#1b5e20;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  Executive Summary  
+  <div style="font-size:14px;">FarmerBase BP Engine</div>
+</header>
+
+<div class="container">
+
+<h2>१. व्यवसायको सार</h2>
+<p>
+यस व्यवसायिक योजनाले किसानमैत्री, यथार्थपरक तथा गणनामा आधारित
+<strong>आम्दानी–खर्च–नाफा</strong> को स्पष्ट चित्र प्रस्तुत गर्दछ।
+यसले व्यवसायको सम्भाव्यता, नाफामूलकता र दीर्घकालीन टिकाउपन
+निर्णय गर्न सहयोग पुर्‍याउँछ।
+</p>
+
+<h2>२. वित्तीय संक्षेप (Financial Snapshot)</h2>
+
+<div class="summary-box">
+  <p><b>कुल आम्दानी :</b> रु <span id="totalIncome">0</span></p>
+  <p><b>कुल खर्च :</b> रु <span id="totalExpense">0</span></p>
+  <p><b>नेट नाफा :</b> रु <span id="netProfit">0</span></p>
+  <p><b>ROI :</b> <span id="roi">0</span> %</p>
+</div>
+
+<h2>३. 5-Year Projection (संक्षेप)</h2>
+
+<table>
+<thead>
+<tr>
+  <th>वर्ष</th>
+  <th>अनुमानित नाफा (रु)</th>
+</tr>
+</thead>
+<tbody id="projectionTable"></tbody>
+</table>
+
+<h2>४. निष्कर्ष</h2>
+<p>
+उपलब्ध तथ्याङ्क र गणनाको आधारमा यो व्यवसाय
+<strong>आर्थिक रूपमा सम्भाव्य</strong> देखिन्छ।
+सही व्यवस्थापन, बजार पहुँच र लागत नियन्त्रण गर्न सकेमा
+यसबाट स्थिर तथा दिगो आम्दानी लिन सकिने स्पष्ट संकेत देखिन्छ।
+</p>
+
+<div class="btns">
+  <a href="profit-loss.html">⬅️ Profit / Loss</a>
+  <a href="#" onclick="window.print()">🖨️ Print Summary</a>
+</div>
+
+</div>
+
+<div class="footer">
+FarmerBase BP Engine – कृषकमैत्री व्यवसायिक योजना यन्त्र
+</div>
+
+<script>
+/* ===== Load Data ===== */
+let income = JSON.parse(localStorage.getItem("incomeData") || "[]");
+let expenses = JSON.parse(localStorage.getItem("expensesData") || "[]");
+
+/* ===== Calculate ===== */
+let totalIncome = income.reduce((s,i)=>s+(+i.amount||0),0);
+let totalExpense = expenses.reduce((s,e)=>s+(+e.amount||0),0);
+let netProfit = totalIncome - totalExpense;
+let roi = totalExpense ? ((netProfit / totalExpense) * 100) : 0;
+
+/* ===== Format ===== */
+const fmt = n => n.toLocaleString("en-IN");
+
+/* ===== Display ===== */
+document.getElementById("totalIncome").innerText = fmt(totalIncome);
+document.getElementById("totalExpense").innerText = fmt(totalExpense);
+document.getElementById("netProfit").innerText = fmt(netProfit);
+document.getElementById("roi").innerText = roi.toFixed(2);
+
+/* ===== Projection ===== */
+let tbody = document.getElementById("projectionTable");
+tbody.innerHTML = "";
+
+for(let y=1;y<=5;y++){
+  let val = netProfit * y;
+  let tr = document.createElement("tr");
+  tr.innerHTML = `<td>Year ${y}</td><td>${fmt(val)}</td>`;
+  tbody.appendChild(tr);
+}
+</script>
+
+</body>
+</html>
