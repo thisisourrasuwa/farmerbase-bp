@@ -11,13 +11,54 @@ body{
   background:#f4f6f7;
   line-height:1.6;
 }
+html{scroll-behavior:smooth}
+
+/* ===== Header ===== */
 header{
   background:#2e7d32;
   color:#fff;
   padding:18px;
   text-align:center;
   font-size:26px;
+  position:sticky;
+  top:0;
+  z-index:10;
 }
+
+/* ===== Page Follow Arrows ===== */
+.nav-arrow{
+  position:fixed;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:26px;
+  background:#2e7d32;
+  color:#fff;
+  padding:10px 12px;
+  border-radius:50%;
+  text-decoration:none;
+  box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+.nav-arrow:hover{background:#1b5e20}
+
+.prev{left:15px}
+.next{right:15px}
+
+/* Scroll arrows */
+.scroll-arrow{
+  position:fixed;
+  right:18px;
+  font-size:24px;
+  background:#2e7d32;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:50%;
+  text-decoration:none;
+  box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+.down{top:90px}
+.up{bottom:20px}
+
+/* ===== Layout ===== */
 .container{
   max-width:1000px;
   margin:auto;
@@ -29,12 +70,14 @@ h2{
   border-bottom:2px solid #e0e0e0;
   padding-bottom:6px;
 }
+
 .summary-box{
   background:#f9f9f9;
   padding:20px;
   margin:20px 0;
   border-left:6px solid #2e7d32;
 }
+
 table{
   width:100%;
   border-collapse:collapse;
@@ -49,9 +92,8 @@ th{
   background:#e8f5e9;
   text-align:center;
 }
-td:first-child{
-  text-align:left;
-}
+td:first-child{text-align:left}
+
 .footer{
   text-align:center;
   padding:15px;
@@ -59,43 +101,35 @@ td:first-child{
   color:#fff;
   margin-top:40px;
 }
-.btns{
-  text-align:center;
-  margin-top:30px;
-}
-.btns a{
-  display:inline-block;
-  margin:5px;
-  padding:10px 18px;
-  background:#2e7d32;
-  color:#fff;
-  text-decoration:none;
-  border-radius:4px;
-}
-.btns a:hover{
-  background:#1b5e20;
-}
 </style>
 </head>
 
-<body>
+<body id="top">
 
 <header>
   Executive Summary  
   <div style="font-size:14px;">FarmerBase BP Engine</div>
 </header>
 
+<!-- ===== PAGE FOLLOW (Prev / Next) ===== -->
+<a href="profit-loss.html" class="nav-arrow prev" title="Back to Profit & Loss">⬅️</a>
+<a href="full-proposal.html" class="nav-arrow next" title="Go to Full Proposal">➡️</a>
+
+<!-- ===== SCROLL FOLLOW ===== -->
+<a href="#summary-end" class="scroll-arrow down" title="Scroll Down">⬇️</a>
+<a href="#top" class="scroll-arrow up" title="Back to Top">⬆️</a>
+
 <div class="container">
 
 <h2>१. व्यवसायको सार</h2>
 <p>
-यस व्यवसायिक योजनाले किसानमैत्री, यथार्थपरक तथा गणनामा आधारित
+यस व्यवसायिक योजनाले किसानमैत्री तथा यथार्थपरक
 <strong>आम्दानी–खर्च–नाफा</strong> को स्पष्ट चित्र प्रस्तुत गर्दछ।
-यसले व्यवसायको सम्भाव्यता, नाफामूलकता र दीर्घकालीन टिकाउपन
-निर्णय गर्न सहयोग पुर्‍याउँछ।
+यस प्रणालीबाट निर्णयकर्ताले व्यवसायको सम्भाव्यता
+छिटो र विश्वसनीय रूपमा मूल्याङ्कन गर्न सक्छन्।
 </p>
 
-<h2>२. वित्तीय संक्षेप (Financial Snapshot)</h2>
+<h2>२. वित्तीय संक्षेप</h2>
 
 <div class="summary-box">
   <p><b>कुल आम्दानी :</b> रु <span id="totalIncome">0</span></p>
@@ -118,16 +152,13 @@ td:first-child{
 
 <h2>४. निष्कर्ष</h2>
 <p>
-उपलब्ध तथ्याङ्क र गणनाको आधारमा यो व्यवसाय
+उपलब्ध तथ्याङ्क अनुसार यो व्यवसाय
 <strong>आर्थिक रूपमा सम्भाव्य</strong> देखिन्छ।
-सही व्यवस्थापन, बजार पहुँच र लागत नियन्त्रण गर्न सकेमा
-यसबाट स्थिर तथा दिगो आम्दानी लिन सकिने स्पष्ट संकेत देखिन्छ।
+व्यवस्थापन र बजार रणनीति सुधार गर्दै लैजान सकेमा
+दिगो आम्दानी प्राप्त हुने स्पष्ट आधार देखिन्छ।
 </p>
 
-<div class="btns">
-  <a href="profit-loss.html">⬅️ Profit / Loss</a>
-  <a href="#" onclick="window.print()">🖨️ Print Summary</a>
-</div>
+<div id="summary-end"></div>
 
 </div>
 
@@ -157,8 +188,6 @@ document.getElementById("roi").innerText = roi.toFixed(2);
 
 /* ===== Projection ===== */
 let tbody = document.getElementById("projectionTable");
-tbody.innerHTML = "";
-
 for(let y=1;y<=5;y++){
   let val = netProfit * y;
   let tr = document.createElement("tr");
