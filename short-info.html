@@ -2,123 +2,171 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Short Info | FarmerBase BP Engine</title>
+<title>Short Info</title>
 
 <style>
 body{
-  font-family: Arial, Helvetica, sans-serif;
-  background:#f5f5f5;
-  margin:0;
+ font-family:Arial, sans-serif;
+ background:#f5f5f5;
+ margin:0
 }
-
-header, footer{
-  background:#2e7d32;
-  color:#fff;
-  padding:12px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+header,footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:16px 20px;
+ display:flex;
+ justify-content:center;
+ align-items:center
 }
-
-header h2{
-  margin:0;
-  font-size:22px;
-}
-
 .container{
-  max-width:1100px;
-  margin:20px auto;
-  background:#fff;
-  padding:25px;
-  min-height:65vh;
+ max-width:1100px;
+ margin:auto;
+ background:#fff;
+ padding:20px;
+ min-height:70vh
 }
-
 h1{
-  text-align:center;
-  color:#2e7d32;
-  margin-bottom:20px;
+ text-align:center;
+ font-size:32px;
+ color:#2e7d32;
+ margin:15px 0 25px
 }
-
+h2{
+ color:#333;
+ border-bottom:2px solid #e0e0e0;
+ padding-bottom:5px;
+ margin-top:25px
+}
 label{
-  font-weight:600;
-  display:block;
-  margin-top:15px;
+ display:block;
+ margin-top:12px;
+ font-weight:bold
 }
-
 input, textarea, select{
-  width:100%;
-  padding:10px;
-  margin-top:6px;
-  font-size:16px;
+ width:100%;
+ padding:8px;
+ margin-top:5px;
+ box-sizing:border-box
+}
+textarea{resize:vertical;min-height:90px}
+.note{
+ font-size:13px;
+ color:#555;
+ margin-top:15px
 }
 
-textarea{resize:vertical}
-
-/* Page Follow */
+/* ===== PAGE FOLLOW (SUMMARY STYLE) ===== */
 .page-follow{
-  display:flex;
-  justify-content:space-between;
-  gap:20px;
-  margin:35px 0 10px;
+ display:flex;
+ justify-content:space-between;
+ gap:20px;
+ margin:35px 0 10px
 }
-
 .page-follow button{
-  flex:1;
-  padding:14px;
-  font-size:18px;
-  font-weight:600;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  background:#2e7d32;
-  color:#fff;
+ flex:1;
+ padding:14px;
+ font-size:18px;
+ font-weight:600;
+ border:none;
+ border-radius:6px;
+ cursor:pointer;
+ background:#2e7d32;
+ color:#fff
 }
-
 .page-follow button:hover{
-  background:#1b5e20;
-}
-
-footer{
-  font-size:14px;
+ background:#1b5e20
 }
 </style>
 </head>
 
-<!-- START PAGE : only NEXT -->
-<body data-next="existing-status.html">
+<!-- START PAGE -->
+<body data-next="production.html">
 
 <header>
   <h2>FarmerBase BP Engine</h2>
-  <div>कृषकमैत्री व्यवसायिक योजना यन्त्र</div>
 </header>
 
 <div class="container">
 
-<h1>Short Information</h1>
+<h2>१. व्यवसाय परिचय</h2>
 
-<label>व्यवसाय / परियोजनाको नाम</label>
-<input type="text" placeholder="उदाहरण: बंगुर पालन फार्म">
+<label>व्यवसाय / फर्मको नाम</label>
+<input id="firmName" placeholder="फर्मको नाम">
 
-<label>प्रस्तावक / उद्यमीको नाम</label>
-<input type="text" placeholder="नाम लेख्नुहोस्">
+<label>परियोजनाको नाम</label>
+<input id="projectName" placeholder="उदाहरण: व्यावसायिक तरकारी खेती">
 
-<label>ठेगाना</label>
-<input type="text" placeholder="गाउँ/नगरपालिका, जिल्ला">
-
-<label>व्यवसायको प्रकार</label>
-<select>
-  <option value="">-- छान्नुहोस् --</option>
-  <option>कृषि</option>
-  <option>पशुपालन</option>
-  <option>उद्योग</option>
-  <option>सेवा</option>
-  <option>अन्य</option>
+<label>व्यवसायको क्षेत्र</label>
+<select id="bizSector">
+ <option value="">छान्नुहोस्</option>
+ <option>कृषि</option>
+ <option>पशुपालन</option>
+ <option>सेवा</option>
+ <option>उत्पादन</option>
+ <option>अन्य</option>
 </select>
 
-<label>संक्षिप्त विवरण</label>
-<textarea rows="4" placeholder="यस व्यवसायको छोटो परिचय लेख्नुहोस्"></textarea>
+<label>व्यवसायको स्वरूप</label>
+<select id="bizStage">
+ <option value="">छान्नुहोस्</option>
+ <option>नयाँ व्यवसाय</option>
+ <option>विद्यमान व्यवसायको विस्तार</option>
+</select>
 
-<!-- PAGE FOLLOW -->
+<h2>२. स्थान र दायरा</h2>
+
+<label>व्यवसायको स्थान</label>
+<input id="location" placeholder="गाउँ/नगरपालिका, जिल्ला">
+
+<label>सेवा / बजार क्षेत्र</label>
+<input id="marketArea" placeholder="स्थानीय / जिल्ला / प्रदेश / राष्ट्रिय">
+
+<h2>३. संचालक / प्रवर्तक</h2>
+
+<label>संचालकको नाम</label>
+<input id="promoter">
+
+<label>अनुभव (वर्षमा)</label>
+<input type="number" id="experience" placeholder="उदाहरण: 5">
+
+<h2>४. कानुनी दर्ता तथा आवद्धता</h2>
+
+<label>व्यवसाय दर्ता स्थिति</label>
+<select id="registrationStatus">
+ <option value="">छान्नुहोस्</option>
+ <option>दर्ता भइसकेको</option>
+ <option>दर्ता प्रक्रियामा</option>
+ <option>दर्ता गर्न बाँकी</option>
+</select>
+
+<label>दर्ता निकाय</label>
+<input id="registrationAuthority">
+
+<label>दर्ता नं</label>
+<input id="registrationNumber">
+
+<label>PAN / VAT नं</label>
+<input id="panNumber">
+
+<label>अन्य आवद्धता / सदस्यता</label>
+<textarea id="affiliation"></textarea>
+
+<h2>५. उद्देश्य र लक्ष्य</h2>
+
+<label>मुख्य उद्देश्य</label>
+<textarea id="objective"></textarea>
+
+<label>लक्षित ग्राहक / बजार</label>
+<textarea id="targetMarket"></textarea>
+
+<h2>६. कार्यकारी सारांश</h2>
+<textarea id="summary"></textarea>
+
+<p class="note">
+✔️ यो पेज बैंक, अनुदान तथा सरकारी निकायले सबैभन्दा पहिले हेर्छन् ।
+</p>
+
+<!-- ===== PAGE FOLLOW ===== -->
 <div class="page-follow">
   <button id="prevBtn"></button>
   <button id="nextBtn"></button>
@@ -127,41 +175,53 @@ footer{
 </div>
 
 <footer>
-  <div>© FarmerBase BP Engine</div>
-  <div>Step 1 of Business Plan</div>
+  FarmerBase BP Engine – Short Info
 </footer>
 
 <script>
-const pageMap = {
-  "short-info.html": "Short Info",
-  "existing-status.html": "Existing Status",
-  "business-detail.html": "Business Detail",
-  "capital-source.html": "Capital Source",
-  "income.html": "Income",
-  "expenses.html": "Expenses",
-  "profit-loss.html": "Profit / Loss",
-  "executive-summary.html": "Executive Summary"
+/* ===== PAGE FOLLOW LOGIC ===== */
+const pageMap={
+ "short-info.html":"Short Info",
+ "production.html":"Production Detail"
 };
 
-const prevPage = document.body.dataset.prev;
-const nextPage = document.body.dataset.next;
+const prev=document.body.dataset.prev;
+const next=document.body.dataset.next;
 
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
+const pBtn=document.getElementById("prevBtn");
+const nBtn=document.getElementById("nextBtn");
 
-if(prevPage){
-  prevBtn.textContent = "Preview : " + pageMap[prevPage];
-  prevBtn.onclick = () => location.href = prevPage;
-}else{
-  prevBtn.style.display = "none";
+if(prev){
+ pBtn.textContent="Preview : "+pageMap[prev];
+ pBtn.onclick=()=>location.href=prev;
+}else pBtn.style.display="none";
+
+if(next){
+ nBtn.textContent="Next : "+pageMap[next];
+ nBtn.onclick=()=>location.href=next;
+}else nBtn.style.display="none";
+
+/* ===== EXISTING AUTO LOGIC (UNCHANGED) ===== */
+const activeId=localStorage.getItem("activeBusinessId");
+const list=JSON.parse(localStorage.getItem("businessList"))||[];
+const biz=list.find(b=>b.id===activeId);
+
+if(biz){
+ firmName.value=biz.name||"";
+ promoter.value=biz.proprietor||"";
 }
 
-if(nextPage){
-  nextBtn.textContent = "Next : " + pageMap[nextPage];
-  nextBtn.onclick = () => location.href = nextPage;
-}else{
-  nextBtn.style.display = "none";
-}
+[
+ "firmName","projectName","bizSector","bizStage",
+ "location","marketArea","promoter","experience",
+ "registrationStatus","registrationAuthority",
+ "registrationNumber","panNumber","affiliation",
+ "objective","targetMarket","summary"
+].forEach(id=>{
+ const el=document.getElementById(id);
+ el.value=el.value||localStorage.getItem(id)||"";
+ el.onchange=()=>localStorage.setItem(id,el.value);
+});
 </script>
 
 </body>
