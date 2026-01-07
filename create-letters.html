@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Create Letters | FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  font-family:"Noto Sans Devanagari","Kalimati","Nirmala UI",system-ui;
+  background:#f4f7f6;
+  margin:0;
+}
+.wrap{
+  max-width:1000px;
+  margin:20px auto;
+  background:#fff;
+  padding:22px;
+  border-radius:12px;
+}
+h2{color:#2e7d32;margin-top:0}
+.small{font-size:13px;color:#555}
+
+/* form */
+label{font-weight:600}
+input,select,textarea{
+  width:100%;
+  padding:8px;
+  margin:6px 0 12px;
+}
+textarea{min-height:180px}
+
+/* buttons */
+button{
+  padding:8px 16px;
+  border:none;
+  border-radius:6px;
+  background:#2e7d32;
+  color:#fff;
+  cursor:pointer;
+}
+button.gray{background:#455a64}
+button.red{background:#c62828}
+
+/* layout */
+.grid{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:20px;
+}
+
+/* letter list */
+.list{
+  border-left:1px solid #ddd;
+  padding-left:15px;
+}
+.item{
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  margin-bottom:8px;
+  cursor:pointer;
+}
+.item.active{
+  background:#e8f5e9;
+  border-color:#2e7d32;
+}
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+/* header info */
+.info{
+  background:#f1f8e9;
+  padding:12px;
+  border-left:5px solid #2e7d32;
+  margin-bottom:15px;
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+<h2>✉️ Letter Generator</h2>
+<p class="small">
+यहाँबाट तपाईंले विभिन्न किसिमका पत्रहरू तयार गर्न, सच्याउन र प्रिन्ट गर्न सक्नुहुन्छ।
+</p>
+
+<!-- AUTO HEADER FROM short-info -->
+<div class="info">
+<b id="orgName">संस्था</b><br>
+<span id="orgAddress"></span><br>
+<span id="orgContact"></span>
+</div>
+
+<div class="grid">
+
+<!-- ================= LETTER EDITOR ================= -->
+<div>
+  <label>पत्रको शीर्षक</label>
+  <input id="title" placeholder="जस्तै: बैंक निवेदन पत्र">
+
+  <label>पत्रको प्रकार</label>
+  <select id="type" onchange="loadTemplate()">
+    <option>निवेदन</option>
+    <option>सिफारिस</option>
+    <option>बैंक पत्र</option>
+    <option>अनुदान आवेदन</option>
+    <option>सम्झौता प्रस्ताव</option>
+    <option>अन्य</option>
+  </select>
+
+  <label>पत्रको सामग्री</label>
+  <textarea id="content" placeholder="पत्रको मुख्य सामग्री यहाँ लेख्नुहोस्..."></textarea>
+
+  <div class="actions">
+    <button onclick="saveLetter()">💾 Save</button>
+    <button class="gray" onclick="newLetter()">➕ New</button>
+    <button class="gray" onclick="printLetter()">🖨 Print</button>
+    <button class="red" onclick="deleteLetter()">🗑 Delete</button>
+  </div>
+</div>
+
+<!-- ================= LETTER LIST ================= -->
+<div class="list">
+  <h3>📂 Saved Letters</h3>
+  <div id="letterList"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+/* ===== AUTO INFO FROM short-info ===== */
+orgName.innerText =
+ localStorage.getItem("organizationName") || "संस्थाको नाम";
+orgAddress.innerText =
+ localStorage.getItem("organizationAddress") || "";
+orgContact.innerText =
+ localStorage.getItem("organizationContact") || "";
+
+/* ===== STORAGE ===== */
+const KEY = "SYSTEM_LETTERS";
+let letters = JSON.parse(localStorage.getItem(KEY)) || [];
+let activeId = null;
+
+/* ===== TEMPLATES ===== */
+function loadTemplate(){
+ if(content.value.trim()) return;
+ const t = type.value;
+ if(t==="निवेदन"){
+  content.value=`महोदय,\n\nविषय: निवेदन सम्बन्धमा\n\nउपरोक्त विषयमा आवश्यक कार्यका लागि यो निवेदन पेश गरिएको छ।\n\nनिवेदक,\n`;
+ }
+ if(t==="बैंक पत्र"){
+  content.value=`श्रीमान्,\n\nविषय: बैंक सम्बन्धी निवेदन\n\nहामीले प्रस्तुत गरेको व्यवसायिक प्रस्ताव अनुसार आवश्यक सहकार्यका लागि अनुरोध गर्दछौं।\n\nधन्यवाद।\n`;
+ }
+ if(t==="अनुदान आवेदन"){
+  content.value=`महोदय,\n\nविषय: अनुदान उपलब्ध गराइदिनुहुन\n\nप्रस्तावित परियोजनाका लागि अनुदान सहयोग उपलब्ध गराइदिनुहुन अनुरोध गर्दछौं।\n\nभवदीय,\n`;
+ }
+}
+
+/* ===== RENDER LIST ===== */
+function renderList(){
+  letterList.innerHTML="";
+  letters.forEach(l=>{
+    const d=document.createElement("div");
+    d.className="item"+(l.id===activeId?" active":"");
+    d.innerHTML=`<b>${l.title}</b><br><span class="small">${l.type}</span>`;
+    d.onclick=()=>loadLetter(l.id);
+    letterList.appendChild(d);
+  });
+}
+
+/* ===== LOAD LETTER ===== */
+function loadLetter(id){
+  const l = letters.find(x=>x.id===id);
+  if(!l) return;
+  activeId=id;
+  title.value=l.title;
+  type.value=l.type;
+  content.value=l.content;
+  renderList();
+}
+
+/* ===== SAVE ===== */
+function saveLetter(){
+  if(!title.value || !content.value){
+    alert("शीर्षक र सामग्री अनिवार्य छ");
+    return;
+  }
+  if(activeId){
+    const l = letters.find(x=>x.id===activeId);
+    l.title=title.value;
+    l.type=type.value;
+    l.content=content.value;
+  }else{
+    letters.push({
+      id:Date.now(),
+      title:title.value,
+      type:type.value,
+      content:content.value
+    });
+    activeId=letters[letters.length-1].id;
+  }
+  localStorage.setItem(KEY,JSON.stringify(letters));
+  renderList();
+}
+
+/* ===== NEW ===== */
+function newLetter(){
+  activeId=null;
+  title.value="";
+  type.value="निवेदन";
+  content.value="";
+  renderList();
+}
+
+/* ===== DELETE ===== */
+function deleteLetter(){
+  if(!activeId) return;
+  if(!confirm("यो पत्र हटाउने?")) return;
+  letters = letters.filter(l=>l.id!==activeId);
+  activeId=null;
+  localStorage.setItem(KEY,JSON.stringify(letters));
+  newLetter();
+}
+
+/* ===== PRINT ===== */
+function printLetter(){
+  if(!content.value) return;
+  const w = window.open("");
+  w.document.write(`
+    <html><head><title>${title.value}</title>
+    <style>
+    body{font-family:"Kalimati","Noto Sans Devanagari";padding:30px}
+    .head{font-weight:bold}
+    </style></head>
+    <body>
+    <div class="head">${orgName.innerText}<br>${orgAddress.innerText}<br>${orgContact.innerText}</div>
+    <hr>
+    <h3>${title.value}</h3>
+    <pre>${content.value}</pre>
+    </body></html>
+  `);
+  w.document.close();
+  w.print();
+}
+
+/* INIT */
+renderList();
+</script>
+
+</body>
+</html>
