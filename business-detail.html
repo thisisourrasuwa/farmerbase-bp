@@ -10,19 +10,28 @@ body{
  background:#f5f5f5;
  margin:0
 }
-header,footer{
+
+/* ===== SIMPLE TRANSPARENT HEADER ===== */
+header{
+ background:rgba(46,125,50,0.85);
+ color:#fff;
+ padding:14px 20px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ backdrop-filter: blur(2px);
+ box-shadow:0 2px 6px rgba(0,0,0,0.15)
+}
+
+footer{
  background:#2e7d32;
  color:#fff;
  padding:12px 20px;
  display:flex;
- justify-content:space-between;
+ justify-content:center;
  align-items:center
 }
-header a, footer a{
- color:#fff;
- text-decoration:none;
- font-weight:bold
-}
+
 .container{
  max-width:1200px;
  margin:auto;
@@ -30,52 +39,74 @@ header a, footer a{
  padding:20px;
  min-height:70vh
 }
-h1{
- text-align:center;
- font-size:32px;
- color:#2e7d32;
- margin:15px 0 25px
-}
+
 h2{
  color:#333;
  border-bottom:2px solid #e0e0e0;
  padding-bottom:5px;
  margin-top:30px
 }
+
 label{
  display:block;
  margin-top:12px;
  font-weight:bold
 }
+
 textarea, input{
  width:100%;
  padding:8px;
  margin-top:5px;
  box-sizing:border-box
 }
+
 textarea{
  resize:vertical;
  min-height:90px
 }
+
 .note{
  font-size:13px;
  color:#555;
  margin-top:15px
 }
+
+/* ===== SUMMARY STYLE SIDE PAGE FOLLOW ===== */
+.side-nav{
+ position:fixed;
+ top:50%;
+ transform:translateY(-50%);
+ width:48px;
+ height:48px;
+ border-radius:50%;
+ background:#2e7d32;
+ color:#fff;
+ font-size:26px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ z-index:999;
+ box-shadow:0 4px 10px rgba(0,0,0,.25)
+}
+.side-nav.prev{left:15px}
+.side-nav.next{right:15px}
+.side-nav:hover{background:#1b5e20}
 </style>
 </head>
 
 <body>
 
-<!-- ================= HEADER ================= -->
+<!-- ===== SIDE PAGE FOLLOW (SUMMARY LIKE) ===== -->
+<div class="side-nav prev" onclick="location.href='short-info.html'">⬅</div>
+<div class="side-nav next" onclick="location.href='production.html'">➡</div>
+
 <header>
-  <a href="short-info.html">⬅️ संक्षिप्त विवरण</a>
-  <span>व्यवसाय सम्बन्धि विस्तृत विवरण</span>
-  <a href="production.html">उत्पादन विवरण ➡️</a>
+  <h2>FarmerBase BP Engine</h2>
 </header>
 
 <div class="container">
-<!-- ================= BUSINESS DESCRIPTION ================= -->
+
 <h2>१. व्यवसायको विस्तृत विवरण</h2>
 
 <label>व्यवसाय के हो ?</label>
@@ -86,7 +117,6 @@ textarea{
 <textarea id="bizJustification"
  placeholder="बजार माग, स्थान, अनुभव, स्रोत साधनको उपलब्धता..."></textarea>
 
-<!-- ================= PRODUCT / SERVICE ================= -->
 <h2>२. उत्पादन / सेवा विवरण</h2>
 
 <label>मुख्य उत्पादन वा सेवा</label>
@@ -97,7 +127,6 @@ textarea{
 <textarea id="productFeature"
  placeholder="गुणस्तर, नवीनता, स्थानीय स्रोत, जैविक, मूल्य..."></textarea>
 
-<!-- ================= MARKET ANALYSIS ================= -->
 <h2>३. बजार तथा माग विश्लेषण</h2>
 
 <label>लक्षित बजार</label>
@@ -112,7 +141,6 @@ textarea{
 <textarea id="competition"
  placeholder="अरू व्यवसाय, हाम्रो फरक पक्ष..."></textarea>
 
-<!-- ================= OPERATION PLAN ================= -->
 <h2>४. सञ्चालन योजना</h2>
 
 <label>सञ्चालन प्रक्रिया</label>
@@ -123,7 +151,6 @@ textarea{
 <textarea id="manpower"
  placeholder="कामदार संख्या, सीप, व्यवस्थापन..."></textarea>
 
-<!-- ================= RESOURCE ================= -->
 <h2>५. स्रोत साधन</h2>
 
 <label>भूमि / भवन / पूर्वाधार</label>
@@ -134,7 +161,6 @@ textarea{
 <textarea id="technology"
  placeholder="मेसिन, उपकरण, प्रविधि..."></textarea>
 
-<!-- ================= RISK ================= -->
 <h2>६. जोखिम तथा न्यूनीकरण उपाय</h2>
 
 <label>सम्भावित जोखिम</label>
@@ -145,7 +171,6 @@ textarea{
 <textarea id="mitigation"
  placeholder="बीमा, विविधीकरण, तालिम, व्यवस्थापन..."></textarea>
 
-<!-- ================= LEGAL / COMPLIANCE ================= -->
 <h2>७. कानुनी तथा वातावरणीय पक्ष</h2>
 
 <label>कानुनी अनुपालन</label>
@@ -163,15 +188,12 @@ textarea{
 
 </div>
 
-<!-- ================= FOOTER ================= -->
 <footer>
-  <a href="short-info.html">⬅️ संक्षिप्त विवरण</a>
-  <span>Farmerbase BP Engine- Business Detail</span>
-  <a href="production.html">उत्पादन विवरण ➡️</a>
+  FarmerBase BP Engine – Business Detail
 </footer>
 
 <script>
-/* ===== AUTO SAVE ===== */
+/* ===== AUTO SAVE (UNCHANGED) ===== */
 const fields=[
  "bizDescription","bizJustification",
  "productService","productFeature",
