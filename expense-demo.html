@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Expenses – Final Stable</title>
+<title>खर्च विवरण</title>
 
 <style>
 body{
@@ -11,29 +11,19 @@ body{
  margin:0
 }
 
-/* ===== CLEAN & BRIGHT HEADER ===== */
-.app-header{
- background:linear-gradient(90deg,#2e7d32,#43a047);
- padding:16px 20px;
+/* ===== HEADER (MATCHED STYLE) ===== */
+header{
+ background:#2e7d32;
+ color:#fff;
+ padding:18px 20px;
  text-align:center;
- box-shadow:0 2px 8px rgba(0,0,0,0.15)
-}
-.app-title{
- color:#e8f5e9;
  font-size:22px;
  font-weight:700;
- letter-spacing:.5px
-}
-.page-title{
- margin-top:4px;
- color:#ffffff;
- font-size:18px;
- font-weight:600;
- border-top:1px solid rgba(255,255,255,.4);
- padding-top:6px
+ letter-spacing:.4px;
+ box-shadow:0 2px 6px rgba(0,0,0,0.2)
 }
 
-/* ===== SIDE PAGE FOLLOW (SUMMARY STYLE) ===== */
+/* ===== SIDE PAGE FOLLOW ===== */
 .side-nav{
  position:fixed;
  top:50%;
@@ -60,7 +50,7 @@ body{
  max-width:1400px;
  margin:auto;
  background:#fff;
- padding:20px;
+ padding:20px 70px;   /* 🔑 SIDE SAFE ZONE */
  min-height:70vh
 }
 
@@ -118,21 +108,21 @@ footer{
  background:#2e7d32;
  color:#fff;
  padding:12px 20px;
- text-align:center
+ text-align:center;
+ font-size:14px
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== SIDE PAGE FOLLOW ===== -->
+<!-- ===== SIDE NAVIGATION ===== -->
 <div class="side-nav prev" onclick="location.href='production.html'">⬅</div>
 <div class="side-nav next" onclick="location.href='capital-source.html'">➡</div>
 
 <!-- ===== HEADER ===== -->
-<header class="app-header">
-  <div class="app-title">FarmerBase BP Engine</div>
-  <div class="page-title">खर्च विवरण</div>
+<header>
+  खर्च विवरण
 </header>
 
 <div class="container">
@@ -187,12 +177,12 @@ footer{
 </div>
 
 <footer>
- FarmerBase BP Engine – Expenses Final Stable
+ FarmerBase BP Engine
 </footer>
 
 <script>
 /* =================================================
-   DATA LOAD (UNCHANGED LOGIC)
+   DATA LOAD (UNCHANGED)
 ================================================= */
 const productions =
  JSON.parse(localStorage.getItem("productions")) || [];
@@ -257,7 +247,7 @@ function deleteExpense(id){
 }
 
 /* =================================================
-   MAP UI (PRODUCT + %)
+   MAP UI
 ================================================= */
 function mapUI(exp){
  if(!productions.length){
@@ -370,7 +360,7 @@ function render(){
    कुल स्थिर पूँजी: ${fixedCapital.toFixed(2)}<br>
    कुल वार्षिक ह्रास: ${fixedDep.toFixed(2)}`;
 
- /* ===== FOR CAPITAL SOURCE (UNCHANGED CONTRACT) ===== */
+ /* ===== CONTRACT FOR CAPITAL SOURCE ===== */
  localStorage.setItem("variable_annual_cost", varTotal.toFixed(2));
  localStorage.setItem("fixed_total_capital", fixedCapital.toFixed(2));
 
