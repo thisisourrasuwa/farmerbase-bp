@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Short Info</title>
+<title>संक्षिप्त जानकारी</title>
 
 <style>
 body{
@@ -11,29 +11,19 @@ body{
  margin:0
 }
 
-/* ===== CLEAN & BRIGHT HEADER ===== */
-.app-header{
- background:linear-gradient(90deg,#2e7d32,#43a047);
- padding:16px 20px;
+/* ===== HEADER (SIMPLE & STABLE) ===== */
+header{
+ background:#2e7d32;
+ color:#fff;
+ padding:18px 20px;
  text-align:center;
- box-shadow:0 2px 8px rgba(0,0,0,0.15)
-}
-.app-title{
- color:#e8f5e9;
  font-size:22px;
  font-weight:700;
- letter-spacing:.5px
-}
-.page-title{
- margin-top:4px;
- color:#ffffff;
- font-size:18px;
- font-weight:600;
- border-top:1px solid rgba(255,255,255,.4);
- padding-top:6px
+ letter-spacing:.5px;
+ box-shadow:0 2px 6px rgba(0,0,0,0.2)
 }
 
-/* ===== SIDE PAGE FOLLOW (SUMMARY STYLE) ===== */
+/* ===== SIDE PAGE FOLLOW ===== */
 .side-nav{
  position:fixed;
  top:50%;
@@ -51,6 +41,7 @@ body{
  z-index:999;
  box-shadow:0 4px 10px rgba(0,0,0,.25)
 }
+.side-nav.prev{left:15px}
 .side-nav.next{right:15px}
 .side-nav:hover{background:#1b5e20}
 
@@ -66,21 +57,22 @@ body{
 h2{
  color:#333;
  border-bottom:2px solid #e0e0e0;
- padding-bottom:5px;
- margin-top:25px
+ padding-bottom:6px;
+ margin-top:30px
 }
 
 label{
  display:block;
- margin-top:12px;
+ margin-top:14px;
  font-weight:bold
 }
 
 input, textarea, select{
  width:100%;
- padding:8px;
- margin-top:5px;
- box-sizing:border-box
+ padding:9px;
+ margin-top:6px;
+ box-sizing:border-box;
+ font-size:15px
 }
 
 textarea{
@@ -98,20 +90,21 @@ footer{
  background:#2e7d32;
  color:#fff;
  padding:12px 20px;
- text-align:center
+ text-align:center;
+ font-size:14px
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== SIDE PAGE FOLLOW (NEXT ONLY) ===== -->
+<!-- ===== SIDE NAVIGATION ===== -->
+<div class="side-nav prev" onclick="location.href='index.html'">⬅</div>
 <div class="side-nav next" onclick="location.href='business-detail.html'">➡</div>
 
 <!-- ===== HEADER ===== -->
-<header class="app-header">
-  <div class="app-title">FarmerBase BP Engine</div>
-  <div class="page-title">संक्षिप्त जानकारी</div>
+<header>
+  संक्षिप्त जानकारी
 </header>
 
 <div class="container">
@@ -119,10 +112,10 @@ footer{
 <h2>१. व्यवसाय परिचय</h2>
 
 <label>व्यवसाय / फर्मको नाम</label>
-<input id="firmName" placeholder="फर्मको नाम">
+<input id="firmName">
 
 <label>परियोजनाको नाम</label>
-<input id="projectName" placeholder="उदाहरण: व्यावसायिक तरकारी खेती">
+<input id="projectName">
 
 <label>व्यवसायको क्षेत्र</label>
 <select id="bizSector">
@@ -144,10 +137,10 @@ footer{
 <h2>२. स्थान र दायरा</h2>
 
 <label>व्यवसायको स्थान</label>
-<input id="location" placeholder="गाउँ/नगरपालिका, जिल्ला">
+<input id="location">
 
 <label>सेवा / बजार क्षेत्र</label>
-<input id="marketArea" placeholder="स्थानीय / जिल्ला / प्रदेश / राष्ट्रिय">
+<input id="marketArea">
 
 <h2>३. संचालक / प्रवर्तक</h2>
 
@@ -155,7 +148,7 @@ footer{
 <input id="promoter">
 
 <label>अनुभव (वर्षमा)</label>
-<input type="number" id="experience" placeholder="उदाहरण: 5">
+<input type="number" id="experience">
 
 <h2>४. कानुनी दर्ता तथा आवद्धता</h2>
 
@@ -197,21 +190,21 @@ footer{
 </div>
 
 <footer>
- FarmerBase BP Engine – Short Info
+ FarmerBase BP Engine
 </footer>
 
 <script>
-/* ===== AUTO FILL FROM INDEX (UNCHANGED) ===== */
+/* ===== AUTO FILL FROM INDEX (SAFE) ===== */
 const activeId = localStorage.getItem("activeBusinessId");
 const list = JSON.parse(localStorage.getItem("businessList")) || [];
 const biz = list.find(b => b.id === activeId);
 
 if(biz){
- document.getElementById("firmName").value = biz.name || "";
- document.getElementById("promoter").value = biz.proprietor || "";
+ firmName.value = biz.name || "";
+ promoter.value = biz.proprietor || "";
 }
 
-/* ===== AUTO SAVE (UNCHANGED) ===== */
+/* ===== AUTO SAVE ===== */
 [
  "firmName","projectName","bizSector","bizStage",
  "location","marketArea","promoter","experience",
