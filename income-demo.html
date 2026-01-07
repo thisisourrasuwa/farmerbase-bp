@@ -7,37 +7,46 @@
 <style>
 body{font-family:Arial;background:#f5f5f5;margin:0}
 
-/* ===== HEADER (PAGE NAME ONLY – SAFE) ===== */
+/* ===== HEADER ===== */
 header{
- background:#2e7d32;
- color:#fff;
- padding:18px 20px;
+ background:#2e7d32;color:#fff;
+ padding:16px 20px;
  text-align:center;
  font-size:22px;
  font-weight:700;
- letter-spacing:.4px;
  box-shadow:0 2px 6px rgba(0,0,0,0.2)
 }
 
-footer{
+/* ===== SIDE PAGE FOLLOW ===== */
+.side-nav{
+ position:fixed;
+ top:50%;
+ transform:translateY(-50%);
+ width:48px;
+ height:48px;
+ border-radius:50%;
  background:#2e7d32;
  color:#fff;
- padding:12px 20px;
+ font-size:26px;
  display:flex;
- justify-content:center;
  align-items:center;
- font-size:14px
+ justify-content:center;
+ cursor:pointer;
+ z-index:999;
+ box-shadow:0 4px 10px rgba(0,0,0,.25)
 }
+.side-nav.prev{left:15px}
+.side-nav.next{right:15px}
+.side-nav:hover{background:#1b5e20}
 
+/* ===== CONTAINER ===== */
 .container{
  max-width:1200px;
  margin:auto;
  background:#fff;
- padding:20px 70px;   /* side safe zone */
+ padding:20px 70px;   /* arrow safe zone */
  min-height:70vh
 }
-
-h1{text-align:center;font-size:32px;color:#2e7d32;margin:15px 0}
 
 table{
  width:100%;
@@ -75,14 +84,25 @@ th{background:#e8f5e9}
  font-weight:bold;
  text-align:right
 }
+
+footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ text-align:center;
+ font-size:14px
+}
 </style>
 </head>
 
 <body>
 
-<!-- ===== HEADER ===== -->
+<!-- ===== SIDE PAGE FOLLOW ===== -->
+<div class="side-nav prev" onclick="location.href='capital-source.html'">⬅</div>
+<div class="side-nav next" onclick="location.href='profit-loss.html'">➡</div>
+
 <header>
-  आम्दानी विवरण
+  आम्दानी विवरण (यहाँ नाफा % मात्र निर्धारण गर्ने)
 </header>
 
 <div class="container">
@@ -103,7 +123,6 @@ th{background:#e8f5e9}
 <tbody id="incomeBody"></tbody>
 </table>
 
-<!-- ✅ TOTAL DISPLAY -->
 <div class="summary">
  कुल आम्दानी (Grand Total):
  <span id="grandTotal">0.00</span>
@@ -205,6 +224,7 @@ function render(){
  document.getElementById("grandTotal").innerText =
   grandTotal.toFixed(2);
 
+ /* ✅ PUBLISH FOR PROFIT-LOSS */
  localStorage.setItem("totalIncome", grandTotal);
 }
 
