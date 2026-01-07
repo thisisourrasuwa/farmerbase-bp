@@ -6,17 +6,48 @@
 
 <style>
 body{font-family:Arial;background:#f5f5f5;margin:0}
-header,footer{
- background:#2e7d32;color:#fff;
- padding:12px 20px;
- display:flex;justify-content:space-between;align-items:center
-}
-header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
 
-.container{
- max-width:1100px;margin:auto;background:#fff;
- padding:20px;min-height:70vh
+/* ===== HEADER ===== */
+header{
+ background:#2e7d32;color:#fff;
+ padding:18px 20px;
+ text-align:center;
+ font-size:22px;
+ font-weight:700;
+ box-shadow:0 2px 6px rgba(0,0,0,0.2)
 }
+
+/* ===== SIDE PAGE FOLLOW ===== */
+.side-nav{
+ position:fixed;
+ top:50%;
+ transform:translateY(-50%);
+ width:48px;
+ height:48px;
+ border-radius:50%;
+ background:#2e7d32;
+ color:#fff;
+ font-size:26px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ z-index:999;
+ box-shadow:0 4px 10px rgba(0,0,0,.25)
+}
+.side-nav.prev{left:15px}
+.side-nav.next{right:15px}
+.side-nav:hover{background:#1b5e20}
+
+/* ===== CONTAINER ===== */
+.container{
+ max-width:1100px;
+ margin:auto;
+ background:#fff;
+ padding:20px 70px; /* arrow safe zone */
+ min-height:70vh
+}
+
 h1{text-align:center;color:#2e7d32;margin:15px 0}
 
 .box{
@@ -38,19 +69,26 @@ h1{text-align:center;color:#2e7d32;margin:15px 0}
  font-size:14px;
  color:#444
 }
-.active{
- font-weight:bold;
- cursor:default
+
+footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ text-align:center;
+ font-size:14px
 }
 </style>
 </head>
 
 <body>
 
+<!-- ===== SIDE PAGE FOLLOW ===== -->
+<div class="side-nav prev" onclick="location.href='projection-5yr.html'">⬅</div>
+<div class="side-nav next" onclick="location.href='executive-summary.html'">➡</div>
+
+<!-- ===== HEADER ===== -->
 <header>
- <a href="profit-distribution.html">⬅️ नाफा वितरण</a>
- <span>⬇️लगानी विश्लेषण (ROI / IRR / Payback)</span>
- <a href="five-year-projection.html">५ वर्ष प्रक्षेपण ➡️</a>
+  लगानी विश्लेषण (ROI / IRR / Payback)
 </header>
 
 <div class="container">
@@ -93,16 +131,13 @@ h1{text-align:center;color:#2e7d32;margin:15px 0}
 </div>
 
 <footer>
- <a href="profit-distribution.html">⬅️ नाफा वितरण</a>
- <span>FarmerBase BP Engine – Investment Analysis</span>
- <a href="five-year-projection.html">५ वर्ष प्रक्षेपण ➡️</a>
+ FarmerBase BP Engine – Investment Analysis
 </footer>
 
 <script>
-/* ================= LOAD DATA (FIXED) ================= */
+/* ================= LOAD DATA (UNCHANGED LOGIC) ================= */
 
 // Total Investment:
-// Capital Source ले कहिले totalCapital, कहिले fixed_total_capital save गर्छ
 const totalInvestment = Number(
  localStorage.getItem("totalCapital")
  || localStorage.getItem("fixed_total_capital")
