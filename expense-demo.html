@@ -5,38 +5,98 @@
 <title>Expenses – Final Stable</title>
 
 <style>
-body{font-family:Arial;background:#f5f5f5;margin:0}
-header,footer{
- background:#2e7d32;color:#fff;
- padding:12px 20px;
- display:flex;justify-content:space-between;align-items:center
+body{
+ font-family:Arial, sans-serif;
+ background:#f5f5f5;
+ margin:0
 }
-header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
 
+/* ===== CLEAN & BRIGHT HEADER ===== */
+.app-header{
+ background:linear-gradient(90deg,#2e7d32,#43a047);
+ padding:16px 20px;
+ text-align:center;
+ box-shadow:0 2px 8px rgba(0,0,0,0.15)
+}
+.app-title{
+ color:#e8f5e9;
+ font-size:22px;
+ font-weight:700;
+ letter-spacing:.5px
+}
+.page-title{
+ margin-top:4px;
+ color:#ffffff;
+ font-size:18px;
+ font-weight:600;
+ border-top:1px solid rgba(255,255,255,.4);
+ padding-top:6px
+}
+
+/* ===== SIDE PAGE FOLLOW (SUMMARY STYLE) ===== */
+.side-nav{
+ position:fixed;
+ top:50%;
+ transform:translateY(-50%);
+ width:48px;
+ height:48px;
+ border-radius:50%;
+ background:#2e7d32;
+ color:#fff;
+ font-size:26px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ z-index:999;
+ box-shadow:0 4px 10px rgba(0,0,0,.25)
+}
+.side-nav.prev{left:15px}
+.side-nav.next{right:15px}
+.side-nav:hover{background:#1b5e20}
+
+/* ===== PAGE BODY ===== */
 .container{
- max-width:1400px;margin:auto;background:#fff;
- padding:20px;min-height:70vh
+ max-width:1400px;
+ margin:auto;
+ background:#fff;
+ padding:20px;
+ min-height:70vh
 }
 
 h2{margin-top:30px}
 
-table{width:100%;border-collapse:collapse;margin-top:10px}
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:10px
+}
 th,td{
- border:1px solid #ccc;padding:6px;
- text-align:center;font-size:14px
+ border:1px solid #ccc;
+ padding:6px;
+ text-align:center;
+ font-size:14px
 }
 th{background:#e8f5e9}
 
-input{width:100%;box-sizing:border-box}
+input{
+ width:100%;
+ box-sizing:border-box
+}
 
 .mapBox{text-align:left;font-size:13px}
 .mapNote{font-size:12px;color:#777}
 
 .percentBox{
- width:55px;font-size:12px
+ width:55px;
+ font-size:12px
 }
 
-.btn{padding:6px 10px;border:none;cursor:pointer}
+.btn{
+ padding:6px 10px;
+ border:none;
+ cursor:pointer
+}
 .add{background:#2e7d32;color:#fff}
 .del{background:#c62828;color:#fff}
 
@@ -53,15 +113,26 @@ textarea{
  box-sizing:border-box;
  padding:8px
 }
+
+footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ text-align:center
+}
 </style>
 </head>
 
 <body>
 
-<header>
- <a href="production.html">⬅️ उत्पादन विवरण</a>
- <span>खर्च विवरण (FINAL)</span>
- <a href="capital-source.html">पुँजिको स्रोत ➡️</a>
+<!-- ===== SIDE PAGE FOLLOW ===== -->
+<div class="side-nav prev" onclick="location.href='production.html'">⬅</div>
+<div class="side-nav next" onclick="location.href='capital-source.html'">➡</div>
+
+<!-- ===== HEADER ===== -->
+<header class="app-header">
+  <div class="app-title">FarmerBase BP Engine</div>
+  <div class="page-title">खर्च विवरण</div>
 </header>
 
 <div class="container">
@@ -116,7 +187,7 @@ textarea{
 </div>
 
 <footer>
- <span>FarmerBase BP Engine – Expenses Final Stable</span>
+ FarmerBase BP Engine – Expenses Final Stable
 </footer>
 
 <script>
