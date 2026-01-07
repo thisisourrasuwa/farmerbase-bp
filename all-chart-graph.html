@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>All Charts & Reports</title>
+<title>सम्पूर्ण व्यवसायिक प्रस्ताव (Full Proposal)</title>
 
 <style>
 body{
@@ -15,7 +15,7 @@ body{
 header{
  background:#2e7d32;
  color:#fff;
- padding:18px;
+ padding:20px;
  text-align:center;
  font-size:24px;
  font-weight:700;
@@ -41,7 +41,6 @@ header{
  box-shadow:0 4px 10px rgba(0,0,0,.25)
 }
 .side-nav.prev{left:15px}
-.side-nav.next{right:15px}
 .side-nav:hover{background:#1b5e20}
 
 /* ===== CONTAINER ===== */
@@ -49,61 +48,50 @@ header{
  max-width:1200px;
  margin:auto;
  background:#fff;
- padding:30px 70px;
- min-height:70vh
+ padding:40px 70px;
+ min-height:80vh
 }
 
 h2{
  color:#2e7d32;
  border-bottom:2px solid #e0e0e0;
  padding-bottom:6px;
- margin-top:35px
+ margin-top:40px
 }
 
-/* ===== CHART GRID ===== */
-.chart-grid{
- display:grid;
- grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
- gap:25px;
- margin-top:20px
+h3{
+ color:#333;
+ margin-top:25px
 }
 
-.chart-box{
- background:#f9f9f9;
- border:1px solid #ddd;
- padding:20px;
- text-align:center
+p{
+ font-size:15px;
+ line-height:1.8;
+ color:#333
 }
 
-.chart-placeholder{
- height:160px;
- background:#e8f5e9;
- display:flex;
- align-items:center;
- justify-content:center;
- font-size:14px;
- color:#2e7d32;
- font-weight:bold
-}
-
-/* ===== REPORT LINKS ===== */
-.link-list{
- margin-top:15px;
+ul{
+ margin-left:20px;
  line-height:1.8
 }
-.link-list a{
- text-decoration:none;
- color:#2e7d32;
- font-weight:bold
-}
-.link-list a:hover{text-decoration:underline}
 
-/* ===== ANNEX ===== */
-.annex{
+.section{
+ margin-bottom:30px
+}
+
+.highlight{
  background:#f1f8e9;
- padding:20px;
- margin-top:20px;
- border-left:6px solid #2e7d32
+ border-left:6px solid #2e7d32;
+ padding:18px;
+ margin:20px 0
+}
+
+.footer-note{
+ margin-top:40px;
+ font-size:14px;
+ color:#555;
+ border-top:1px dashed #ccc;
+ padding-top:20px
 }
 
 footer{
@@ -119,95 +107,130 @@ footer{
 <body>
 
 <!-- ===== PAGE FOLLOW ===== -->
-<div class="side-nav prev" onclick="location.href='executive-summary.html'">⬅</div>
+<div class="side-nav prev" onclick="location.href='all-chart-graph.html'">⬅</div>
 
 <header>
-  📊 All Charts, Reports & Annex
-  <div style="font-size:14px;font-weight:normal">
-    FarmerBase BP Engine – Visual & Supporting Reports
-  </div>
+  सम्पूर्ण व्यवसायिक प्रस्ताव (Full Business Proposal)
 </header>
 
 <div class="container">
 
-<h2>१. Key Charts & Graphs (Overview)</h2>
-
-<div class="chart-grid">
-
-  <div class="chart-box">
-    <div class="chart-placeholder">
-      📈 Income vs Expense Chart
-    </div>
-    <div class="link-list">
-      <a href="profit-loss.html">View Profit / Loss Page</a>
-    </div>
-  </div>
-
-  <div class="chart-box">
-    <div class="chart-placeholder">
-      📊 5-Year Profit Trend
-    </div>
-    <div class="link-list">
-      <a href="projection-5yr.html">View 5-Year Projection</a>
-    </div>
-  </div>
-
-  <div class="chart-box">
-    <div class="chart-placeholder">
-      💹 ROI / IRR / Payback
-    </div>
-    <div class="link-list">
-      <a href="roi-irr-payback.html">View Investment Analysis</a>
-    </div>
-  </div>
-
-  <div class="chart-box">
-    <div class="chart-placeholder">
-      🧮 Profit Distribution
-    </div>
-    <div class="link-list">
-      <a href="profit-distribution.html">View Profit Distribution</a>
-    </div>
-  </div>
-
-</div>
-
-<h2>२. Detailed Reports (Links)</h2>
-
-<div class="link-list">
-  🔗 <a href="income-demo.html">Income Details</a><br>
-  🔗 <a href="expense-demo.html">Expense Details</a><br>
-  🔗 <a href="capital-source.html">Capital Source & Interest</a><br>
-  🔗 <a href="business-detail.html">Business Detail</a><br>
-  🔗 <a href="production.html">Production Details</a>
-</div>
-
-<h2>३. Annex (परिशिष्ट)</h2>
-
-<div class="annex">
-  <p><b>Annex A:</b> Detailed Cost Assumptions</p>
-  <p><b>Annex B:</b> Market Survey & Price Reference</p>
-  <p><b>Annex C:</b> Technical Design / Production Plan</p>
-  <p><b>Annex D:</b> Legal / Registration Documents</p>
-
-  <!-- Optional links -->
-  <!--
-  <p>📎 <a href="annex/annex-a.pdf">Annex A (PDF)</a></p>
-  -->
-</div>
-
-<h2>४. Reviewer Notes (Optional)</h2>
+<!-- ================= SECTION 1 ================= -->
+<h2>१. प्रस्तावना</h2>
 <p>
-यो पेजले निर्णयकर्तालाई
-<strong>पूरै व्यवसायिक योजनाको दृश्य नक्सा</strong> प्रदान गर्दछ।
-चार्टहरू, विस्तृत रिपोर्टहरू र Annex हरू
-आवश्यकता अनुसार सजिलै हेर्न सकिन्छ।
+यो दस्तावेज <b>FarmerBase BP Engine</b> प्रयोग गरी
+तयार गरिएको एक पूर्ण व्यवसायिक प्रस्ताव हो।
+यसमा व्यवसायको अवधारणा,
+उत्पादन योजना,
+बजार रणनीति,
+वित्तीय विश्लेषण
+र भविष्यको सम्भावना
+समेटिएको छ।
 </p>
+
+<!-- ================= SECTION 2 ================= -->
+<h2>२. व्यवसायको विवरण</h2>
+<p>
+प्रस्तावित व्यवसाय
+स्थानीय स्रोत साधन,
+उपलब्ध सीप
+र बजार मागको
+आधारमा सञ्चालन गरिनेछ।
+व्यवसाय संरचना
+व्यवहारिक र
+कृषकमैत्री छ।
+</p>
+
+<!-- ================= SECTION 3 ================= -->
+<h2>३. उत्पादन तथा सञ्चालन योजना</h2>
+<ul>
+ <li>उत्पादन प्रकार र परिमाण</li>
+ <li>आवश्यक प्रविधि तथा उपकरण</li>
+ <li>जनशक्ति व्यवस्थापन</li>
+ <li>सञ्चालन कार्यतालिका</li>
+</ul>
+
+<!-- ================= SECTION 4 ================= -->
+<h2>४. बजार तथा विक्री रणनीति</h2>
+<p>
+बजार विश्लेषण अनुसार
+स्थानीय तथा क्षेत्रीय माग
+उच्च रहेको छ।
+मूल्य निर्धारण,
+गुणस्तर नियन्त्रण
+र वितरण प्रणाली
+स्पष्ट रूपमा परिभाषित छन्।
+</p>
+
+<!-- ================= SECTION 5 ================= -->
+<h2>५. वित्तीय विवरण सारांश</h2>
+
+<div class="highlight">
+<ul>
+ <li>✔️ कुल आम्दानी र खर्च यथार्थपरक</li>
+ <li>✔️ शुद्ध नाफा सकारात्मक</li>
+ <li>✔️ ५ वर्षे वित्तीय प्रक्षेपण उपलब्ध</li>
+ <li>✔️ ROI, IRR र Payback आकर्षक</li>
+</ul>
+</div>
+
+<p>
+वित्तीय विवरणहरू
+यस प्रस्तावसँग संलग्न
+विस्तृत तालिका,
+चार्ट र रिपोर्टहरूबाट
+समर्थित छन्।
+</p>
+
+<!-- ================= SECTION 6 ================= -->
+<h2>६. पुँजिको स्रोत र लगानी संरचना</h2>
+<p>
+स्वलगानी,
+अनुदान,
+र ऋणको संयोजनबाट
+पुँजी व्यवस्था गरिनेछ।
+ब्याज लागत
+र कार्यशील पूँजी
+सन्तुलित रूपमा
+व्यवस्थापन गरिएको छ।
+</p>
+
+<!-- ================= SECTION 7 ================= -->
+<h2>७. जोखिम विश्लेषण तथा न्यूनीकरण</h2>
+<ul>
+ <li>बजार मूल्य उतारचढाव</li>
+ <li>उत्पादन तथा प्राविधिक जोखिम</li>
+ <li>मौसमीय र वातावरणीय असर</li>
+ <li>न्यूनीकरण उपायहरू</li>
+</ul>
+
+<!-- ================= SECTION 8 ================= -->
+<h2>८. निष्कर्ष र सिफारिस</h2>
+<p>
+उपलब्ध तथ्य,
+गणना
+र विश्लेषणका आधारमा
+यो व्यवसायिक प्रस्ताव
+आर्थिक तथा प्राविधिक दृष्टिले
+सम्भाव्य देखिन्छ।
+सम्बन्धित निकायबाट
+सहयोग तथा स्वीकृतिका लागि
+यो प्रस्ताव सिफारिस गरिन्छ।
+</p>
+
+<div class="footer-note">
+यो Full Proposal
+<b>FarmerBase BP Engine</b> द्वारा
+स्वतः संरचित गरिएको दस्तावेज हो।
+आवश्यक परे Annex,
+चार्ट र विस्तृत रिपोर्टहरू
+यससँग संलग्न गर्न सकिन्छ।
+</div>
 
 </div>
 
 <footer>
- FarmerBase BP Engine – All Charts & Reports Hub
+ FarmerBase BP Engine – Full Business Proposal
 </footer>
 
 </body>
