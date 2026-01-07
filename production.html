@@ -1,178 +1,199 @@
 <!DOCTYPE html>
 <html lang="ne">
 <head>
-  <meta charset="UTF-8">
-  <title>Production</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="UTF-8">
+<title>Production</title>
 
-    header, footer {
-      background: #2e7d32;
-      color: #fff;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+<style>
+body{
+ font-family:Arial, sans-serif;
+ background:#f7f7f7;
+ margin:0
+}
 
-    header a, footer a {
-      color: #fff;
-      text-decoration: none;
-      font-size: 18px;
-      font-weight: bold;
-    }
+/* ===== CLEAN & BRIGHT HEADER ===== */
+.app-header{
+ background:linear-gradient(90deg,#2e7d32,#43a047);
+ padding:16px 20px;
+ text-align:center;
+ box-shadow:0 2px 8px rgba(0,0,0,0.15)
+}
+.app-title{
+ color:#e8f5e9;
+ font-size:22px;
+ font-weight:700;
+ letter-spacing:.5px
+}
+.page-title{
+ margin-top:4px;
+ color:#ffffff;
+ font-size:18px;
+ font-weight:600;
+ border-top:1px solid rgba(255,255,255,.4);
+ padding-top:6px
+}
 
-    .container {
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
-      background: #fff;
-      min-height: 70vh;
-    }
+/* ===== SIDE PAGE FOLLOW (SUMMARY STYLE) ===== */
+.side-nav{
+ position:fixed;
+ top:50%;
+ transform:translateY(-50%);
+ width:48px;
+ height:48px;
+ border-radius:50%;
+ background:#2e7d32;
+ color:#fff;
+ font-size:26px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ z-index:999;
+ box-shadow:0 4px 10px rgba(0,0,0,.25)
+}
+.side-nav.prev{left:15px}
+.side-nav.next{right:15px}
+.side-nav:hover{background:#1b5e20}
 
-    h1 {
-      text-align: center;
-      font-size: 32px;
-      margin-bottom: 25px;
-      color: #2e7d32;
-    }
+/* ===== PAGE BODY ===== */
+.container{
+ padding:20px;
+ max-width:1000px;
+ margin:auto;
+ background:#fff;
+ min-height:70vh
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:15px
+}
+th,td{
+ border:1px solid #ccc;
+ padding:10px;
+ text-align:center;
+ font-size:15px
+}
+th{background:#e8f5e9}
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-      font-size: 15px;
-    }
+input{
+ width:95%;
+ padding:6px;
+ font-size:14px
+}
 
-    th {
-      background: #e8f5e9;
-    }
+.btn{
+ padding:6px 12px;
+ cursor:pointer;
+ border:none;
+ font-size:14px
+}
+.add-btn{
+ background:#2e7d32;
+ color:#fff;
+ margin-top:10px
+}
+.delete-btn{
+ background:#c62828;
+ color:#fff
+}
 
-    input {
-      width: 95%;
-      padding: 6px;
-      font-size: 14px;
-    }
-
-    .btn {
-      padding: 6px 12px;
-      cursor: pointer;
-      border: none;
-      font-size: 14px;
-    }
-
-    .add-btn {
-      background: #2e7d32;
-      color: white;
-      margin-top: 10px;
-    }
-
-    .edit-btn {
-      background: #0277bd;
-      color: white;
-    }
-
-    .delete-btn {
-      background: #c62828;
-      color: white;
-    }
-  </style>
+footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ text-align:center
+}
+</style>
 </head>
+
 <body>
 
-<header>
-  <a href="business-detail.html">⬅️ विस्तृत विवरण</a>
-  <span>उत्पादन सम्बन्धि विवरण</span>
-  <a href="expense-demo.html">खर्च विवरण ➡️</a>
+<!-- ===== SIDE PAGE FOLLOW ===== -->
+<div class="side-nav prev" onclick="location.href='business-detail.html'">⬅</div>
+<div class="side-nav next" onclick="location.href='expense-demo.html'">➡</div>
+
+<!-- ===== HEADER ===== -->
+<header class="app-header">
+  <div class="app-title">FarmerBase BP Engine</div>
+  <div class="page-title">उत्पादन विवरण</div>
 </header>
 
 <div class="container">
-  <table id="productionTable">
-    <thead>
-      <tr>
-        <th>उत्पादन नाम</th>
-        <th>इकाई</th>
-        <th>परिमाण</th>
-        <th>कैफियत</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
 
-  <button class="btn add-btn" onclick="addRow()">➕ उत्पादन थप्नुहोस्</button>
+<table id="productionTable">
+<thead>
+<tr>
+ <th>उत्पादन नाम</th>
+ <th>इकाई</th>
+ <th>परिमाण</th>
+ <th>कैफियत</th>
+ <th>Action</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<button class="btn add-btn" onclick="addRow()">➕ उत्पादन थप्नुहोस्</button>
+
 </div>
 
 <footer>
-  <a href="business-detail.html">⬅️ विस्तृत विवरण</a>
-  <span>Farmerbase BP Engine-Production Module</span>
-  <a href="expense-demo.html">खर्च विवरण ➡️</a>
+ FarmerBase BP Engine – Production Module
 </footer>
 
 <script>
-  let productions = JSON.parse(localStorage.getItem("productions")) || [];
+/* ===== EXISTING LOGIC (UNCHANGED) ===== */
+let productions = JSON.parse(localStorage.getItem("productions")) || [];
 
-  function saveData() {
-    localStorage.setItem("productions", JSON.stringify(productions));
-  }
+function saveData(){
+ localStorage.setItem("productions", JSON.stringify(productions));
+}
 
-  function renderTable() {
-    const tbody = document.querySelector("#productionTable tbody");
-    tbody.innerHTML = "";
+function renderTable(){
+ const tbody = document.querySelector("#productionTable tbody");
+ tbody.innerHTML = "";
 
-    productions.forEach((p, index) => {
-      const row = document.createElement("tr");
+ productions.forEach((p, index)=>{
+  const row = document.createElement("tr");
+  row.innerHTML = `
+<td><input value="${p.name}" onchange="update(${index},'name',this.value)"></td>
+<td><input value="${p.unit}" onchange="update(${index},'unit',this.value)"></td>
+<td><input type="number" value="${p.quantity}" onchange="update(${index},'quantity',this.value)"></td>
+<td><input value="${p.note}" onchange="update(${index},'note',this.value)"></td>
+<td><button class="btn delete-btn" onclick="removeRow(${index})">🗑️</button></td>
+`;
+  tbody.appendChild(row);
+ });
+}
 
-      row.innerHTML = `
-        <td><input value="${p.name}" onchange="update(${index}, 'name', this.value)"></td>
-        <td><input value="${p.unit}" onchange="update(${index}, 'unit', this.value)"></td>
-        <td><input type="number" value="${p.quantity}" onchange="update(${index}, 'quantity', this.value)"></td>
-        <td><input value="${p.note}" onchange="update(${index}, 'note', this.value)"></td>
-        <td>
-          <button class="btn delete-btn" onclick="removeRow(${index})">🗑️</button>
-        </td>
-      `;
-      tbody.appendChild(row);
-    });
-  }
+function addRow(){
+ productions.push({
+  id:"p"+Date.now(),
+  name:"",
+  unit:"",
+  quantity:"",
+  note:""
+ });
+ saveData();
+ renderTable();
+}
 
-  function addRow() {
-    productions.push({
-      id: "p" + Date.now(),
-      name: "",
-      unit: "",
-      quantity: "",
-      note: ""
-    });
-    saveData();
-    renderTable();
-  }
+function update(index, field, value){
+ productions[index][field] = value;
+ saveData();
+}
 
-  function update(index, field, value) {
-    productions[index][field] = value;
-    saveData();
-  }
-
-  function removeRow(index) {
-    if (confirm("यो उत्पादन हटाउने हो ?")) {
-      productions.splice(index, 1);
-      saveData();
-      renderTable();
-    }
-  }
-
+function removeRow(index){
+ if(confirm("यो उत्पादन हटाउने हो ?")){
+  productions.splice(index,1);
+  saveData();
   renderTable();
+ }
+}
+
+renderTable();
 </script>
 
 </body>
