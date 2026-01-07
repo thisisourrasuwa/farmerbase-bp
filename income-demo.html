@@ -2,21 +2,38 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Income</title>
+<title>आम्दानी विवरण</title>
 
 <style>
 body{font-family:Arial;background:#f5f5f5;margin:0}
-header,footer{
- background:#2e7d32;color:#fff;padding:12px 20px;
- display:flex;justify-content:space-between;align-items:center
+
+/* ===== HEADER (PAGE NAME ONLY – SAFE) ===== */
+header{
+ background:#2e7d32;
+ color:#fff;
+ padding:18px 20px;
+ text-align:center;
+ font-size:22px;
+ font-weight:700;
+ letter-spacing:.4px;
+ box-shadow:0 2px 6px rgba(0,0,0,0.2)
 }
-header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
+
+footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ font-size:14px
+}
 
 .container{
  max-width:1200px;
  margin:auto;
  background:#fff;
- padding:20px;
+ padding:20px 70px;   /* side safe zone */
  min-height:70vh
 }
 
@@ -63,10 +80,9 @@ th{background:#e8f5e9}
 
 <body>
 
+<!-- ===== HEADER ===== -->
 <header>
-  <a href="capital-source.html">⬅️ पुँजिको स्रोत</a>
-  <span>आम्दानी (यहाँ नाफा % मात्र निर्धारण गर्ने)</span>
-  <a href="profit-loss.html">नाफा-नोक्सान ➡️</a>
+  आम्दानी विवरण
 </header>
 
 <div class="container">
@@ -89,7 +105,7 @@ th{background:#e8f5e9}
 
 <!-- ✅ TOTAL DISPLAY -->
 <div class="summary">
- कुल आम्दानी (Grand Total): 
+ कुल आम्दानी (Grand Total):
  <span id="grandTotal">0.00</span>
 </div>
 
@@ -101,9 +117,7 @@ th{background:#e8f5e9}
 </div>
 
 <footer>
-  <a href="capital-source.html">⬅️ पुँजिको स्रोत</a>
-  <span>Farmerbase BP Engine – Income Module</span>
-  <a href="profit-loss.html">नाफा-नोक्सान ➡️</a>
+ FarmerBase BP Engine – Income Module
 </footer>
 
 <script>
@@ -188,11 +202,9 @@ function render(){
 </tr>`;
  });
 
- /* ✅ SHOW TOTAL */
  document.getElementById("grandTotal").innerText =
   grandTotal.toFixed(2);
 
- /* ✅ PUBLISH FOR PROFIT-LOSS */
  localStorage.setItem("totalIncome", grandTotal);
 }
 
