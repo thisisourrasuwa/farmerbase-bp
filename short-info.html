@@ -10,46 +10,30 @@ body{
  background:#f5f5f5;
  margin:0
 }
-header,footer{
- background:#2e7d32;
- color:#fff;
- padding:12px 20px;
- display:flex;
- justify-content:center;
- align-items:center
+
+/* ===== CLEAN & BRIGHT HEADER ===== */
+.app-header{
+ background:linear-gradient(90deg,#2e7d32,#43a047);
+ padding:16px 20px;
+ text-align:center;
+ box-shadow:0 2px 8px rgba(0,0,0,0.15)
 }
-.container{
- max-width:1100px;
- margin:auto;
- background:#fff;
- padding:20px;
- min-height:70vh
+.app-title{
+ color:#e8f5e9;
+ font-size:22px;
+ font-weight:700;
+ letter-spacing:.5px
 }
-h2{
- color:#333;
- border-bottom:2px solid #e0e0e0;
- padding-bottom:5px;
- margin-top:25px
-}
-label{
- display:block;
- margin-top:12px;
- font-weight:bold
-}
-input, textarea, select{
- width:100%;
- padding:8px;
- margin-top:5px;
- box-sizing:border-box
-}
-textarea{resize:vertical;min-height:90px}
-.note{
- font-size:13px;
- color:#555;
- margin-top:15px
+.page-title{
+ margin-top:4px;
+ color:#ffffff;
+ font-size:18px;
+ font-weight:600;
+ border-top:1px solid rgba(255,255,255,.4);
+ padding-top:6px
 }
 
-/* ===== SUMMARY STYLE SIDE PAGE FOLLOW ===== */
+/* ===== SIDE PAGE FOLLOW (SUMMARY STYLE) ===== */
 .side-nav{
  position:fixed;
  top:50%;
@@ -67,21 +51,67 @@ textarea{resize:vertical;min-height:90px}
  z-index:999;
  box-shadow:0 4px 10px rgba(0,0,0,.25)
 }
-.side-nav.prev{left:15px}
 .side-nav.next{right:15px}
 .side-nav:hover{background:#1b5e20}
+
+/* ===== PAGE BODY ===== */
+.container{
+ max-width:1100px;
+ margin:auto;
+ background:#fff;
+ padding:20px;
+ min-height:70vh
+}
+
+h2{
+ color:#333;
+ border-bottom:2px solid #e0e0e0;
+ padding-bottom:5px;
+ margin-top:25px
+}
+
+label{
+ display:block;
+ margin-top:12px;
+ font-weight:bold
+}
+
+input, textarea, select{
+ width:100%;
+ padding:8px;
+ margin-top:5px;
+ box-sizing:border-box
+}
+
+textarea{
+ resize:vertical;
+ min-height:90px
+}
+
+.note{
+ font-size:13px;
+ color:#555;
+ margin-top:15px
+}
+
+footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ text-align:center
+}
 </style>
 </head>
 
 <body>
 
-<!-- ===== SIDE PAGE FOLLOW (SUMMARY LIKE) ===== -->
-<div class="side-nav prev" onclick="location.href='index.html'">⬅</div>
- <div class="side-nav prev" onclick="location.href='business-detail.html.html'">➡</div>
+<!-- ===== SIDE PAGE FOLLOW (NEXT ONLY) ===== -->
+<div class="side-nav next" onclick="location.href='business-detail.html'">➡</div>
 
-
-<header>
-  <h2>संक्षिप्त जानकारी</h2>
+<!-- ===== HEADER ===== -->
+<header class="app-header">
+  <div class="app-title">FarmerBase BP Engine</div>
+  <div class="page-title">संक्षिप्त जानकारी</div>
 </header>
 
 <div class="container">
@@ -167,18 +197,18 @@ textarea{resize:vertical;min-height:90px}
 </div>
 
 <footer>
-  FarmerBase BP Engine – Short Info
+ FarmerBase BP Engine – Short Info
 </footer>
 
 <script>
-/* ===== AUTO FILL FROM INDEX ===== */
+/* ===== AUTO FILL FROM INDEX (UNCHANGED) ===== */
 const activeId = localStorage.getItem("activeBusinessId");
 const list = JSON.parse(localStorage.getItem("businessList")) || [];
 const biz = list.find(b => b.id === activeId);
 
 if(biz){
- firmName.value = biz.name || "";
- promoter.value = biz.proprietor || "";
+ document.getElementById("firmName").value = biz.name || "";
+ document.getElementById("promoter").value = biz.proprietor || "";
 }
 
 /* ===== AUTO SAVE (UNCHANGED) ===== */
@@ -189,9 +219,9 @@ if(biz){
  "registrationNumber","panNumber","affiliation",
  "objective","targetMarket","summary"
 ].forEach(id=>{
- const el = document.getElementById(id);
+ const el=document.getElementById(id);
  el.value = el.value || localStorage.getItem(id) || "";
- el.onchange = () => localStorage.setItem(id, el.value);
+ el.onchange = ()=>localStorage.setItem(id, el.value);
 });
 </script>
 
