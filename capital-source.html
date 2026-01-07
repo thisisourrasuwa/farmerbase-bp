@@ -5,11 +5,7 @@
 <title>पुँजिको स्रोत</title>
 
 <style>
-body{
- font-family:Arial, sans-serif;
- background:#f5f5f5;
- margin:0
-}
+body{font-family:Arial;background:#f5f5f5;margin:0}
 
 /* ===== HEADER (PAGE NAME ONLY) ===== */
 header{
@@ -45,59 +41,47 @@ header{
 .side-nav.next{right:15px}
 .side-nav:hover{background:#1b5e20}
 
-/* ===== PAGE BODY ===== */
+/* ===== CONTAINER (SIDE SAFE ZONE) ===== */
 .container{
- max-width:1100px;
+ max-width:1200px;
  margin:auto;
  background:#fff;
- padding:20px 70px;   /* side safe zone */
+ padding:20px 70px; /* arrow safe */
  min-height:70vh
 }
 
-h2{
- margin-top:30px;
- color:#2e7d32
-}
-
-table{
- width:100%;
- border-collapse:collapse;
- margin-top:15px
-}
-
-th,td{
- border:1px solid #ccc;
- padding:10px;
- text-align:center;
+.summary{
+ background:#f1f8e9;padding:15px;margin-bottom:20px;
  font-size:15px
 }
 
-th{
- background:#e8f5e9
-}
+select,input{padding:5px}
 
-input{
- width:100%;
- padding:6px;
- box-sizing:border-box
-}
-
-.btn{
- padding:6px 12px;
- border:none;
- cursor:pointer;
+table{width:100%;border-collapse:collapse}
+th,td{
+ border:1px solid #ccc;padding:8px;text-align:center;
  font-size:14px
 }
+th{background:#e8f5e9}
 
-.add{
- background:#2e7d32;
- color:#fff
+td input{width:100%;box-sizing:border-box}
+
+.btn{padding:6px 12px;border:none;cursor:pointer;border-radius:4px}
+.add{background:#2e7d32;color:#fff}
+.del{background:#c62828;color:#fff}
+
+.typeBtns{margin:10px 0}
+.typeBtns .btn{margin-right:6px}
+
+.tag{
+ padding:4px 8px;
+ background:#e0f2f1;
+ border-radius:12px;
+ font-size:12px
 }
 
-.del{
- background:#c62828;
- color:#fff
-}
+.ok{color:#2e7d32;font-weight:bold}
+.warn{color:#c62828;font-weight:bold}
 
 footer{
  background:#2e7d32;
@@ -113,7 +97,7 @@ footer{
 
 <!-- ===== SIDE NAVIGATION ===== -->
 <div class="side-nav prev" onclick="location.href='expense-demo.html'">⬅</div>
-<div class="side-nav next" onclick="location.href='income.html'">➡</div>
+<div class="side-nav next" onclick="location.href='income-demo.html'">➡</div>
 
 <!-- ===== HEADER ===== -->
 <header>
@@ -122,73 +106,188 @@ footer{
 
 <div class="container">
 
-<h2>१. पुँजीको विवरण</h2>
+<!-- ================= SUMMARY ================= -->
+<div class="summary">
+<b>स्थिर पूँजी:</b> <span id="fixedCap">0</span><br>
+<b>वार्षिक चालु खर्च:</b> <span id="annualVar">0</span><br><br>
 
-<table id="capitalTable">
+<b>कार्यशील पूँजी मोड:</b>
+<select id="wcMode" onchange="changeWCMode(this.value)">
+ <option value="months">महिना आधारित</option>
+ <option value="percent">प्रतिशत आधारित</option>
+ <option value="manual">Manual</option>
+</select>
+<span id="wcOptions"></span>
+
+<hr>
+
+<b>कार्यशील पूँजी:</b> <span id="workingCap">0</span><br>
+<b>कुल आवश्यक पूँजी:</b> <span id="totalCapital">0</span><br>
+<b>कुल %:</b> <span id="totalPercent">0%</span>
+<span id="status"></span><br>
+
+<b>वार्षिक ब्याज खर्च:</b> <span id="totalInterest">0</span>
+</div>
+
+<!-- ================= ADD TYPE BUTTONS ================= -->
+<div class="typeBtns">
+ <button class="btn add" onclick="addSource('self')">➕ स्वलगानी</button>
+ <button class="btn add" onclick="addSource('grant')">➕ अनुदान</button>
+ <button class="btn add" onclick="addSource('loan')">➕ बैंक/सहकारी ऋण</button>
+ <button class="btn add" onclick="addSource('other')">➕ अन्य स्रोत</button>
+</div>
+
+<!-- ================= TABLE ================= -->
+<table>
 <thead>
 <tr>
- <th>पुँजीको स्रोत</th>
- <th>रकम</th>
- <th>कैफियत</th>
+ <th>स्रोत प्रकार</th>
+ <th>%</th>
+ <th>रकम (Auto)</th>
+ <th>ब्याज %</th>
+ <th>वार्षिक ब्याज</th>
  <th>🗑️</th>
 </tr>
 </thead>
-<tbody></tbody>
+<tbody id="capBody"></tbody>
 </table>
-
-<button class="btn add" onclick="addCapital()">➕ पुँजी स्रोत थप्नुहोस्</button>
 
 </div>
 
 <footer>
- FarmerBase BP Engine
+ FarmerBase BP Engine – Capital Source
 </footer>
 
 <script>
-/* ===== SAFE & SIMPLE CAPITAL LOGIC ===== */
-let capitals = JSON.parse(localStorage.getItem("capitals")) || [];
+/* ================= LOAD FROM EXPENSES ================= */
+const annualVar = parseFloat(localStorage.getItem("variable_annual_cost")) || 0;
+const fixedCap  = parseFloat(localStorage.getItem("fixed_total_capital")) || 0;
 
-function save(){
- localStorage.setItem("capitals", JSON.stringify(capitals));
+/* ================= WORKING CAPITAL STATE ================= */
+let wcState = JSON.parse(localStorage.getItem("wcState")) || {
+ mode:"months", months:3, percent:20, manual:0
+};
+function saveWC(){localStorage.setItem("wcState",JSON.stringify(wcState));}
+function changeWCMode(m){wcState.mode=m;saveWC();render();}
+
+/* ================= CAPITAL SOURCES ================= */
+let sources = JSON.parse(localStorage.getItem("capitalSources")) || [];
+function saveSources(){localStorage.setItem("capitalSources",JSON.stringify(sources));}
+
+function addSource(type){
+ sources.push({
+  id:Date.now(),
+  type:type,
+  pct:0,
+  interest:0
+ });
+ saveSources(); render();
 }
 
+function updateSource(id,field,val){
+ const s=sources.find(x=>x.id===id);
+ s[field]=parseFloat(val)||0;
+ saveSources(); render();
+}
+
+function removeSource(id){
+ if(confirm("हटाउने हो ?")){
+  sources=sources.filter(s=>s.id!==id);
+  saveSources(); render();
+ }
+}
+
+/* ================= WORKING CAPITAL ================= */
+function calcWorkingCap(){
+ if(wcState.mode==="months") return (annualVar/12)*(wcState.months||3);
+ if(wcState.mode==="percent") return annualVar*(wcState.percent||0)/100;
+ if(wcState.mode==="manual") return wcState.manual||0;
+ return 0;
+}
+
+/* ================= RENDER ================= */
 function render(){
- const tbody = document.querySelector("#capitalTable tbody");
- tbody.innerHTML = "";
+ document.getElementById("fixedCap").innerText=fixedCap.toFixed(2);
+ document.getElementById("annualVar").innerText=annualVar.toFixed(2);
 
- let total = 0;
+ document.getElementById("wcMode").value=wcState.mode;
+ let opt="";
+ if(wcState.mode==="months"){
+  opt=` महिना:
+  <select onchange="wcState.months=this.value;saveWC();render()">
+   <option value="3" ${wcState.months==3?"selected":""}>3</option>
+   <option value="6" ${wcState.months==6?"selected":""}>6</option>
+   <option value="9" ${wcState.months==9?"selected":""}>9</option>
+   <option value="12" ${wcState.months==12?"selected":""}>12</option>
+  </select>`;
+ }
+ if(wcState.mode==="percent"){
+  opt=` %:
+  <input type="number" value="${wcState.percent}"
+   onchange="wcState.percent=this.value;saveWC();render()"
+   style="width:80px">`;
+ }
+ if(wcState.mode==="manual"){
+  opt=` रकम:
+  <input type="number" value="${wcState.manual}"
+   onchange="wcState.manual=this.value;saveWC();render()"
+   style="width:120px">`;
+ }
+ document.getElementById("wcOptions").innerHTML=opt;
 
- capitals.forEach((c, i)=>{
-  total += +c.amount || 0;
+ const workingCap=calcWorkingCap();
+ const totalCapital=fixedCap+workingCap;
 
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-<td><input value="${c.source}" onchange="update(${i},'source',this.value)"></td>
-<td><input type="number" value="${c.amount}" onchange="update(${i},'amount',this.value)"></td>
-<td><input value="${c.note}" onchange="update(${i},'note',this.value)"></td>
-<td><button class="btn del" onclick="removeCapital(${i})">🗑️</button></td>
-`;
-  tbody.appendChild(tr);
+ document.getElementById("workingCap").innerText=workingCap.toFixed(2);
+ document.getElementById("totalCapital").innerText=totalCapital.toFixed(2);
+
+ const tb=document.getElementById("capBody");
+ tb.innerHTML="";
+ let sumPct=0,totalInterest=0;
+
+ sources.forEach(s=>{
+  const pct=s.pct||0;
+  const amt=totalCapital*pct/100;
+  const interestAmt =
+   (s.type==="loan"||s.type==="other")
+    ? amt*(s.interest||0)/100
+    : 0;
+
+  sumPct+=pct; totalInterest+=interestAmt;
+
+  tb.innerHTML+=`
+<tr>
+<td><span class="tag">${
+ s.type==="self"?"स्वलगानी":
+ s.type==="grant"?"अनुदान":
+ s.type==="loan"?"बैंक/सहकारी ऋण":"अन्य"
+}</span></td>
+<td><input type="number" value="${pct}"
+ oninput="updateSource(${s.id},'pct',this.value)"></td>
+<td>${amt.toFixed(2)}</td>
+<td>
+ <input type="number" value="${s.interest}"
+ ${s.type==="loan"||s.type==="other"?"":"disabled"}
+ oninput="updateSource(${s.id},'interest',this.value)">
+</td>
+<td>${interestAmt.toFixed(2)}</td>
+<td><button class="btn del"
+ onclick="removeSource(${s.id})">🗑️</button></td>
+</tr>`;
  });
 
- localStorage.setItem("total_capital", total.toFixed(2));
-}
+ document.getElementById("totalPercent").innerText=sumPct+"%";
+ document.getElementById("totalInterest").innerText=totalInterest.toFixed(2);
 
-function addCapital(){
- capitals.push({source:"", amount:0, note:""});
- save(); render();
-}
+ document.getElementById("status").innerHTML=
+  sumPct===100
+   ?'<span class="ok"> ✔️ 100% मिल्यो</span>'
+   :'<span class="warn"> ❗ 100% हुनुपर्छ</span>';
 
-function update(i, key, val){
- capitals[i][key] = val;
- save();
-}
-
-function removeCapital(i){
- if(confirm("यो पुँजी स्रोत हटाउने हो ?")){
-  capitals.splice(i,1);
-  save(); render();
- }
+ localStorage.setItem(
+  "annual_interest_cost",
+  totalInterest.toFixed(2)
+ );
 }
 
 render();
