@@ -2,159 +2,231 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>नाफा / नोक्सान सारांश</title>
+<title>नाफा वितरण</title>
 
 <style>
 body{font-family:Arial;background:#f5f5f5;margin:0}
-header,footer{
- background:#2e7d32;color:#fff;
- padding:12px 20px;
- display:flex;justify-content:space-between;align-items:center
+
+/* ===== HEADER ===== */
+header{
+ background:#2e7d32;
+ color:#fff;
+ padding:18px 20px;
+ text-align:center;
+ font-size:22px;
+ font-weight:700;
+ letter-spacing:.4px;
+ box-shadow:0 2px 6px rgba(0,0,0,0.2)
 }
-header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
+
+/* ===== SIDE PAGE FOLLOW ===== */
+.side-nav{
+ position:fixed;
+ top:50%;
+ transform:translateY(-50%);
+ width:48px;
+ height:48px;
+ border-radius:50%;
+ background:#2e7d32;
+ color:#fff;
+ font-size:26px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ z-index:999;
+ box-shadow:0 4px 10px rgba(0,0,0,.25)
+}
+.side-nav.prev{left:15px}
+.side-nav.next{right:15px}
+.side-nav:hover{background:#1b5e20}
+
+/* ===== CONTAINER ===== */
 .container{
- max-width:1200px;margin:auto;background:#fff;
- padding:20px;min-height:70vh
+ max-width:1100px;
+ margin:auto;
+ background:#fff;
+ padding:20px 70px; /* arrow safe zone */
+ min-height:70vh
 }
-h1{text-align:center;color:#2e7d32;margin:15px 0 25px}
+
 .summary{
- background:#f1f8e9;padding:16px;margin-bottom:20px;font-size:16px
+ background:#f1f8e9;
+ padding:16px;
+ margin-bottom:20px;
+ font-size:16px
 }
-table{width:100%;border-collapse:collapse}
-th,td{border:1px solid #ccc;padding:10px}
-th{background:#e8f5e9;text-align:center}
-td.label{font-weight:bold}
-td.amount{text-align:right}
-.net{font-size:18px;font-weight:bold}
-.profit{color:#2e7d32}
-.loss{color:#c62828}
-.note{margin-top:15px;font-size:14px;color:#444}
+
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:15px
+}
+th,td{
+ border:1px solid #ccc;
+ padding:10px;
+ text-align:center
+}
+th{background:#e8f5e9}
+
+input{
+ width:100%;
+ padding:6px;
+ box-sizing:border-box
+}
+
+.total{
+ font-size:18px;
+ font-weight:bold;
+ text-align:right;
+ margin-top:15px
+}
+
+.ok{color:#2e7d32}
+.warn{color:#c62828}
+
+footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ text-align:center;
+ font-size:14px
+}
 </style>
 </head>
 
 <body>
 
+<!-- ===== SIDE NAVIGATION ===== -->
+<div class="side-nav prev" onclick="location.href='profit-loss.html'">⬅</div>
+<div class="side-nav next" onclick="location.href='five-year-projection.html'">➡</div>
+
+<!-- ===== HEADER ===== -->
 <header>
- <a href="income-demo.html">⬅️ आम्दानी </a>
- <span>⬇️नाफा / नोक्सान हिसाब⬇️</span>
- <a href="profit-distribution.html">नाफा वितरण ➡️</a>
+  नाफा वितरण
 </header>
 
 <div class="container">
 
-<h1>नाफा / नोक्सान सारांश (Profit / Loss)</h1>
-
 <div class="summary">
- ✔️ Income page बाट आएको <b>कुल आम्दानी</b>,  
- चालु खर्च र ऋणको ब्याजका आधारमा  
- <b>शुद्ध नाफा / नोक्सान स्वतः</b> गणना हुन्छ ।
+ ✔️ यो पेजमा <b>Profit / Loss</b> बाट आएको <b>शुद्ध नाफा</b>  
+ विभिन्न शीर्षकमा बाँडफाँट गरिन्छ ।  
 </div>
 
 <table>
 <thead>
 <tr>
- <th>शीर्षक</th>
- <th>रकम (Rs.)</th>
+ <th>वितरण शीर्षक</th>
+ <th>प्रतिशत (%)</th>
+ <th>रकम (Auto)</th>
 </tr>
 </thead>
-<tbody>
-
-<tr>
- <td class="label">कुल आम्दानी (Total Income)</td>
- <td class="amount" id="totalIncome">0.00</td>
-</tr>
-
-<tr>
- <td class="label">वार्षिक चालु खर्च</td>
- <td class="amount" id="annualVar">0.00</td>
-</tr>
-
-<!-- ब्याज पहिलो ठाउँ -->
-<tr>
- <td class="label">वार्षिक ब्याज खर्च</td>
- <td class="amount" id="interestExpense">0.00</td>
-</tr>
-
-<tr>
- <td class="label">कुल खर्च (चालु + ब्याज)</td>
- <td class="amount" id="totalExpense">0.00</td>
-</tr>
-
-<tr class="net">
- <td class="label">कुल शुद्ध नाफा / नोक्सान</td>
- <td class="amount" id="netProfit">0.00</td>
-</tr>
-
-</tbody>
+<tbody id="distBody"></tbody>
 </table>
 
-<p class="note">
-✔️ आम्दानी <b>Income page</b> बाट publish भएको हो ।<br>
-✔️ ब्याज <b>Capital Source</b> बाट स्वतः आएको हो ।<br>
-✔️ यही शुद्ध नाफा <b>नाफा वितरण</b> र <b>5-Year Projection</b> मा प्रयोग हुन्छ ।
-</p>
+<button onclick="addRow()">➕ वितरण शीर्षक थप्नुहोस्</button>
+
+<div class="total">
+ कुल नाफा: <span id="netProfit">0.00</span><br>
+ वितरण भएको: <span id="usedAmount">0.00</span><br>
+ बाँकी: <span id="remaining">0.00</span>
+ <span id="status"></span>
+</div>
 
 </div>
 
 <footer>
- <a href="income-demo.html">⬅️ आम्दानी</a>
- <span>FarmerBase BP Engine – Profit / Loss</span>
- <a href="profit-distribution.html">नाफा वितरण ➡️</a>
+ FarmerBase BP Engine – Profit Distribution
 </footer>
 
-<!-- ================= SCRIPT (BOTTOM ONLY) ================= -->
 <script>
-/* =====================================================
-   1️⃣ TOTAL INCOME (SINGLE SOURCE OF TRUTH)
-   — Income page ले publish गरेको value
-===================================================== */
-const totalIncome =
- Number(localStorage.getItem("totalIncome")) || 0;
+/* =================================================
+   1️⃣ LOAD NET PROFIT (FROM PROFIT-LOSS)
+================================================= */
+const netProfit =
+ Number(localStorage.getItem("netProfit")) || 0;
 
-/* =====================================================
-   2️⃣ VARIABLE (ANNUAL) EXPENSE
-   — Expense page बाट आएको annual sum
-===================================================== */
-const annualVar =
- Number(localStorage.getItem("variable_annual_cost")) || 0;
+/* =================================================
+   2️⃣ DISTRIBUTION STATE
+================================================= */
+let distributions =
+ JSON.parse(localStorage.getItem("profitDistribution")) || [];
 
-/* =====================================================
-   3️⃣ INTEREST EXPENSE
-   — Capital Source बाट आएको
-===================================================== */
-const interestExpense =
- Number(localStorage.getItem("annual_interest_cost")) || 0;
+/* =================================================
+   3️⃣ SAVE
+================================================= */
+function save(){
+ localStorage.setItem(
+  "profitDistribution",
+  JSON.stringify(distributions)
+ );
+}
 
-/* =====================================================
-   4️⃣ TOTAL EXPENSE & NET PROFIT
-===================================================== */
-const totalExpense = annualVar + interestExpense;
-const netProfit = totalIncome - totalExpense;
+/* =================================================
+   4️⃣ ADD / UPDATE
+================================================= */
+function addRow(){
+ distributions.push({
+  title:"",
+  percent:0
+ });
+ save(); render();
+}
 
-/* =====================================================
+function update(i,field,val){
+ distributions[i][field] = field==="percent"
+  ? Number(val)||0
+  : val;
+ save(); render();
+}
+
+/* =================================================
    5️⃣ RENDER
-===================================================== */
-document.getElementById("totalIncome").innerText =
- totalIncome.toFixed(2);
+================================================= */
+function render(){
+ const tb = document.getElementById("distBody");
+ tb.innerHTML = "";
 
-document.getElementById("annualVar").innerText =
- annualVar.toFixed(2);
+ let used = 0;
 
-document.getElementById("interestExpense").innerText =
- interestExpense.toFixed(2);
+ distributions.forEach((d,i)=>{
+  const amt = netProfit * (d.percent||0) / 100;
+  used += amt;
 
-document.getElementById("totalExpense").innerText =
- totalExpense.toFixed(2);
+  tb.innerHTML += `
+<tr>
+<td>
+ <input value="${d.title}"
+  onchange="update(${i},'title',this.value)">
+</td>
+<td>
+ <input type="number" value="${d.percent}"
+  onchange="update(${i},'percent',this.value)">
+</td>
+<td>${amt.toFixed(2)}</td>
+</tr>`;
+ });
 
-const npEl = document.getElementById("netProfit");
-npEl.innerText = netProfit.toFixed(2);
-npEl.classList.add(netProfit < 0 ? "loss" : "profit");
+ const remaining = netProfit - used;
 
-/* =====================================================
-   6️⃣ SAVE FOR NEXT MODULES
-===================================================== */
-localStorage.setItem("totalExpense", totalExpense);
-localStorage.setItem("netProfit", netProfit);
+ document.getElementById("netProfit").innerText =
+  netProfit.toFixed(2);
+
+ document.getElementById("usedAmount").innerText =
+  used.toFixed(2);
+
+ const remEl = document.getElementById("remaining");
+ remEl.innerText = remaining.toFixed(2);
+
+ const st = document.getElementById("status");
+ if(Math.abs(remaining) < 0.01){
+  st.innerHTML = ' <span class="ok">✔️ 100% वितरण भयो</span>';
+ }else{
+  st.innerHTML = ' <span class="warn">❗ 100% हुनुपर्छ</span>';
+ }
+}
+
+render();
 </script>
 
 </body>
