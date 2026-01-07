@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Business Detail</title>
+<title>व्यवसायको विस्तृत विवरण</title>
 
 <style>
 body{
@@ -11,67 +11,19 @@ body{
  margin:0
 }
 
-/* ===== SIMPLE TRANSPARENT HEADER ===== */
+/* ===== HEADER (MATCHING SHORT-INFO STYLE) ===== */
 header{
- background:rgba(46,125,50,0.85);
- color:#fff;
- padding:14px 20px;
- display:flex;
- justify-content:center;
- align-items:center;
- backdrop-filter: blur(2px);
- box-shadow:0 2px 6px rgba(0,0,0,0.15)
-}
-
-footer{
  background:#2e7d32;
  color:#fff;
- padding:12px 20px;
- display:flex;
- justify-content:center;
- align-items:center
+ padding:18px 20px;
+ text-align:center;
+ font-size:22px;
+ font-weight:700;
+ letter-spacing:.4px;
+ box-shadow:0 2px 6px rgba(0,0,0,0.2)
 }
 
-.container{
- max-width:1200px;
- margin:auto;
- background:#fff;
- padding:20px;
- min-height:70vh
-}
-
-h2{
- color:#333;
- border-bottom:2px solid #e0e0e0;
- padding-bottom:5px;
- margin-top:30px
-}
-
-label{
- display:block;
- margin-top:12px;
- font-weight:bold
-}
-
-textarea, input{
- width:100%;
- padding:8px;
- margin-top:5px;
- box-sizing:border-box
-}
-
-textarea{
- resize:vertical;
- min-height:90px
-}
-
-.note{
- font-size:13px;
- color:#555;
- margin-top:15px
-}
-
-/* ===== SUMMARY STYLE SIDE PAGE FOLLOW ===== */
+/* ===== SIDE PAGE FOLLOW (SUMMARY STYLE) ===== */
 .side-nav{
  position:fixed;
  top:50%;
@@ -92,17 +44,67 @@ textarea{
 .side-nav.prev{left:15px}
 .side-nav.next{right:15px}
 .side-nav:hover{background:#1b5e20}
+
+/* ===== PAGE BODY ===== */
+.container{
+ max-width:1200px;
+ margin:auto;
+ background:#fff;
+ padding:20px 70px;   /* 🔑 SIDE SPACE FOR ARROWS */
+ min-height:70vh
+}
+
+h2{
+ color:#333;
+ border-bottom:2px solid #e0e0e0;
+ padding-bottom:6px;
+ margin-top:30px
+}
+
+label{
+ display:block;
+ margin-top:14px;
+ font-weight:bold
+}
+
+textarea, input{
+ width:100%;
+ padding:9px;
+ margin-top:6px;
+ box-sizing:border-box;
+ font-size:15px
+}
+
+textarea{
+ resize:vertical;
+ min-height:90px
+}
+
+.note{
+ font-size:13px;
+ color:#555;
+ margin-top:15px
+}
+
+footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:12px 20px;
+ text-align:center;
+ font-size:14px
+}
 </style>
 </head>
 
 <body>
 
-<!-- ===== SIDE PAGE FOLLOW (SUMMARY LIKE) ===== -->
+<!-- ===== SIDE NAVIGATION ===== -->
 <div class="side-nav prev" onclick="location.href='short-info.html'">⬅</div>
 <div class="side-nav next" onclick="location.href='production.html'">➡</div>
 
+<!-- ===== HEADER ===== -->
 <header>
-  <h2>FarmerBase BP Engine</h2>
+  व्यवसायको विस्तृत विवरण
 </header>
 
 <div class="container">
@@ -120,66 +122,53 @@ textarea{
 <h2>२. उत्पादन / सेवा विवरण</h2>
 
 <label>मुख्य उत्पादन वा सेवा</label>
-<textarea id="productService"
- placeholder="के–के उत्पादन/सेवा प्रदान गरिनेछ..."></textarea>
+<textarea id="productService"></textarea>
 
 <label>उत्पादन/सेवाको विशेषता</label>
-<textarea id="productFeature"
- placeholder="गुणस्तर, नवीनता, स्थानीय स्रोत, जैविक, मूल्य..."></textarea>
+<textarea id="productFeature"></textarea>
 
 <h2>३. बजार तथा माग विश्लेषण</h2>
 
 <label>लक्षित बजार</label>
-<textarea id="marketTarget"
- placeholder="स्थानीय, होटल, थोक, उपभोक्ता, उद्योग..."></textarea>
+<textarea id="marketTarget"></textarea>
 
 <label>माग अवस्था</label>
-<textarea id="marketDemand"
- placeholder="माग बढ्दो/स्थिर, किन किन्ने ?"></textarea>
+<textarea id="marketDemand"></textarea>
 
 <label>प्रतिस्पर्धी अवस्था</label>
-<textarea id="competition"
- placeholder="अरू व्यवसाय, हाम्रो फरक पक्ष..."></textarea>
+<textarea id="competition"></textarea>
 
 <h2>४. सञ्चालन योजना</h2>
 
 <label>सञ्चालन प्रक्रिया</label>
-<textarea id="operationPlan"
- placeholder="उत्पादन/सेवा कसरी सञ्चालन हुन्छ ?"></textarea>
+<textarea id="operationPlan"></textarea>
 
 <label>आवश्यक जनशक्ति</label>
-<textarea id="manpower"
- placeholder="कामदार संख्या, सीप, व्यवस्थापन..."></textarea>
+<textarea id="manpower"></textarea>
 
 <h2>५. स्रोत साधन</h2>
 
 <label>भूमि / भवन / पूर्वाधार</label>
-<textarea id="infrastructure"
- placeholder="जग्गा, भवन, गोदाम, सिंचाइ, सडक..."></textarea>
+<textarea id="infrastructure"></textarea>
 
 <label>प्रविधि / उपकरण</label>
-<textarea id="technology"
- placeholder="मेसिन, उपकरण, प्रविधि..."></textarea>
+<textarea id="technology"></textarea>
 
 <h2>६. जोखिम तथा न्यूनीकरण उपाय</h2>
 
 <label>सम्भावित जोखिम</label>
-<textarea id="risk"
- placeholder="बजार, मौसम, रोग, मूल्य..."></textarea>
+<textarea id="risk"></textarea>
 
 <label>न्यूनीकरण उपाय</label>
-<textarea id="mitigation"
- placeholder="बीमा, विविधीकरण, तालिम, व्यवस्थापन..."></textarea>
+<textarea id="mitigation"></textarea>
 
 <h2>७. कानुनी तथा वातावरणीय पक्ष</h2>
 
 <label>कानुनी अनुपालन</label>
-<textarea id="legal"
- placeholder="दर्ता, कर, अनुमति, मापदण्ड..."></textarea>
+<textarea id="legal"></textarea>
 
 <label>वातावरणीय प्रभाव</label>
-<textarea id="environment"
- placeholder="फोहर व्यवस्थापन, वातावरण संरक्षण..."></textarea>
+<textarea id="environment"></textarea>
 
 <p class="note">
 ✔️ यो पेजले व्यवसायको व्यवहारिकता देखाउँछ ।<br>
@@ -189,11 +178,11 @@ textarea{
 </div>
 
 <footer>
-  FarmerBase BP Engine – Business Detail
+ FarmerBase BP Engine
 </footer>
 
 <script>
-/* ===== AUTO SAVE (UNCHANGED) ===== */
+/* ===== AUTO SAVE (UNCHANGED LOGIC) ===== */
 const fields=[
  "bizDescription","bizJustification",
  "productService","productFeature",
