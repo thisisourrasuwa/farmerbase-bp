@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>All Charts & Reports</title>
+
+<style>
+body{
+ font-family:Arial, sans-serif;
+ margin:0;
+ background:#f4f6f7
+}
+
+/* ===== HEADER ===== */
+header{
+ background:#2e7d32;
+ color:#fff;
+ padding:18px;
+ text-align:center;
+ font-size:24px;
+ font-weight:700;
+ box-shadow:0 2px 6px rgba(0,0,0,.2)
+}
+
+/* ===== SIDE PAGE FOLLOW ===== */
+.side-nav{
+ position:fixed;
+ top:50%;
+ transform:translateY(-50%);
+ width:48px;
+ height:48px;
+ border-radius:50%;
+ background:#2e7d32;
+ color:#fff;
+ font-size:26px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ z-index:999;
+ box-shadow:0 4px 10px rgba(0,0,0,.25)
+}
+.side-nav.prev{left:15px}
+.side-nav.next{right:15px}
+.side-nav:hover{background:#1b5e20}
+
+/* ===== CONTAINER ===== */
+.container{
+ max-width:1200px;
+ margin:auto;
+ background:#fff;
+ padding:30px 70px;
+ min-height:70vh
+}
+
+h2{
+ color:#2e7d32;
+ border-bottom:2px solid #e0e0e0;
+ padding-bottom:6px;
+ margin-top:35px
+}
+
+/* ===== CHART GRID ===== */
+.chart-grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+ gap:25px;
+ margin-top:20px
+}
+
+.chart-box{
+ background:#f9f9f9;
+ border:1px solid #ddd;
+ padding:20px;
+ text-align:center
+}
+
+.chart-placeholder{
+ height:160px;
+ background:#e8f5e9;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:14px;
+ color:#2e7d32;
+ font-weight:bold
+}
+
+/* ===== REPORT LINKS ===== */
+.link-list{
+ margin-top:15px;
+ line-height:1.8
+}
+.link-list a{
+ text-decoration:none;
+ color:#2e7d32;
+ font-weight:bold
+}
+.link-list a:hover{text-decoration:underline}
+
+/* ===== ANNEX ===== */
+.annex{
+ background:#f1f8e9;
+ padding:20px;
+ margin-top:20px;
+ border-left:6px solid #2e7d32
+}
+
+footer{
+ background:#2e7d32;
+ color:#fff;
+ padding:14px;
+ text-align:center;
+ margin-top:40px
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== PAGE FOLLOW ===== -->
+<div class="side-nav prev" onclick="location.href='executive-summary.html'">⬅</div>
+
+<header>
+  📊 All Charts, Reports & Annex
+  <div style="font-size:14px;font-weight:normal">
+    FarmerBase BP Engine – Visual & Supporting Reports
+  </div>
+</header>
+
+<div class="container">
+
+<h2>१. Key Charts & Graphs (Overview)</h2>
+
+<div class="chart-grid">
+
+  <div class="chart-box">
+    <div class="chart-placeholder">
+      📈 Income vs Expense Chart
+    </div>
+    <div class="link-list">
+      <a href="profit-loss.html">View Profit / Loss Page</a>
+    </div>
+  </div>
+
+  <div class="chart-box">
+    <div class="chart-placeholder">
+      📊 5-Year Profit Trend
+    </div>
+    <div class="link-list">
+      <a href="projection-5yr.html">View 5-Year Projection</a>
+    </div>
+  </div>
+
+  <div class="chart-box">
+    <div class="chart-placeholder">
+      💹 ROI / IRR / Payback
+    </div>
+    <div class="link-list">
+      <a href="roi-irr-payback.html">View Investment Analysis</a>
+    </div>
+  </div>
+
+  <div class="chart-box">
+    <div class="chart-placeholder">
+      🧮 Profit Distribution
+    </div>
+    <div class="link-list">
+      <a href="profit-distribution.html">View Profit Distribution</a>
+    </div>
+  </div>
+
+</div>
+
+<h2>२. Detailed Reports (Links)</h2>
+
+<div class="link-list">
+  🔗 <a href="income-demo.html">Income Details</a><br>
+  🔗 <a href="expense-demo.html">Expense Details</a><br>
+  🔗 <a href="capital-source.html">Capital Source & Interest</a><br>
+  🔗 <a href="business-detail.html">Business Detail</a><br>
+  🔗 <a href="production.html">Production Details</a>
+</div>
+
+<h2>३. Annex (परिशिष्ट)</h2>
+
+<div class="annex">
+  <p><b>Annex A:</b> Detailed Cost Assumptions</p>
+  <p><b>Annex B:</b> Market Survey & Price Reference</p>
+  <p><b>Annex C:</b> Technical Design / Production Plan</p>
+  <p><b>Annex D:</b> Legal / Registration Documents</p>
+
+  <!-- Optional links -->
+  <!--
+  <p>📎 <a href="annex/annex-a.pdf">Annex A (PDF)</a></p>
+  -->
+</div>
+
+<h2>४. Reviewer Notes (Optional)</h2>
+<p>
+यो पेजले निर्णयकर्तालाई
+<strong>पूरै व्यवसायिक योजनाको दृश्य नक्सा</strong> प्रदान गर्दछ।
+चार्टहरू, विस्तृत रिपोर्टहरू र Annex हरू
+आवश्यकता अनुसार सजिलै हेर्न सकिन्छ।
+</p>
+
+</div>
+
+<footer>
+ FarmerBase BP Engine – All Charts & Reports Hub
+</footer>
+
+</body>
+</html>
