@@ -4,112 +4,69 @@
 <meta charset="UTF-8">
 <title>All Charts, Graphs & Annex</title>
 
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-body{
- font-family:Arial, sans-serif;
- margin:0;
- background:#f4f6f7
-}
+body{font-family:Arial;margin:0;background:#f4f6f7}
 
 /* ===== HEADER ===== */
 header{
- background:#2e7d32;
- color:#fff;
- padding:18px;
- text-align:center;
- font-size:24px;
- font-weight:700;
- box-shadow:0 2px 6px rgba(0,0,0,.2)
+ background:#2e7d32;color:#fff;
+ padding:18px;text-align:center;
+ font-size:24px;font-weight:700
 }
 
 /* ===== SIDE PAGE FOLLOW ===== */
 .side-nav{
- position:fixed;
- top:50%;
- transform:translateY(-50%);
- width:48px;
- height:48px;
- border-radius:50%;
- background:#2e7d32;
- color:#fff;
- font-size:26px;
- display:flex;
- align-items:center;
- justify-content:center;
- cursor:pointer;
- z-index:999;
- box-shadow:0 4px 10px rgba(0,0,0,.25)
+ position:fixed;top:50%;transform:translateY(-50%);
+ width:48px;height:48px;border-radius:50%;
+ background:#2e7d32;color:#fff;
+ font-size:26px;display:flex;
+ align-items:center;justify-content:center;
+ cursor:pointer;z-index:999
 }
 .side-nav.prev{left:15px}
 .side-nav.next{right:15px}
-.side-nav:hover{background:#1b5e20}
 
 /* ===== CONTAINER ===== */
 .container{
- max-width:1200px;
- margin:auto;
- background:#fff;
- padding:30px 70px;
+ max-width:1200px;margin:auto;
+ background:#fff;padding:30px 70px;
  min-height:70vh
 }
 
-h2{
- color:#2e7d32;
- border-bottom:2px solid #e0e0e0;
- padding-bottom:6px;
- margin-top:35px
-}
+h2{color:#2e7d32;margin-top:35px}
 
-/* ===== GRID ===== */
-.grid{
- display:grid;
- grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
- gap:25px;
- margin-top:25px
-}
-
-.box{
- background:#f9f9f9;
- border:1px solid #ddd;
- padding:20px;
- text-align:center
-}
-
-.placeholder{
- height:160px;
- background:#e8f5e9;
+/* ===== TOGGLE BUTTONS ===== */
+.toggle{
+ margin:15px 0;
  display:flex;
- align-items:center;
- justify-content:center;
- font-size:14px;
+ gap:10px;
+ flex-wrap:wrap
+}
+.toggle button{
+ padding:8px 14px;
+ border:1px solid #2e7d32;
+ background:#fff;
  color:#2e7d32;
+ cursor:pointer;
  font-weight:bold
 }
-
-.links{
- margin-top:10px;
- line-height:1.8
+.toggle button.active{
+ background:#2e7d32;
+ color:#fff
 }
-.links a{
- text-decoration:none;
- color:#2e7d32;
- font-weight:bold
-}
-.links a:hover{text-decoration:underline}
 
-/* ===== ANNEX ===== */
-.annex{
- background:#f1f8e9;
- padding:20px;
- margin-top:25px;
- border-left:6px solid #2e7d32
+/* ===== CHART BOX ===== */
+.box{
+ border:1px solid #ddd;
+ padding:20px
 }
 
 footer{
- background:#2e7d32;
- color:#fff;
- padding:14px;
- text-align:center;
+ background:#2e7d32;color:#fff;
+ padding:14px;text-align:center;
  margin-top:40px
 }
 </style>
@@ -122,75 +79,144 @@ footer{
 <div class="side-nav next" onclick="location.href='full-proposal.html'">➡</div>
 
 <header>
-  📊 All Charts, Reports & Annex
-  <div style="font-size:14px;font-weight:normal">
-    Visual Summary & Supporting Documents
-  </div>
+ 📊 Interactive Charts (Year / Product / Expense)
 </header>
 
 <div class="container">
 
-<h2>१. Key Charts & Graphs</h2>
+<h2>Financial Analysis View</h2>
 
-<div class="grid">
-
- <div class="box">
-  <div class="placeholder">📈 Income vs Expense</div>
-  <div class="links">
-   <a href="profit-loss.html">View Profit / Loss</a>
-  </div>
- </div>
-
- <div class="box">
-  <div class="placeholder">📊 5-Year Profit Trend</div>
-  <div class="links">
-   <a href="projection-5yr.html">View 5-Year Projection</a>
-  </div>
- </div>
-
- <div class="box">
-  <div class="placeholder">💹 ROI / IRR / Payback</div>
-  <div class="links">
-   <a href="roi-irr-payback.html">View Investment Analysis</a>
-  </div>
- </div>
-
- <div class="box">
-  <div class="placeholder">🧮 Profit Distribution</div>
-  <div class="links">
-   <a href="profit-distribution.html">View Profit Distribution</a>
-  </div>
- </div>
-
+<div class="toggle">
+ <button id="yearBtn" class="active" onclick="showYearWise()">Year-wise</button>
+ <button id="prodBtn" onclick="showProductWise()">Product-wise</button>
+ <button id="expBtn" onclick="showExpenseWise()">Expense-wise</button>
 </div>
 
-<h2>२. Detailed Reports (Quick Links)</h2>
-
-<div class="links">
- 🔗 <a href="income-demo.html">Income Details</a><br>
- 🔗 <a href="expense-demo.html">Expense Details</a><br>
- 🔗 <a href="capital-source.html">Capital Source & Interest</a><br>
- 🔗 <a href="business-detail.html">Business Detail</a><br>
- 🔗 <a href="production.html">Production Details</a>
-</div>
-
-<h2>३. Annex (परिशिष्ट)</h2>
-
-<div class="annex">
- <p><b>Annex A:</b> Cost Assumptions & Price Reference</p>
- <p><b>Annex B:</b> Market Survey / Demand Analysis</p>
- <p><b>Annex C:</b> Technical Design / Production Plan</p>
- <p><b>Annex D:</b> Legal / Registration Documents</p>
-
- <!-- Optional file links -->
- <!-- <p>📎 <a href="annex/annex-a.pdf">Annex A (PDF)</a></p> -->
+<div class="box">
+ <canvas id="mainChart"></canvas>
 </div>
 
 </div>
 
 <footer>
- FarmerBase BP Engine – Charts & Report Hub
+ FarmerBase BP Engine – Interactive Charts
 </footer>
+
+<script>
+/* ================= LOAD BASE DATA ================= */
+
+// Income / Expense summary
+const totalIncome =
+ Number(localStorage.getItem("totalIncome")) || 0;
+const totalExpense =
+ Number(localStorage.getItem("totalExpense")) || 0;
+
+// Production list
+const productions =
+ JSON.parse(localStorage.getItem("productions")) || [];
+
+// Expenses list
+const expenses =
+ JSON.parse(localStorage.getItem("expenses")) || [];
+
+/* ================= CHART INSTANCE ================= */
+let chart;
+
+/* ================= YEAR-WISE ================= */
+function getYearWise(){
+ let inc = totalIncome;
+ let exp = totalExpense;
+ const labels=[], data=[];
+ for(let y=1;y<=5;y++){
+  labels.push("Year "+y);
+  data.push(inc - exp);
+  inc*=1.1; exp*=1.1;
+ }
+ return {labels, data, title:"Year-wise Net Profit"};
+}
+
+/* ================= PRODUCT-WISE ================= */
+function getProductWise(){
+ const labels=[], data=[];
+ productions.forEach(p=>{
+  labels.push(p.name);
+  const qty = Number(p.quantity)||1;
+  const rate = Number(p.sellingRate)||0;
+  data.push(qty * rate);
+ });
+ return {labels, data, title:"Product-wise Income"};
+}
+
+/* ================= EXPENSE-WISE ================= */
+function getExpenseWise(){
+ const map = {};
+ expenses.forEach(e=>{
+  const label = e.title || e.category || "Other";
+  const amount = (Number(e.qty)||1) * (Number(e.rate)||0);
+  map[label] = (map[label] || 0) + amount;
+ });
+ return {
+  labels:Object.keys(map),
+  data:Object.values(map),
+  title:"Expense-wise Distribution"
+ };
+}
+
+/* ================= RENDER ================= */
+function renderChart(type, labels, data, title){
+ if(chart) chart.destroy();
+ chart = new Chart(
+  document.getElementById("mainChart"),
+  {
+   type:type,
+   data:{
+    labels:labels,
+    datasets:[{
+     label:title,
+     data:data,
+     backgroundColor:[
+      "#66bb6a","#42a5f5","#ffa726",
+      "#ab47bc","#ef5350","#26a69a"
+     ]
+    }]
+   },
+   options:{
+    plugins:{title:{display:true,text:title}},
+    responsive:true
+   }
+  }
+ );
+}
+
+/* ================= TOGGLE ACTIONS ================= */
+function setActive(btn){
+ ["yearBtn","prodBtn","expBtn"].forEach(id=>{
+  document.getElementById(id).classList.remove("active");
+ });
+ document.getElementById(btn).classList.add("active");
+}
+
+function showYearWise(){
+ setActive("yearBtn");
+ const d = getYearWise();
+ renderChart("bar", d.labels, d.data, d.title);
+}
+
+function showProductWise(){
+ setActive("prodBtn");
+ const d = getProductWise();
+ renderChart("bar", d.labels, d.data, d.title);
+}
+
+function showExpenseWise(){
+ setActive("expBtn");
+ const d = getExpenseWise();
+ renderChart("doughnut", d.labels, d.data, d.title);
+}
+
+/* ================= INIT ================= */
+showYearWise();
+</script>
 
 </body>
 </html>
