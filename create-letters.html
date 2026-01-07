@@ -22,12 +22,12 @@ h2{color:#2e7d32;margin-top:0}
 .small{font-size:13px;color:#555}
 
 label{font-weight:600}
-input,select,textarea{
+input,textarea{
  width:100%;
  padding:8px;
  margin:6px 0 12px
 }
-textarea{min-height:160px}
+textarea{min-height:140px}
 
 button{
  padding:8px 16px;
@@ -66,36 +66,41 @@ button.red{background:#c62828}
  gap:8px;
  flex-wrap:wrap
 }
+
+.attach-row{
+ display:flex;
+ gap:8px;
+ margin-bottom:6px
+}
+.attach-row input{flex:1}
 </style>
 </head>
 
 <body>
 
 <div class="wrap">
-<h2>✉️ Letter Generator</h2>
-<p class="small">सरकारी, बैंक तथा संस्थागत प्रयोजनका लागि औपचारिक पत्र तयार गर्नुहोस्।</p>
+<h2>✉️ पत्र तयार गर्ने प्रणाली</h2>
+<p class="small">सरकारी, बैंक तथा संस्थागत प्रयोजनका लागि औपचारिक पत्र</p>
 
 <div class="grid">
 
 <!-- ================= EDITOR ================= -->
 <div>
 
-<label>पत्रको शीर्षक</label>
-<input id="title" placeholder="जस्तै: बैंक ऋण निवेदन पत्र">
-
 <label>पेश गर्ने कार्यालय (Self भए खाली छोड्नुहोस्)</label>
-<input id="office" placeholder="जस्तै: श्री कृषि विकास बैंक, रसुवा">
+<input id="office" placeholder="जस्तै: नेपाल सरकार, कृषि मन्त्रालय">
 
 <label>विषय</label>
-<input id="subject" placeholder="जस्तै: ऋण उपलब्ध गराइदिनुहुन">
+<input id="subject" placeholder="जस्तै: प्रस्तावना अध्ययन गरी स्वीकृत गरिदिनुहुन">
 
 <label>पत्रको मुख्य व्यहोरा</label>
-<textarea id="content"></textarea>
+<textarea id="content" placeholder="महोदय,&#10;प्रस्तुत विषयमा ..."></textarea>
 
-<label>संलग्न कागजपत्र (एक लाइनमा एउटा)</label>
-<textarea id="attachments" placeholder="१. नागरिकता प्रतिलिपि&#10;२. व्यवसाय दर्ता प्रमाणपत्र"></textarea>
+<label>संलग्न कागजपत्र</label>
+<div id="attachList"></div>
+<button class="gray" onclick="addAttachment()">➕ Add another</button>
 
-<div class="actions">
+<div class="actions" style="margin-top:15px">
  <button onclick="saveLetter()">💾 Save</button>
  <button class="gray" onclick="newLetter()">➕ New</button>
  <button class="gray" onclick="printLetter()">🖨 Print</button>
@@ -123,9 +128,18 @@ const panNo = localStorage.getItem("panNo") || "—";
 const proprietor = localStorage.getItem("proprietorName") || "—";
 
 /* ===== STORAGE ===== */
-const KEY="SYSTEM_LETTERS_V2";
+const KEY="SYSTEM_LETTERS_V3";
 let letters=JSON.parse(localStorage.getItem(KEY))||[];
 let activeId=null;
+
+/* ===== ATTACHMENTS ===== */
+function addAttachment(val=""){
+ const d=document.createElement("div");
+ d.className="attach-row";
+ d.innerHTML=`<input value="${val}" placeholder="कागजपत्रको नाम">`;
+ attachList.appendChild(d);
+}
+addAttachment();
 
 /* ===== LIST ===== */
 function renderList(){
@@ -133,7 +147,7 @@ function renderList(){
  letters.forEach(l=>{
   const d=document.createElement("div");
   d.className="item"+(l.id===activeId?" active":"");
-  d.innerHTML=`<b>${l.title}</b><br><span class="small">${l.subject||""}</span>`;
+  d.innerHTML=`<b>${l.subject}</b>`;
   d.onclick=()=>loadLetter(l.id);
   letterList.appendChild(d);
  });
@@ -144,35 +158,32 @@ function loadLetter(id){
  const l=letters.find(x=>x.id===id);
  if(!l) return;
  activeId=id;
- title.value=l.title;
  office.value=l.office;
  subject.value=l.subject;
  content.value=l.content;
- attachments.value=l.attachments;
+ attachList.innerHTML="";
+ l.attachments.forEach(a=>addAttachment(a));
  renderList();
 }
 
 /* ===== SAVE ===== */
 function saveLetter(){
- if(!title.value||!content.value){
-  alert("शीर्षक र मुख्य व्यहोरा अनिवार्य छ");
+ const attachments=[...attachList.querySelectorAll("input")]
+  .map(i=>i.value).filter(v=>v.trim());
+ if(!subject.value||!content.value){
+  alert("विषय र व्यहोरा अनिवार्य छ");
   return;
  }
+ const data={
+  office:office.value,
+  subject:subject.value,
+  content:content.value,
+  attachments
+ };
  if(activeId){
-  Object.assign(letters.find(x=>x.id===activeId),{
-   title:title.value,office:office.value,
-   subject:subject.value,content:content.value,
-   attachments:attachments.value
-  });
+  Object.assign(letters.find(x=>x.id===activeId),data);
  }else{
-  letters.push({
-   id:Date.now(),
-   title:title.value,
-   office:office.value,
-   subject:subject.value,
-   content:content.value,
-   attachments:attachments.value
-  });
+  letters.push({id:Date.now(),...data});
   activeId=letters.at(-1).id;
  }
  localStorage.setItem(KEY,JSON.stringify(letters));
@@ -182,7 +193,8 @@ function saveLetter(){
 /* ===== NEW ===== */
 function newLetter(){
  activeId=null;
- title.value=office.value=subject.value=content.value=attachments.value="";
+ office.value=subject.value=content.value="";
+ attachList.innerHTML=""; addAttachment();
  renderList();
 }
 
@@ -196,14 +208,13 @@ function deleteLetter(){
 
 /* ===== PRINT (OFFICIAL FORMAT) ===== */
 function printLetter(){
- const w=window.open("");
  const date=new Date().toLocaleDateString("ne-NP");
- const attachList = attachments.value
-  .split("\n").filter(x=>x.trim())
-  .map(x=>"• "+x).join("<br>");
+ const atts=[...attachList.querySelectorAll("input")]
+  .map((i,idx)=>`${idx+1}. ${i.value}`).join("<br>");
 
+ const w=window.open("");
  w.document.write(`
-<html><head><title>${title.value}</title>
+<html><head>
 <style>
 body{font-family:"Kalimati","Noto Sans Devanagari";padding:40px}
 .header{text-align:center;font-weight:bold}
@@ -219,16 +230,15 @@ ${orgName}<br>${orgAddress}
 </div><hr>
 
 <div class="right">मिति: ${date}</div>
-<div class="left">
-${office.value?office.value:"Self"}
-</div>
+<div class="left">${office.value||"Self"}</div>
 <div class="clear"></div>
 
-<p><b>विषय:</b> ${subject.value}</p>
+<p><b>विषय :</b> ${subject.value}</p>
 
+<p>महोदय,</p>
 <p>${content.value.replace(/\n/g,"<br>")}</p>
 
-<p><b>संलग्न कागजपत्र:</b><br>${attachList||"—"}</p>
+<p><b>संलग्न कागजपत्र:</b><br>${atts||"—"}</p>
 
 <div class="footer">
 निवेदक: ${proprietor}<br>
