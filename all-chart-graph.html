@@ -2,22 +2,21 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>All Charts, Graphs & Annex</title>
+<title>Advanced Charts, Matrix & Break-even</title>
 
-<!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{font-family:Arial;margin:0;background:#f4f6f7}
 
-/* ===== HEADER ===== */
+/* HEADER */
 header{
  background:#2e7d32;color:#fff;
  padding:18px;text-align:center;
  font-size:24px;font-weight:700
 }
 
-/* ===== SIDE PAGE FOLLOW ===== */
+/* SIDE NAV */
 .side-nav{
  position:fixed;top:50%;transform:translateY(-50%);
  width:48px;height:48px;border-radius:50%;
@@ -29,7 +28,7 @@ header{
 .side-nav.prev{left:15px}
 .side-nav.next{right:15px}
 
-/* ===== CONTAINER ===== */
+/* CONTAINER */
 .container{
  max-width:1200px;margin:auto;
  background:#fff;padding:30px 70px;
@@ -38,30 +37,26 @@ header{
 
 h2{color:#2e7d32;margin-top:35px}
 
-/* ===== TOGGLE BUTTONS ===== */
-.toggle{
- margin:15px 0;
- display:flex;
- gap:10px;
- flex-wrap:wrap
+/* MATRIX TABLE */
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:15px
 }
-.toggle button{
- padding:8px 14px;
- border:1px solid #2e7d32;
- background:#fff;
- color:#2e7d32;
- cursor:pointer;
- font-weight:bold
+th,td{
+ border:1px solid #ccc;
+ padding:10px;
+ text-align:center
 }
-.toggle button.active{
- background:#2e7d32;
- color:#fff
-}
+th{background:#e8f5e9}
+.pos{color:#2e7d32;font-weight:bold}
+.neg{color:#c62828;font-weight:bold}
 
-/* ===== CHART BOX ===== */
+/* CHART BOX */
 .box{
  border:1px solid #ddd;
- padding:20px
+ padding:20px;
+ margin-top:25px
 }
 
 footer{
@@ -74,148 +69,128 @@ footer{
 
 <body>
 
-<!-- ===== PAGE FOLLOW ===== -->
 <div class="side-nav prev" onclick="location.href='executive-summary.html'">⬅</div>
 <div class="side-nav next" onclick="location.href='full-proposal.html'">➡</div>
 
 <header>
- 📊 Interactive Charts (Year / Product / Expense)
+ 📊 Scenario × Product Matrix & Break-even Analysis
 </header>
 
 <div class="container">
 
-<h2>Financial Analysis View</h2>
+<!-- ================= SCENARIO × PRODUCT MATRIX ================= -->
+<h2>📊 Scenario × Product Profit Matrix</h2>
 
-<div class="toggle">
- <button id="yearBtn" class="active" onclick="showYearWise()">Year-wise</button>
- <button id="prodBtn" onclick="showProductWise()">Product-wise</button>
- <button id="expBtn" onclick="showExpenseWise()">Expense-wise</button>
-</div>
+<table id="matrixTable">
+<thead>
+<tr>
+ <th>उत्पादन</th>
+ <th>Conservative (5%)</th>
+ <th>Base (10%)</th>
+ <th>Optimistic (15%)</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<!-- ================= BREAK-EVEN ================= -->
+<h2>📉 Break-even Chart</h2>
 
 <div class="box">
- <canvas id="mainChart"></canvas>
+ <canvas id="breakEvenChart"></canvas>
 </div>
 
 </div>
 
 <footer>
- FarmerBase BP Engine – Interactive Charts
+ FarmerBase BP Engine – Advanced Financial Insight
 </footer>
 
 <script>
-/* ================= LOAD BASE DATA ================= */
+/* ================= LOAD DATA ================= */
+const totalIncome = Number(localStorage.getItem("totalIncome")) || 0;
+const totalExpense = Number(localStorage.getItem("totalExpense")) || 0;
+const productions = JSON.parse(localStorage.getItem("productions")) || [];
 
-// Income / Expense summary
-const totalIncome =
- Number(localStorage.getItem("totalIncome")) || 0;
-const totalExpense =
- Number(localStorage.getItem("totalExpense")) || 0;
+/* ================= SCENARIO MATRIX ================= */
+const scenarios = [
+ {name:"Conservative", rate:5},
+ {name:"Base", rate:10},
+ {name:"Optimistic", rate:15}
+];
 
-// Production list
-const productions =
- JSON.parse(localStorage.getItem("productions")) || [];
+const tbody = document.querySelector("#matrixTable tbody");
+tbody.innerHTML = "";
 
-// Expenses list
-const expenses =
- JSON.parse(localStorage.getItem("expenses")) || [];
+productions.forEach(p=>{
+ const qty = Number(p.quantity)||1;
+ const rate = Number(p.sellingRate)||0;
+ const baseRevenue = qty * rate;
 
-/* ================= CHART INSTANCE ================= */
-let chart;
+ let row = `<tr><td>${p.name}</td>`;
 
-/* ================= YEAR-WISE ================= */
-function getYearWise(){
- let inc = totalIncome;
- let exp = totalExpense;
- const labels=[], data=[];
- for(let y=1;y<=5;y++){
-  labels.push("Year "+y);
-  data.push(inc - exp);
-  inc*=1.1; exp*=1.1;
- }
- return {labels, data, title:"Year-wise Net Profit"};
-}
+ scenarios.forEach(s=>{
+  const revenue = baseRevenue * (1 + s.rate/100);
+  const costShare = totalExpense / (productions.length || 1);
+  const profit = revenue - costShare;
 
-/* ================= PRODUCT-WISE ================= */
-function getProductWise(){
- const labels=[], data=[];
- productions.forEach(p=>{
-  labels.push(p.name);
-  const qty = Number(p.quantity)||1;
-  const rate = Number(p.sellingRate)||0;
-  data.push(qty * rate);
+  row += `
+   <td class="${profit>=0?'pos':'neg'}">
+    ${profit.toFixed(2)}
+   </td>`;
  });
- return {labels, data, title:"Product-wise Income"};
+
+ row += "</tr>";
+ tbody.innerHTML += row;
+});
+
+/* ================= BREAK-EVEN CHART ================= */
+// Simple linear break-even approximation
+const fixedCost = totalExpense * 0.6;
+const variableCostRate = 0.4; // 40% of sales
+const maxSales = totalIncome * 1.5;
+
+const sales=[], profit=[];
+for(let s=0;s<=10;s++){
+ const x = (maxSales/10)*s;
+ const y = x - (fixedCost + x*variableCostRate);
+ sales.push(x.toFixed(0));
+ profit.push(y);
 }
 
-/* ================= EXPENSE-WISE ================= */
-function getExpenseWise(){
- const map = {};
- expenses.forEach(e=>{
-  const label = e.title || e.category || "Other";
-  const amount = (Number(e.qty)||1) * (Number(e.rate)||0);
-  map[label] = (map[label] || 0) + amount;
- });
- return {
-  labels:Object.keys(map),
-  data:Object.values(map),
-  title:"Expense-wise Distribution"
- };
-}
-
-/* ================= RENDER ================= */
-function renderChart(type, labels, data, title){
- if(chart) chart.destroy();
- chart = new Chart(
-  document.getElementById("mainChart"),
-  {
-   type:type,
-   data:{
-    labels:labels,
-    datasets:[{
-     label:title,
-     data:data,
-     backgroundColor:[
-      "#66bb6a","#42a5f5","#ffa726",
-      "#ab47bc","#ef5350","#26a69a"
-     ]
-    }]
+new Chart(
+ document.getElementById("breakEvenChart"),
+ {
+  type:"line",
+  data:{
+   labels:sales,
+   datasets:[
+    {
+     label:"Profit / Loss",
+     data:profit,
+     borderColor:"#2e7d32",
+     fill:false
+    },
+    {
+     label:"Break-even Line",
+     data:new Array(profit.length).fill(0),
+     borderColor:"#c62828",
+     borderDash:[5,5],
+     fill:false
+    }
+   ]
+  },
+  options:{
+   plugins:{
+    title:{display:true,text:"Break-even Analysis"}
    },
-   options:{
-    plugins:{title:{display:true,text:title}},
-    responsive:true
+   scales:{
+    y:{title:{display:true,text:"Profit / Loss"}},
+    x:{title:{display:true,text:"Sales"}}
    }
   }
- );
-}
-
-/* ================= TOGGLE ACTIONS ================= */
-function setActive(btn){
- ["yearBtn","prodBtn","expBtn"].forEach(id=>{
-  document.getElementById(id).classList.remove("active");
- });
- document.getElementById(btn).classList.add("active");
-}
-
-function showYearWise(){
- setActive("yearBtn");
- const d = getYearWise();
- renderChart("bar", d.labels, d.data, d.title);
-}
-
-function showProductWise(){
- setActive("prodBtn");
- const d = getProductWise();
- renderChart("bar", d.labels, d.data, d.title);
-}
-
-function showExpenseWise(){
- setActive("expBtn");
- const d = getExpenseWise();
- renderChart("doughnut", d.labels, d.data, d.title);
-}
-
-/* ================= INIT ================= */
-showYearWise();
+ }
+);
 </script>
 
 </body>
