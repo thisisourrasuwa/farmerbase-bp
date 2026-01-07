@@ -2,222 +2,227 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>नाफा वितरण विवरण (Profit Utilization)</title>
+<title>नाफा वितरण</title>
 
 <style>
-body{
- font-family:Arial;
- background:#f5f5f5;
- margin:0
-}
-header,footer{
+body{font-family:Arial;background:#f5f5f5;margin:0}
+
+/* ===== HEADER ===== */
+header{
  background:#2e7d32;
  color:#fff;
- padding:12px 20px;
- display:flex;
- justify-content:space-between;
- align-items:center
+ padding:18px 20px;
+ text-align:center;
+ font-size:22px;
+ font-weight:700;
+ letter-spacing:.4px;
+ box-shadow:0 2px 6px rgba(0,0,0,0.2)
 }
-header a,footer a{
+
+/* ===== SIDE PAGE FOLLOW ===== */
+.side-nav{
+ position:fixed;
+ top:50%;
+ transform:translateY(-50%);
+ width:48px;
+ height:48px;
+ border-radius:50%;
+ background:#2e7d32;
  color:#fff;
- text-decoration:none;
- font-weight:bold
+ font-size:26px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ z-index:999;
+ box-shadow:0 4px 10px rgba(0,0,0,.25)
 }
+.side-nav.prev{left:15px}
+.side-nav.next{right:15px}
+.side-nav:hover{background:#1b5e20}
+
+/* ===== CONTAINER ===== */
 .container{
- max-width:1200px;
+ max-width:1100px;
  margin:auto;
  background:#fff;
- padding:20px;
+ padding:20px 70px; /* arrow safe zone */
  min-height:70vh
 }
-h1{
- text-align:center;
- color:#2e7d32;
- margin:15px 0 25px
-}
+
 .summary{
  background:#f1f8e9;
- padding:15px;
+ padding:16px;
  margin-bottom:20px;
- font-size:15px
+ font-size:16px
 }
+
 table{
  width:100%;
- border-collapse:collapse
+ border-collapse:collapse;
+ margin-top:15px
 }
 th,td{
  border:1px solid #ccc;
  padding:10px;
  text-align:center
 }
-th{
- background:#e8f5e9
-}
-td input{
+th{background:#e8f5e9}
+
+input{
  width:100%;
+ padding:6px;
  box-sizing:border-box
 }
-.btn{
- padding:6px 12px;
- border:none;
- cursor:pointer
+
+.total{
+ font-size:18px;
+ font-weight:bold;
+ text-align:right;
+ margin-top:15px
 }
-.add{
+
+.ok{color:#2e7d32}
+.warn{color:#c62828}
+
+footer{
  background:#2e7d32;
- color:#fff
-}
-.del{
- background:#c62828;
- color:#fff
-}
-.warn{
- color:#c62828;
- font-weight:bold;
- margin-left:10px
-}
-.ok{
- color:#2e7d32;
- font-weight:bold;
- margin-left:10px
+ color:#fff;
+ padding:12px 20px;
+ text-align:center;
+ font-size:14px
 }
 </style>
 </head>
 
 <body>
 
+<!-- ===== SIDE NAVIGATION ===== -->
+<div class="side-nav prev" onclick="location.href='profit-loss.html'">⬅</div>
+<div class="side-nav next" onclick="location.href='five-year-projection.html'">➡</div>
+
+<!-- ===== HEADER ===== -->
 <header>
- <a href="profit-loss.html">⬅️ नाफा/नोक्सान</a>
- <span>नाफा वितरण विवरण (Profit Utilization)</span>
- <a href="roi-irr-payback.html">लगानी विश्लेषण ➡️</a>
+  नाफा वितरण
 </header>
 
 <div class="container">
 
-<h1>नाफा वितरण विवरण (Profit Utilization)</h1>
-
 <div class="summary">
- <b>कुल शुद्ध नाफा (Auto):</b>
- <span id="totalProfit">0.00</span><br>
- <b>कुल वितरण %:</b>
- <span id="totalPct">0%</span>
- <span id="status"></span>
+ ✔️ यो पेजमा <b>Profit / Loss</b> बाट आएको <b>शुद्ध नाफा</b>  
+ विभिन्न शीर्षकमा बाँडफाँट गरिन्छ ।  
 </div>
 
 <table>
 <thead>
 <tr>
- <th>शीर्षक</th>
+ <th>वितरण शीर्षक</th>
  <th>प्रतिशत (%)</th>
- <th>रकम</th>
- <th>🗑️</th>
+ <th>रकम (Auto)</th>
 </tr>
 </thead>
 <tbody id="distBody"></tbody>
 </table>
 
-<button class="btn add" onclick="addHead()">➕ शीर्षक थप्नुहोस्</button>
+<button onclick="addRow()">➕ वितरण शीर्षक थप्नुहोस्</button>
 
-<p style="margin-top:15px;font-size:14px">
- ✔️ नाफा नहुँदा (नोक्सान/शून्य) वितरण रकम 0 हुन्छ ।<br>
- ✔️ कुल प्रतिशत 100% हुनुपर्छ ।<br>
- ✔️ पुनः लगानी रकम 5-Year Projection मा carry हुन्छ ।
-</p>
+<div class="total">
+ कुल नाफा: <span id="netProfit">0.00</span><br>
+ वितरण भएको: <span id="usedAmount">0.00</span><br>
+ बाँकी: <span id="remaining">0.00</span>
+ <span id="status"></span>
+</div>
 
 </div>
 
 <footer>
- <a href="profit-loss.html">⬅️ नाफा/नोक्सान</a>
- <span>FarmerBase BP Engine – Profit Utilization</span>
- <a href="roi-irr-payback.html">लगानी विश्लेषण ➡️</a>
+ FarmerBase BP Engine – Profit Distribution
 </footer>
 
 <script>
-/* ================= LOAD NET PROFIT ================= */
-const profit = Number(localStorage.getItem("netProfit")) || 0;
+/* =================================================
+   1️⃣ LOAD NET PROFIT (FROM PROFIT-LOSS)
+================================================= */
+const netProfit =
+ Number(localStorage.getItem("netProfit")) || 0;
 
-/* ================= DEFAULT DISTRIBUTION ================= */
-let dist =
- JSON.parse(localStorage.getItem("profitDistribution")) || [
-  {id:1,name:"पुनः लगानी",pct:60},
-  {id:2,name:"वातावरण संरक्षण",pct:10},
-  {id:3,name:"समुदाय विकास",pct:10},
-  {id:4,name:"व्यक्तिगत उपयोग",pct:20}
- ];
+/* =================================================
+   2️⃣ DISTRIBUTION STATE
+================================================= */
+let distributions =
+ JSON.parse(localStorage.getItem("profitDistribution")) || [];
 
-/* ================= SAVE ================= */
+/* =================================================
+   3️⃣ SAVE
+================================================= */
 function save(){
  localStorage.setItem(
   "profitDistribution",
-  JSON.stringify(dist)
+  JSON.stringify(distributions)
  );
 }
 
-/* ================= CRUD ================= */
-function addHead(){
- dist.push({id:Date.now(),name:"",pct:0});
+/* =================================================
+   4️⃣ ADD / UPDATE
+================================================= */
+function addRow(){
+ distributions.push({
+  title:"",
+  percent:0
+ });
  save(); render();
 }
 
-function update(id,field,val){
- const d = dist.find(x=>x.id===id);
- d[field] = field==="pct" ? Number(val)||0 : val;
+function update(i,field,val){
+ distributions[i][field] = field==="percent"
+  ? Number(val)||0
+  : val;
  save(); render();
 }
 
-function removeHead(id){
- if(confirm("हटाउने हो ?")){
-  dist = dist.filter(d=>d.id!==id);
-  save(); render();
- }
-}
-
-/* ================= RENDER (FINAL FIX) ================= */
+/* =================================================
+   5️⃣ RENDER
+================================================= */
 function render(){
  const tb = document.getElementById("distBody");
  tb.innerHTML = "";
- let sumPct = 0;
 
- dist.forEach(d=>{
-  sumPct += d.pct;
+ let used = 0;
 
-  // 🔒 PROFIT / LOSS GUARD
-  const amt = profit > 0
-    ? profit * d.pct / 100
-    : 0;
+ distributions.forEach((d,i)=>{
+  const amt = netProfit * (d.percent||0) / 100;
+  used += amt;
 
   tb.innerHTML += `
 <tr>
 <td>
- <input value="${d.name}"
-  onchange="update(${d.id},'name',this.value)">
+ <input value="${d.title}"
+  onchange="update(${i},'title',this.value)">
 </td>
 <td>
- <input type="number" value="${d.pct}"
-  onchange="update(${d.id},'pct',this.value)">
+ <input type="number" value="${d.percent}"
+  onchange="update(${i},'percent',this.value)">
 </td>
 <td>${amt.toFixed(2)}</td>
-<td>
- <button class="btn del"
-  onclick="removeHead(${d.id})">🗑️</button>
-</td>
 </tr>`;
  });
 
- document.getElementById("totalProfit").innerText =
-  profit.toFixed(2);
+ const remaining = netProfit - used;
 
- document.getElementById("totalPct").innerText =
-  sumPct + "%";
+ document.getElementById("netProfit").innerText =
+  netProfit.toFixed(2);
 
- // ===== STATUS MESSAGE =====
- if(profit <= 0){
-  document.getElementById("status").innerHTML =
-   '<span class="warn"> ❗ नोक्सान/शून्य नाफा भएकाले वितरण लागू हुँदैन</span>';
+ document.getElementById("usedAmount").innerText =
+  used.toFixed(2);
+
+ const remEl = document.getElementById("remaining");
+ remEl.innerText = remaining.toFixed(2);
+
+ const st = document.getElementById("status");
+ if(Math.abs(remaining) < 0.01){
+  st.innerHTML = ' <span class="ok">✔️ 100% वितरण भयो</span>';
  }else{
-  document.getElementById("status").innerHTML =
-   sumPct === 100
-    ? '<span class="ok"> ✔️ मिल्यो</span>'
-    : '<span class="warn"> ❗ 100% हुनुपर्छ</span>';
+  st.innerHTML = ' <span class="warn">❗ 100% हुनुपर्छ</span>';
  }
 }
 
