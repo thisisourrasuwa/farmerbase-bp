@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Business Project Cover</title>
+<title>Cover – Business Project</title>
 
 <style>
 body{
@@ -11,7 +11,6 @@ body{
  background:#f4f6f7
 }
 
-/* ===== PAGE LAYOUT ===== */
 .page{
  max-width:900px;
  margin:40px auto;
@@ -26,8 +25,7 @@ body{
 
 /* ===== HEADER ===== */
 .header{
- text-align:center;
- margin-bottom:30px
+ text-align:center
 }
 .header h1{
  font-size:32px;
@@ -37,7 +35,7 @@ body{
 .header p{
  font-size:16px;
  color:#555;
- margin-top:10px
+ margin-top:8px
 }
 
 /* ===== MAP ===== */
@@ -54,7 +52,7 @@ body{
 /* ===== NARRATION ===== */
 .narration{
  background:#f1f8e9;
- padding:25px;
+ padding:24px;
  font-size:16px;
  line-height:1.8;
  border-left:6px solid #2e7d32;
@@ -68,16 +66,14 @@ body{
  color:#333;
  margin-top:40px
 }
-.footer strong{
- color:#2e7d32
-}
+.footer strong{color:#2e7d32}
 
-/* ===== PRINT FRIENDLY ===== */
+/* ===== PRINT ===== */
 @media print{
  body{background:#fff}
  .page{
-  box-shadow:none;
   margin:0;
+  box-shadow:none;
   min-height:100vh
  }
 }
@@ -88,41 +84,72 @@ body{
 
 <div class="page">
 
- <!-- ===== HEADER ===== -->
+ <!-- HEADER -->
  <div class="header">
-  <h1>व्यवसायिक परियोजना प्रस्ताव</h1>
+  <h1 id="projectName">व्यवसायिक परियोजना</h1>
   <p>(Business Project Proposal)</p>
  </div>
 
- <!-- ===== MAP SECTION ===== -->
+ <!-- MAP -->
  <div class="map">
-  <!-- 🔁 Google Map: Replace location name as needed -->
-  <iframe
-   src="https://www.google.com/maps?q=Rasuwa%20Nepal&output=embed"
+  <iframe id="mapFrame"
    loading="lazy"
    referrerpolicy="no-referrer-when-downgrade">
   </iframe>
  </div>
 
- <!-- ===== NARRATION ===== -->
- <div class="narration">
-  यो दस्तावेज प्रस्तावित व्यवसायिक परियोजनाको
-  संक्षिप्त परिचय, उद्देश्य र कार्यक्षेत्र प्रस्तुत गर्ने
-  आधिकारिक प्रस्ताव हो।
-  परियोजना स्थानीय स्रोत, सीप र बजारको मागलाई
-  आधार मानेर तयार गरिएको छ
-  र यसले दिगो आम्दानी, रोजगारी सिर्जना
-  तथा आर्थिक सशक्तिकरणमा योगदान पुर्‍याउने लक्ष्य राख्दछ।
+ <!-- NARRATION -->
+ <div class="narration" id="projectNarration">
+  परियोजनाको संक्षिप्त विवरण यहाँ देखिनेछ ।
  </div>
 
- <!-- ===== FOOTER ===== -->
+ <!-- FOOTER -->
  <div class="footer">
-  <strong>संस्थाको नाम:</strong> FarmerBase BP Engine<br>
-  <strong>ठेगाना:</strong> कालिका गाउँपालिका, रसुवा जिल्ला, नेपाल<br>
-  <strong>सम्पर्क:</strong> .....................................
+  <strong>संस्थाको नाम:</strong>
+  <span id="orgName">—</span><br>
+  <strong>ठेगाना:</strong>
+  <span id="orgAddress">—</span><br>
+  <strong>सम्पर्क:</strong>
+  <span id="orgContact">—</span>
  </div>
 
 </div>
+
+<script>
+/* ===== AUTO-FILL FROM short-info.html ===== */
+
+const projectName =
+ localStorage.getItem("projectName") || "व्यवसायिक परियोजना";
+
+const projectAddress =
+ localStorage.getItem("projectAddress") || "Nepal";
+
+const projectNarration =
+ localStorage.getItem("projectNarration")
+ || "परियोजनाको संक्षिप्त विवरण उपलब्ध छैन।";
+
+const organizationName =
+ localStorage.getItem("organizationName") || "—";
+
+const organizationAddress =
+ localStorage.getItem("organizationAddress") || "—";
+
+const organizationContact =
+ localStorage.getItem("organizationContact") || "—";
+
+/* Render text */
+document.getElementById("projectName").innerText = projectName;
+document.getElementById("projectNarration").innerText = projectNarration;
+document.getElementById("orgName").innerText = organizationName;
+document.getElementById("orgAddress").innerText = organizationAddress;
+document.getElementById("orgContact").innerText = organizationContact;
+
+/* Google Map from address */
+document.getElementById("mapFrame").src =
+ "https://www.google.com/maps?q=" +
+ encodeURIComponent(projectAddress) +
+ "&output=embed";
+</script>
 
 </body>
 </html>
