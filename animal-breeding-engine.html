@@ -10,7 +10,7 @@ body{
   font-family:"Noto Sans Devanagari","Kalimati",system-ui;
   background:#f4f7f6;margin:0
 }
-.container{max-width:1200px;margin:auto;padding:20px}
+.container{max-width:1250px;margin:auto;padding:20px}
 h1,h2{color:#2c7a7b}
 .card{
   background:#fff;padding:15px;margin-bottom:20px;
@@ -26,6 +26,7 @@ th{background:#e6fffa}
 button{cursor:pointer}
 .flex{display:flex;gap:10px}
 .flex>div{flex:1}
+.action-btn{padding:4px 8px;font-size:12px}
 </style>
 </head>
 
@@ -34,7 +35,7 @@ button{cursor:pointer}
 
 <h1>🐖 बंगुर पालन तथा प्रजनन इन्जिन – ५ वर्षे प्रक्षेपण</h1>
 
-<!-- INPUT -->
+<!-- BASIC INPUT -->
 <div class="card">
 <h2>आधारभूत विवरण</h2>
 
@@ -59,13 +60,6 @@ button{cursor:pointer}
 <input type="number" id="mortality" value="10">
 </div>
 <div>
-<label>वार्षिक माउ बिक्री / हटाउने दर (%)</label>
-<input type="number" id="cullRate" value="10">
-</div>
-</div>
-
-<div class="flex">
-<div>
 <label>बेच्ने तरिका</label>
 <select id="sellMode" onchange="toggleSellMode()">
   <option value="single">एकैचोटी बेच्ने</option>
@@ -73,16 +67,32 @@ button{cursor:pointer}
 </select>
 </div>
 </div>
+</div>
+
+<!-- YEAR WISE CULLING -->
+<div class="card">
+<h2>वर्ष अनुसार माउ बिक्री (हटाउने) दर</h2>
+<table>
+<tr>
+ <th>वर्ष</th>
+ <th>माउ बिक्री दर (%)</th>
+ <th>Action</th>
+</tr>
+<tbody id="cullRows"></tbody>
+</table>
+<button onclick="addCullYear()">+ वर्ष थप्नुहोस्</button>
+</div>
 
 <!-- SINGLE SELL -->
 <div id="singleSell" class="card">
+<h2>एकैचोटी बच्चा बिक्री</h2>
 <label>कुल बच्चामध्ये कति % बेच्ने ?</label>
 <input type="number" id="singleSellPercent" value="50">
 </div>
 
 <!-- AGE SELL -->
 <div id="ageSell" class="card" style="display:none">
-<h2>उमेर अनुसार बेच्ने (%)</h2>
+<h2>उमेर अनुसार बच्चा बिक्री (%)</h2>
 <table>
 <tr><th>उमेर</th><th>बेच्ने %</th><th>Action</th></tr>
 <tbody id="sellRows"></tbody>
@@ -91,7 +101,6 @@ button{cursor:pointer}
 </div>
 
 <button onclick="calculate()">५ वर्षे गणना गर्नुहोस्</button>
-</div>
 
 <!-- RESULT -->
 <div class="card">
@@ -117,6 +126,7 @@ button{cursor:pointer}
 </div>
 
 <script>
+/* ---------- DATA MODELS ---------- */
 let sellOptions=[
  {age:"१–३ महिना",percent:10},
  {age:"४–६ महिना",percent:20},
@@ -124,22 +134,31 @@ let sellOptions=[
  {age:"१०–१२ महिना",percent:10},
 ];
 
+let cullRates=[
+ {year:1,percent:5},
+ {year:2,percent:7},
+ {year:3,percent:10},
+ {year:4,percent:10},
+ {year:5,percent:12},
+];
+
+/* ---------- SELL MODE ---------- */
 function toggleSellMode(){
  singleSell.style.display = sellMode.value==="single"?"block":"none";
  ageSell.style.display = sellMode.value==="age"?"block":"none";
  renderSellRows();
 }
 
+/* ---------- SELL OPTIONS ---------- */
 function renderSellRows(){
- const tbody=sellRows;
- tbody.innerHTML="";
+ sellRows.innerHTML="";
  sellOptions.forEach((r,i)=>{
-  tbody.innerHTML+=`
+  sellRows.innerHTML+=`
   <tr>
    <td>${r.age}</td>
    <td><input type="number" value="${r.percent}"
      onchange="sellOptions[${i}].percent=this.value"></td>
-   <td><button onclick="deleteRow(${i})">हटाउनुहोस्</button></td>
+   <td><button class="action-btn" onclick="deleteSell(${i})">हटाउनुहोस्</button></td>
   </tr>`;
  });
 }
@@ -147,45 +166,70 @@ function addSellRow(){
  sellOptions.push({age:"नयाँ उमेर",percent:0});
  renderSellRows();
 }
-function deleteRow(i){
+function deleteSell(i){
  sellOptions.splice(i,1);
  renderSellRows();
 }
 
+/* ---------- CULLING OPTIONS ---------- */
+function renderCullRows(){
+ cullRows.innerHTML="";
+ cullRates.forEach((r,i)=>{
+  cullRows.innerHTML+=`
+  <tr>
+   <td>${r.year}</td>
+   <td>
+    <input type="number" value="${r.percent}"
+     onchange="cullRates[${i}].percent=this.value">
+   </td>
+   <td><button class="action-btn" onclick="deleteCull(${i})">हटाउनुहोस्</button></td>
+  </tr>`;
+ });
+}
+function addCullYear(){
+ const y=cullRates.length+1;
+ cullRates.push({year:y,percent:0});
+ renderCullRows();
+}
+function deleteCull(i){
+ cullRates.splice(i,1);
+ renderCullRows();
+}
+
+/* ---------- MAIN CALCULATION ---------- */
 function calculate(){
  let adult=+adultFemale.value;
  const rate=breedingRate.value/100;
  const birthRate=+birthPerFemale.value;
  const mort=mortality.value/100;
- const cull=cullRate.value/100;
  const mode=sellMode.value;
 
- const tbody=result;
- tbody.innerHTML="";
+ result.innerHTML="";
 
  for(let y=1;y<=5;y++){
-  const culledAdult=adult*cull;
-  const remainingAdult=adult-culledAdult;
+  const cullPercent = cullRates[y-1] ? cullRates[y-1].percent/100 : 0;
+  const culledAdult = adult * cullPercent;
+  const remainingAdult = adult - culledAdult;
 
-  const bred=remainingAdult*rate;
-  const birth=bred*birthRate;
-  const death=birth*mort;
-  const alive=birth-death;
+  const bred = remainingAdult * rate;
+  const birth = bred * birthRate;
+  const death = birth * mort;
+  const alive = birth - death;
 
   let soldKids=0;
   if(mode==="single"){
-    soldKids=alive*(singleSellPercent.value/100);
+    soldKids = alive * (singleSellPercent.value/100);
   }else{
-    sellOptions.forEach(o=> soldKids+=alive*(o.percent/100));
+    sellOptions.forEach(o=> soldKids += alive*(o.percent/100));
   }
 
-  const remainingKids=alive-soldKids;
-  const femaleKids=remainingKids/2;
+  const remainingKids = alive - soldKids;
+  const femaleKids = remainingKids / 2;
 
-  const replacement=Math.min(culledAdult,femaleKids);
-  const nextAdult=remainingAdult+replacement;
+  const replacement = Math.min(culledAdult, femaleKids);
+  const nextAdult = remainingAdult + replacement;
 
-  tbody.innerHTML+=`
+  result.innerHTML+=`
   <tr>
    <td>${y}</td>
    <td>${adult.toFixed(0)}</td>
@@ -198,11 +242,13 @@ function calculate(){
    <td>${nextAdult.toFixed(0)}</td>
   </tr>`;
 
-  adult=nextAdult;
+  adult = nextAdult;
  }
 }
 
+/* ---------- INIT ---------- */
 toggleSellMode();
+renderCullRows();
 calculate();
 </script>
 
