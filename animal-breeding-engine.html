@@ -2,89 +2,104 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Animal Breeding Projection (5 Years)</title>
+<title>बंगुर पालन तथा प्रजनन (५ वर्षे)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
   font-family:"Noto Sans Devanagari","Kalimati",system-ui;
-  background:#f4f7f6;
-  margin:0;
+  background:#f4f7f6;margin:0
 }
-.container{
-  max-width:1100px;
-  margin:auto;
-  padding:20px;
-}
-h1{color:#2c7a7b}
+.container{max-width:1200px;margin:auto;padding:20px}
+h1,h2{color:#2c7a7b}
 .card{
-  background:#fff;
-  padding:15px;
-  margin-bottom:20px;
-  border-radius:8px;
-  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  background:#fff;padding:15px;margin-bottom:20px;
+  border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.08)
 }
 label{font-weight:600}
-input{
-  width:100%;
-  padding:8px;
-  margin:6px 0 12px;
+input,select,button{
+  width:100%;padding:8px;margin:6px 0 12px
 }
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:14px;
-}
-th,td{
-  border:1px solid #ccc;
-  padding:6px;
-  text-align:right;
-}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border:1px solid #ccc;padding:6px;text-align:right}
 th{background:#e6fffa}
-tfoot td{
-  font-weight:bold;
-  background:#fafafa;
-}
+button{cursor:pointer}
+.flex{display:flex;gap:10px}
+.flex > div{flex:1}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>🐖 Pig Breeding – 5 Year Projection</h1>
+<h1>🐖 बंगुर पालन तथा प्रजनन – ५ वर्षे प्रक्षेपण</h1>
 
+<!-- INPUT -->
 <div class="card">
-  <label>Initial Adult Female (माउ)</label>
-  <input type="number" id="adultFemale" value="100">
+<h2>आधारभूत विवरण</h2>
 
-  <label>Breeding Rate (%)</label>
-  <input type="number" id="breedingRate" value="90">
-
-  <label>Births per Female / Year</label>
-  <input type="number" id="birthPerFemale" value="20">
-
-  <label>Mortality (%)</label>
-  <input type="number" id="mortality" value="10">
-
-  <label>Sell % (Total Kids – any age)</label>
-  <input type="number" id="sellPercent" value="50">
-
-  <button onclick="calculate()">Calculate Projection</button>
+<div class="flex">
+<div>
+<label>सुरुका बयस्क माउ संख्या</label>
+<input type="number" id="adultFemale" value="100">
+</div>
+<div>
+<label>व्याउने दर (%)</label>
+<input type="number" id="breedingRate" value="90">
+</div>
+<div>
+<label>प्रति माउ वार्षिक बच्चा</label>
+<input type="number" id="birthPerFemale" value="20">
+</div>
 </div>
 
+<div class="flex">
+<div>
+<label>बच्चा मृत्युदर (%)</label>
+<input type="number" id="mortality" value="10">
+</div>
+<div>
+<label>बेच्ने तरिका</label>
+<select id="sellMode" onchange="toggleSellMode()">
+  <option value="single">एकैचोटी बेच्ने</option>
+  <option value="age">उमेर अनुसार बेच्ने</option>
+</select>
+</div>
+</div>
+
+<!-- SINGLE SELL -->
+<div id="singleSell" class="card">
+<label>कुल बच्चामध्ये कति % बेच्ने ?</label>
+<input type="number" id="singleSellPercent" value="50">
+</div>
+
+<!-- AGE SELL -->
+<div id="ageSell" class="card" style="display:none">
+<h2>उमेर अनुसार बेच्ने (%)</h2>
+<table>
+<tr><th>उमेर</th><th>बेच्ने %</th><th>Action</th></tr>
+<tbody id="sellRows"></tbody>
+</table>
+<button onclick="addSellRow()">+ नयाँ उमेर समूह थप्नुहोस्</button>
+</div>
+
+<button onclick="calculate()">५ वर्षे गणना गर्नुहोस्</button>
+</div>
+
+<!-- RESULT -->
 <div class="card">
+<h2>५ वर्षे प्रजनन प्रक्षेपण</h2>
 <table>
 <thead>
 <tr>
-<th>Year</th>
-<th>Adult Female</th>
-<th>Bred Female</th>
-<th>Total Birth</th>
-<th>Death</th>
-<th>Male Left</th>
-<th>Female Left</th>
-<th>Sold</th>
-<th>Next Year Adult Female</th>
+<th>वर्ष</th>
+<th>बयस्क माउ</th>
+<th>व्याएका माउ</th>
+<th>जन्म</th>
+<th>मृत्यु</th>
+<th>बेचिएको</th>
+<th>बाँकी पोथी</th>
+<th>अर्को वर्ष माउ</th>
 </tr>
 </thead>
 <tbody id="result"></tbody>
@@ -94,49 +109,88 @@ tfoot td{
 </div>
 
 <script>
-function calculate(){
-  let adultFemale = Number(document.getElementById("adultFemale").value);
-  const breedingRate = Number(document.getElementById("breedingRate").value)/100;
-  const birthPerFemale = Number(document.getElementById("birthPerFemale").value);
-  const mortality = Number(document.getElementById("mortality").value)/100;
-  const sellPercent = Number(document.getElementById("sellPercent").value)/100;
+let sellOptions = [
+ {age:"१–३ महिना", percent:10},
+ {age:"४–६ महिना", percent:20},
+ {age:"७–९ महिना", percent:10},
+ {age:"१०–१२ महिना", percent:10},
+];
 
-  const tbody = document.getElementById("result");
-  tbody.innerHTML="";
-
-  for(let year=1; year<=5; year++){
-    const bred = adultFemale * breedingRate;
-    const birth = bred * birthPerFemale;
-    const death = birth * mortality;
-    const alive = birth - death;
-
-    let male = alive / 2;
-    let female = alive / 2;
-
-    const sold = alive * sellPercent;
-
-    const remaining = alive - sold;
-    const femaleLeft = remaining / 2;
-
-    const nextAdultFemale = adultFemale + femaleLeft;
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${year}</td>
-        <td>${adultFemale.toFixed(0)}</td>
-        <td>${bred.toFixed(0)}</td>
-        <td>${birth.toFixed(0)}</td>
-        <td>${death.toFixed(0)}</td>
-        <td>${male.toFixed(0)}</td>
-        <td>${female.toFixed(0)}</td>
-        <td>${sold.toFixed(0)}</td>
-        <td>${nextAdultFemale.toFixed(0)}</td>
-      </tr>
-    `;
-
-    adultFemale = nextAdultFemale;
-  }
+function toggleSellMode(){
+ document.getElementById("singleSell").style.display =
+   sellMode.value==="single"?"block":"none";
+ document.getElementById("ageSell").style.display =
+   sellMode.value==="age"?"block":"none";
+ renderSellRows();
 }
+
+function renderSellRows(){
+ const tbody=document.getElementById("sellRows");
+ tbody.innerHTML="";
+ sellOptions.forEach((r,i)=>{
+  tbody.innerHTML+=`
+   <tr>
+    <td>${r.age}</td>
+    <td><input type="number" value="${r.percent}"
+      onchange="sellOptions[${i}].percent=this.value"></td>
+    <td><button onclick="deleteRow(${i})">हटाउनुहोस्</button></td>
+   </tr>`;
+ });
+}
+
+function addSellRow(){
+ sellOptions.push({age:"नयाँ उमेर",percent:0});
+ renderSellRows();
+}
+function deleteRow(i){
+ sellOptions.splice(i,1);
+ renderSellRows();
+}
+
+function calculate(){
+ let adult = +adultFemale.value;
+ const rate = breedingRate.value/100;
+ const birthRate = +birthPerFemale.value;
+ const mort = mortality.value/100;
+ const mode = sellMode.value;
+
+ const tbody=document.getElementById("result");
+ tbody.innerHTML="";
+
+ for(let y=1;y<=5;y++){
+  const bred=adult*rate;
+  const birth=bred*birthRate;
+  const death=birth*mort;
+  const alive=birth-death;
+
+  let sold=0;
+  if(mode==="single"){
+    sold = alive*(singleSellPercent.value/100);
+  }else{
+    sellOptions.forEach(o=> sold += alive*(o.percent/100));
+  }
+
+  const remaining = alive - sold;
+  const femaleLeft = remaining/2;
+  const nextAdult = adult + femaleLeft;
+
+  tbody.innerHTML+=`
+   <tr>
+    <td>${y}</td>
+    <td>${adult.toFixed(0)}</td>
+    <td>${bred.toFixed(0)}</td>
+    <td>${birth.toFixed(0)}</td>
+    <td>${death.toFixed(0)}</td>
+    <td>${sold.toFixed(0)}</td>
+    <td>${femaleLeft.toFixed(0)}</td>
+    <td>${nextAdult.toFixed(0)}</td>
+   </tr>`;
+
+  adult = nextAdult;
+ }
+}
+
+toggleSellMode();
 calculate();
 </script>
 
