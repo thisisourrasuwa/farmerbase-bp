@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>बंगुर पालन तथा प्रजनन इन्जिन (५ वर्षे)</title>
+<title>बंगुर पालन तथा प्रजनन (५ वर्षे)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -10,7 +10,7 @@ body{
   font-family:"Noto Sans Devanagari","Kalimati",system-ui;
   background:#f4f7f6;margin:0
 }
-.container{max-width:1300px;margin:auto;padding:20px}
+.container{max-width:1250px;margin:auto;padding:20px}
 h1,h2{color:#2c7a7b}
 .card{
   background:#fff;padding:15px;margin-bottom:20px;
@@ -23,69 +23,62 @@ input,button{
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{border:1px solid #ccc;padding:6px;text-align:right}
 th{background:#e6fffa}
-button{cursor:pointer}
 .flex{display:flex;gap:10px}
 .flex>div{flex:1}
-.action-btn{padding:4px 8px;font-size:12px}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>🐖 बंगुर पालन तथा प्रजनन इन्जिन – ५ वर्षे प्रक्षेपण</h1>
+<h1>🐖 बंगुर पालन तथा प्रजनन – ५ वर्षे प्रक्षेपण</h1>
 
-<!-- BASIC INPUT -->
 <div class="card">
 <h2>आधारभूत विवरण</h2>
-<div class="flex">
-<div>
+
 <label>सुरुका बयस्क माउ संख्या</label>
 <input type="number" id="adultFemale" value="200">
-</div>
-<div>
+
 <label>व्याउने दर (%)</label>
 <input type="number" id="breedingRate" value="90">
-</div>
-<div>
+
 <label>प्रति माउ वार्षिक बच्चा</label>
 <input type="number" id="birthPerFemale" value="20">
-</div>
-</div>
-<div class="flex">
-<div>
+
 <label>बच्चा मृत्युदर (%)</label>
 <input type="number" id="mortality" value="10">
 </div>
+
+<div class="card">
+<h2>वर्ष अनुसार माउ बिक्री (%)</h2>
+<div class="flex">
+<div><label>वर्ष १</label><input type="number" id="a1" value="5"></div>
+<div><label>वर्ष २</label><input type="number" id="a2" value="7"></div>
+</div>
+<div class="flex">
+<div><label>वर्ष ३</label><input type="number" id="a3" value="10"></div>
+<div><label>वर्ष ४</label><input type="number" id="a4" value="10"></div>
+</div>
+<div class="flex">
+<div><label>वर्ष ५</label><input type="number" id="a5" value="12"></div>
 </div>
 </div>
 
-<!-- YEAR WISE CULLING -->
 <div class="card">
-<h2>वर्ष अनुसार माउ बिक्री (हटाउने) दर</h2>
-<table>
-<tr><th>वर्ष</th><th>माउ बिक्री दर (%)</th></tr>
-<tbody id="cullRows"></tbody>
-</table>
-</div>
+<h2>बच्चा बिक्री नीति</h2>
 
-<!-- AGE WISE KID SALE -->
-<div class="card">
-<h2>उमेर अनुसार बच्चा बिक्री (%)</h2>
-<table>
-<tr>
-<th>उमेर (महिना)</th>
-<th>बेच्ने %</th>
-<th>Action</th>
-</tr>
-<tbody id="kidSellRows"></tbody>
-</table>
-<button onclick="addKidSell()">+ नयाँ उमेर समूह</button>
+<label>उमेर अनुसार कुल बच्चा बिक्री (%)</label>
+<input type="number" id="kidSellRate" value="50">
+
+<label>भालेमध्ये प्रजननका लागि राखिने (%)</label>
+<input type="number" id="boarKeepRate" value="5">
+
+<label>पोथी बच्चामध्ये बिक्री (%)</label>
+<input type="number" id="femaleKidSellRate" value="10">
 </div>
 
 <button onclick="calculate()">५ वर्षे गणना गर्नुहोस्</button>
 
-<!-- RESULT -->
 <div class="card">
 <h2>५ वर्ष प्रजनन प्रक्षेपण</h2>
 <table>
@@ -93,12 +86,12 @@ button{cursor:pointer}
 <tr>
 <th>वर्ष</th>
 <th>बयस्क माउ</th>
-<th>व्याएका माउ</th>
 <th>जन्म</th>
-<th>मृत्यु</th>
-<th>बच्चा बेचिएको</th>
+<th>बच्चा बिक्री</th>
+<th>भाले बिक्री</th>
+<th>पोथी बिक्री</th>
+<th>प्रजनन भाले</th>
 <th>बाँकी पोथी</th>
-<th>प्रतिस्थापन माउ</th>
 <th>अर्का वर्ष माउ</th>
 </tr>
 </thead>
@@ -109,122 +102,70 @@ button{cursor:pointer}
 </div>
 
 <script>
-/* ---------- DATA ---------- */
-
-// Year-wise adult culling
-let cullRates=[
- {year:1,percent:5},
- {year:2,percent:7},
- {year:3,percent:10},
- {year:4,percent:10},
- {year:5,percent:12},
-];
-
-// Age-wise kid selling (applies every year)
-let kidSellAges=[
- {age:"१–३ महिना",percent:20},
- {age:"४–६ महिना",percent:15},
- {age:"७–९ महिना",percent:10},
- {age:"१०–१२ महिना",percent:5},
-];
-
-/* ---------- RENDER ---------- */
-function renderCull(){
- cullRows.innerHTML="";
- cullRates.forEach(r=>{
-  cullRows.innerHTML+=`
-   <tr><td>${r.year}</td><td>${r.percent}</td></tr>`;
- });
-}
-
-function renderKidSell(){
- kidSellRows.innerHTML="";
- kidSellAges.forEach((r,i)=>{
-  kidSellRows.innerHTML+=`
-   <tr>
-    <td>${r.age}</td>
-    <td>
-      <input type="number" value="${r.percent}"
-       onchange="kidSellAges[${i}].percent=this.value">
-    </td>
-    <td>
-      <button class="action-btn"
-        onclick="kidSellAges.splice(${i},1);renderKidSell()">
-        हटाउनुहोस्
-      </button>
-    </td>
-   </tr>`;
- });
-}
-
-function addKidSell(){
- kidSellAges.push({age:"नयाँ उमेर",percent:0});
- renderKidSell();
-}
-
-/* ---------- CALCULATION (CORRECT LOGIC) ---------- */
 function calculate(){
- let adult=+adultFemale.value;
- const rate=breedingRate.value/100;
- const birthRate=+birthPerFemale.value;
- const mort=mortality.value/100;
+ let adult = +adultFemale.value;
 
- // total kid sell % (age-wise cumulative)
- const totalKidSellPercent =
-   kidSellAges.reduce((s,r)=>s+(+r.percent),0)/100;
+ const breedRate = breedingRate.value/100;
+ const birthRate = +birthPerFemale.value;
+ const mort = mortality.value/100;
+
+ const adultSellRates=[
+  a1.value,a2.value,a3.value,a4.value,a5.value
+ ].map(v=>+v/100);
+
+ const kidSell = +kidSellRate.value/100;
+ const boarKeep = +boarKeepRate.value/100;
+ const femaleKidSell = +femaleKidSellRate.value/100;
 
  result.innerHTML="";
 
  for(let y=1;y<=5;y++){
-  const cullP=cullRates[y-1]?cullRates[y-1].percent/100:0;
 
-  // Adult culling
-  const culledAdult = adult * cullP;
-  const remainingAdult = adult - culledAdult;
+  // Adult female sale
+  const soldAdult = adult * adultSellRates[y-1];
+  const remainingAdult = adult - soldAdult;
 
-  // Breeding
-  const bred = remainingAdult * rate;
+  // Breeding & birth
+  const bred = remainingAdult * breedRate;
   const birth = bred * birthRate;
   const death = birth * mort;
-  const alive = birth - death;
+  const aliveKids = birth - death;
 
-  // Kid sale (age-wise applied)
-  const soldKids = alive * totalKidSellPercent;
-  const remainingKids = alive - soldKids;
+  // Kid sale (total)
+  const soldKids = aliveKids * kidSell;
+  const remainingKids = aliveKids - soldKids;
 
-  // Female kids
+  // Sex ratio
+  const maleKids = remainingKids / 2;
   const femaleKids = remainingKids / 2;
 
-  // Replacement + expansion
-  const replacement = Math.min(culledAdult, femaleKids);
-  const extraFemale = femaleKids - replacement;
+  // Male logic
+  const breedingBoar = maleKids * boarKeep;
+  const soldMale = maleKids - breedingBoar;
 
-  // NEXT YEAR ADULT (✔ correct)
-  const nextAdult =
-    remainingAdult +
-    replacement +
-    extraFemale;
+  // Female logic
+  const soldFemale = femaleKids * femaleKidSell;
+  const remainingFemale = femaleKids - soldFemale;
+
+  // Next year adult female
+  const nextAdult = remainingAdult + remainingFemale;
 
   result.innerHTML+=`
   <tr>
    <td>${y}</td>
    <td>${adult.toFixed(0)}</td>
-   <td>${bred.toFixed(0)}</td>
    <td>${birth.toFixed(0)}</td>
-   <td>${death.toFixed(0)}</td>
    <td>${soldKids.toFixed(0)}</td>
-   <td>${femaleKids.toFixed(0)}</td>
-   <td>${replacement.toFixed(0)}</td>
+   <td>${soldMale.toFixed(0)}</td>
+   <td>${soldFemale.toFixed(0)}</td>
+   <td>${breedingBoar.toFixed(0)}</td>
+   <td>${remainingFemale.toFixed(0)}</td>
    <td>${nextAdult.toFixed(0)}</td>
   </tr>`;
 
   adult = nextAdult;
  }
 }
-
-/* ---------- INIT ---------- */
-renderCull();
-renderKidSell();
 calculate();
 </script>
 
