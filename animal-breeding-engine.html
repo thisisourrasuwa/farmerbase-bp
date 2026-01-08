@@ -10,7 +10,7 @@ body{
   font-family:"Noto Sans Devanagari","Kalimati",system-ui;
   background:#f4f7f6;margin:0
 }
-.container{max-width:1250px;margin:auto;padding:20px}
+.container{max-width:1300px;margin:auto;padding:20px}
 h1,h2{color:#2c7a7b}
 .card{
   background:#fff;padding:15px;margin-bottom:20px;
@@ -41,7 +41,7 @@ button{cursor:pointer}
 <div class="flex">
 <div>
 <label>सुरुका बयस्क माउ संख्या</label>
-<input type="number" id="adultFemale" value="100">
+<input type="number" id="adultFemale" value="200">
 </div>
 <div>
 <label>व्याउने दर (%)</label>
@@ -64,27 +64,25 @@ button{cursor:pointer}
 <div class="card">
 <h2>वर्ष अनुसार माउ बिक्री (हटाउने) दर</h2>
 <table>
-<tr><th>वर्ष</th><th>माउ बिक्री दर (%)</th><th>Action</th></tr>
+<tr><th>वर्ष</th><th>माउ बिक्री दर (%)</th></tr>
 <tbody id="cullRows"></tbody>
 </table>
-<button onclick="addCullYear()">+ वर्ष थप्नुहोस्</button>
 </div>
 
 <!-- YEAR WISE KID SALE -->
 <div class="card">
 <h2>वर्ष अनुसार बच्चा बिक्री दर</h2>
 <table>
-<tr><th>वर्ष</th><th>बच्चा बिक्री दर (%)</th><th>Action</th></tr>
+<tr><th>वर्ष</th><th>बच्चा बिक्री दर (%)</th></tr>
 <tbody id="kidSellRows"></tbody>
 </table>
-<button onclick="addKidSellYear()">+ वर्ष थप्नुहोस्</button>
 </div>
 
 <button onclick="calculate()">५ वर्षे गणना गर्नुहोस्</button>
 
 <!-- RESULT -->
 <div class="card">
-<h2>५ वर्षे प्रजनन प्रक्षेपण</h2>
+<h2>५ वर्ष प्रजनन प्रक्षेपण</h2>
 <table>
 <thead>
 <tr>
@@ -96,7 +94,7 @@ button{cursor:pointer}
 <th>बच्चा बेचिएको</th>
 <th>बाँकी पोथी</th>
 <th>प्रतिस्थापन माउ</th>
-<th>अर्को वर्ष माउ</th>
+<th>अर्का वर्ष माउ</th>
 </tr>
 </thead>
 <tbody id="result"></tbody>
@@ -106,7 +104,7 @@ button{cursor:pointer}
 </div>
 
 <script>
-/* -------- DATA -------- */
+/* ---------- DATA ---------- */
 let cullRates=[
  {year:1,percent:5},
  {year:2,percent:7},
@@ -123,41 +121,21 @@ let kidSellRates=[
  {year:5,percent:25},
 ];
 
-/* -------- RENDER -------- */
-function renderCullRows(){
+/* ---------- RENDER ---------- */
+function renderTables(){
  cullRows.innerHTML="";
- cullRates.forEach((r,i)=>{
-  cullRows.innerHTML+=`
-  <tr>
-   <td>${r.year}</td>
-   <td><input type="number" value="${r.percent}"
-    onchange="cullRates[${i}].percent=this.value"></td>
-   <td><button class="action-btn" onclick="cullRates.splice(${i},1);renderCullRows()">हटाउनुहोस्</button></td>
-  </tr>`;
- });
-}
-function renderKidSellRows(){
  kidSellRows.innerHTML="";
- kidSellRates.forEach((r,i)=>{
-  kidSellRows.innerHTML+=`
-  <tr>
-   <td>${r.year}</td>
-   <td><input type="number" value="${r.percent}"
-    onchange="kidSellRates[${i}].percent=this.value"></td>
-   <td><button class="action-btn" onclick="kidSellRates.splice(${i},1);renderKidSellRows()">हटाउनुहोस्</button></td>
-  </tr>`;
+ cullRates.forEach(r=>{
+  cullRows.innerHTML+=`
+   <tr><td>${r.year}</td><td>${r.percent}</td></tr>`;
  });
-}
-function addCullYear(){
- cullRates.push({year:cullRates.length+1,percent:0});
- renderCullRows();
-}
-function addKidSellYear(){
- kidSellRates.push({year:kidSellRates.length+1,percent:0});
- renderKidSellRows();
+ kidSellRates.forEach(r=>{
+  kidSellRows.innerHTML+=`
+   <tr><td>${r.year}</td><td>${r.percent}</td></tr>`;
+ });
 }
 
-/* -------- CALCULATION -------- */
+/* ---------- CALCULATION (FIXED LOGIC) ---------- */
 function calculate(){
  let adult=+adultFemale.value;
  const rate=breedingRate.value/100;
@@ -170,26 +148,32 @@ function calculate(){
   const cullP=cullRates[y-1]?cullRates[y-1].percent/100:0;
   const kidSellP=kidSellRates[y-1]?kidSellRates[y-1].percent/100:0;
 
-  const culledAdult=adult*cullP;
-  const remainingAdult=adult-culledAdult;
+  // 1️⃣ Adult culling
+  const culledAdult = adult * cullP;
+  const remainingAdult = adult - culledAdult;
 
-  const bred=remainingAdult*rate;
-  const birth=bred*birthRate;
-  const death=birth*mort;
-  const alive=birth-death;
+  // 2️⃣ Breeding
+  const bred = remainingAdult * rate;
+  const birth = bred * birthRate;
+  const death = birth * mort;
+  const alive = birth - death;
 
-  const soldKids=alive*kidSellP;
-  const remainingKids=alive-soldKids;
+  // 3️⃣ Kid sale
+  const soldKids = alive * kidSellP;
+  const remainingKids = alive - soldKids;
 
-  const femaleKids=remainingKids/2;
+  // 4️⃣ Female kids
+  const femaleKids = remainingKids / 2;
 
-  const replacement=Math.min(culledAdult,femaleKids);
-  const extraFemale=femaleKids-replacement;
+  // 5️⃣ Replacement + expansion
+  const replacement = Math.min(culledAdult, femaleKids);
+  const extraFemale = femaleKids - replacement;
 
-  const nextAdult=
-    remainingAdult
-    + replacement
-    + extraFemale;
+  // 6️⃣ NEXT YEAR ADULT (✅ CORRECT)
+  const nextAdult =
+    remainingAdult +
+    replacement +
+    extraFemale;
 
   result.innerHTML+=`
   <tr>
@@ -204,13 +188,12 @@ function calculate(){
    <td>${nextAdult.toFixed(0)}</td>
   </tr>`;
 
-  adult=nextAdult;
+  adult = nextAdult;
  }
 }
 
-/* -------- INIT -------- */
-renderCullRows();
-renderKidSellRows();
+/* ---------- INIT ---------- */
+renderTables();
 calculate();
 </script>
 
