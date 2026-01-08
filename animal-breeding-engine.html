@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>बंगुर पालन तथा प्रजनन (५ वर्षे)</title>
+<title>बंगुर पालन तथा प्रजनन इन्जिन (५ वर्षे)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -25,14 +25,14 @@ th,td{border:1px solid #ccc;padding:6px;text-align:right}
 th{background:#e6fffa}
 button{cursor:pointer}
 .flex{display:flex;gap:10px}
-.flex > div{flex:1}
+.flex>div{flex:1}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>🐖 बंगुर पालन तथा प्रजनन – ५ वर्षे प्रक्षेपण</h1>
+<h1>🐖 बंगुर पालन तथा प्रजनन इन्जिन – ५ वर्षे प्रक्षेपण</h1>
 
 <!-- INPUT -->
 <div class="card">
@@ -58,6 +58,13 @@ button{cursor:pointer}
 <label>बच्चा मृत्युदर (%)</label>
 <input type="number" id="mortality" value="10">
 </div>
+<div>
+<label>वार्षिक माउ बिक्री / हटाउने दर (%)</label>
+<input type="number" id="cullRate" value="10">
+</div>
+</div>
+
+<div class="flex">
 <div>
 <label>बेच्ने तरिका</label>
 <select id="sellMode" onchange="toggleSellMode()">
@@ -97,8 +104,9 @@ button{cursor:pointer}
 <th>व्याएका माउ</th>
 <th>जन्म</th>
 <th>मृत्यु</th>
-<th>बेचिएको</th>
+<th>बच्चा बेचिएको</th>
 <th>बाँकी पोथी</th>
+<th>प्रतिस्थापन / माउ बिक्री</th>
 <th>अर्को वर्ष माउ</th>
 </tr>
 </thead>
@@ -109,35 +117,32 @@ button{cursor:pointer}
 </div>
 
 <script>
-let sellOptions = [
- {age:"१–३ महिना", percent:10},
- {age:"४–६ महिना", percent:20},
- {age:"७–९ महिना", percent:10},
- {age:"१०–१२ महिना", percent:10},
+let sellOptions=[
+ {age:"१–३ महिना",percent:10},
+ {age:"४–६ महिना",percent:20},
+ {age:"७–९ महिना",percent:10},
+ {age:"१०–१२ महिना",percent:10},
 ];
 
 function toggleSellMode(){
- document.getElementById("singleSell").style.display =
-   sellMode.value==="single"?"block":"none";
- document.getElementById("ageSell").style.display =
-   sellMode.value==="age"?"block":"none";
+ singleSell.style.display = sellMode.value==="single"?"block":"none";
+ ageSell.style.display = sellMode.value==="age"?"block":"none";
  renderSellRows();
 }
 
 function renderSellRows(){
- const tbody=document.getElementById("sellRows");
+ const tbody=sellRows;
  tbody.innerHTML="";
  sellOptions.forEach((r,i)=>{
   tbody.innerHTML+=`
-   <tr>
-    <td>${r.age}</td>
-    <td><input type="number" value="${r.percent}"
-      onchange="sellOptions[${i}].percent=this.value"></td>
-    <td><button onclick="deleteRow(${i})">हटाउनुहोस्</button></td>
-   </tr>`;
+  <tr>
+   <td>${r.age}</td>
+   <td><input type="number" value="${r.percent}"
+     onchange="sellOptions[${i}].percent=this.value"></td>
+   <td><button onclick="deleteRow(${i})">हटाउनुहोस्</button></td>
+  </tr>`;
  });
 }
-
 function addSellRow(){
  sellOptions.push({age:"नयाँ उमेर",percent:0});
  renderSellRows();
@@ -148,45 +153,52 @@ function deleteRow(i){
 }
 
 function calculate(){
- let adult = +adultFemale.value;
- const rate = breedingRate.value/100;
- const birthRate = +birthPerFemale.value;
- const mort = mortality.value/100;
- const mode = sellMode.value;
+ let adult=+adultFemale.value;
+ const rate=breedingRate.value/100;
+ const birthRate=+birthPerFemale.value;
+ const mort=mortality.value/100;
+ const cull=cullRate.value/100;
+ const mode=sellMode.value;
 
- const tbody=document.getElementById("result");
+ const tbody=result;
  tbody.innerHTML="";
 
  for(let y=1;y<=5;y++){
-  const bred=adult*rate;
+  const culledAdult=adult*cull;
+  const remainingAdult=adult-culledAdult;
+
+  const bred=remainingAdult*rate;
   const birth=bred*birthRate;
   const death=birth*mort;
   const alive=birth-death;
 
-  let sold=0;
+  let soldKids=0;
   if(mode==="single"){
-    sold = alive*(singleSellPercent.value/100);
+    soldKids=alive*(singleSellPercent.value/100);
   }else{
-    sellOptions.forEach(o=> sold += alive*(o.percent/100));
+    sellOptions.forEach(o=> soldKids+=alive*(o.percent/100));
   }
 
-  const remaining = alive - sold;
-  const femaleLeft = remaining/2;
-  const nextAdult = adult + femaleLeft;
+  const remainingKids=alive-soldKids;
+  const femaleKids=remainingKids/2;
+
+  const replacement=Math.min(culledAdult,femaleKids);
+  const nextAdult=remainingAdult+replacement;
 
   tbody.innerHTML+=`
-   <tr>
-    <td>${y}</td>
-    <td>${adult.toFixed(0)}</td>
-    <td>${bred.toFixed(0)}</td>
-    <td>${birth.toFixed(0)}</td>
-    <td>${death.toFixed(0)}</td>
-    <td>${sold.toFixed(0)}</td>
-    <td>${femaleLeft.toFixed(0)}</td>
-    <td>${nextAdult.toFixed(0)}</td>
-   </tr>`;
+  <tr>
+   <td>${y}</td>
+   <td>${adult.toFixed(0)}</td>
+   <td>${bred.toFixed(0)}</td>
+   <td>${birth.toFixed(0)}</td>
+   <td>${death.toFixed(0)}</td>
+   <td>${soldKids.toFixed(0)}</td>
+   <td>${femaleKids.toFixed(0)}</td>
+   <td>${replacement.toFixed(0)}</td>
+   <td>${nextAdult.toFixed(0)}</td>
+  </tr>`;
 
-  adult = nextAdult;
+  adult=nextAdult;
  }
 }
 
