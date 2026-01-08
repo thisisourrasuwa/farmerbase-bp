@@ -2,39 +2,36 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>बंगुर प्रजनन इन्जिन (५ वर्ष)</title>
+<title>बंगुर प्रजनन इन्जिन – ५ वर्ष (Final)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1200px;margin:auto;padding:20px}
-h1,h2{color:#2c7a7b}
+.container{max-width:1400px;margin:auto;padding:20px}
 .card{background:#fff;padding:15px;margin-bottom:20px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+h1,h2{color:#2c7a7b}
 label{font-weight:600}
 input,button{width:100%;padding:6px;margin:4px 0 10px}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{border:1px solid #ccc;padding:6px;text-align:right}
-th{background:#e6fffa}
 .flex{display:flex;gap:10px}
 .flex>div{flex:1}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid #ccc;padding:6px;text-align:right}
+th{background:#e6fffa}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>🐖 बंगुर प्रजनन – ५ वर्षे फ्रेम</h1>
+<h1>🐖 बंगुर प्रजनन इन्जिन – ५ वर्ष (जनसंख्या मात्र)</h1>
 
 <div class="card">
 <h2>आधारभूत इनपुट</h2>
 <label>सुरुका प्रजनन योग्य माउ</label>
-<input id="startSow" type="number" value="100">
-
+<input id="startSow" value="100">
 <label>व्याउने दर (%)</label>
-<input id="breedRate" type="number" value="90">
-
+<input id="breedRate" value="90">
 <label>प्रति माउ वार्षिक बच्चा</label>
-<input id="kidsPerSow" type="number" value="20">
-
+<input id="kidsPerSow" value="20">
 <label>बच्चा मृत्युदर (%)</label>
-<input id="mortality" type="number" value="10">
+<input id="mortality" value="10">
 </div>
 
 <div class="card">
@@ -49,7 +46,7 @@ th{background:#e6fffa}
 </div>
 
 <div class="card">
-<h2>महिनापिच्छे बच्चा बिक्री (%) – भाले</h2>
+<h2>बच्चा बिक्री नीति – भाले (%)</h2>
 <div class="flex">
 <div><label>१–३ महिना</label><input id="mk1" value="20"></div>
 <div><label>४–६ महिना</label><input id="mk2" value="15"></div>
@@ -58,7 +55,7 @@ th{background:#e6fffa}
 </div>
 
 <div class="card">
-<h2>महिनापिच्छे बच्चा बिक्री (%) – पोथी</h2>
+<h2>बच्चा बिक्री नीति – पोथी (%)</h2>
 <div class="flex">
 <div><label>१–३ महिना</label><input id="fk1" value="10"></div>
 <div><label>४–६ महिना</label><input id="fk2" value="5"></div>
@@ -74,7 +71,7 @@ th{background:#e6fffa}
 <button onclick="run()">५ वर्ष गणना</button>
 
 <div class="card">
-<h2>५ वर्षे परिणाम (Preview)</h2>
+<h2>५ वर्षे प्रजनन परिणाम (Final)</h2>
 <table>
 <thead>
 <tr>
@@ -89,80 +86,15 @@ th{background:#e6fffa}
 <th rowspan="2">अर्को वर्ष माउ</th>
 </tr>
 <tr>
-<th>1–3 महिना</th>
-<th>4–6 महिना</th>
-<th>7–10 महिना</th>
-<th>1–3 महिना</th>
-<th>4–6 महिना</th>
-<th>7–10 महिना</th>
+<th>1–3</th><th>4–6</th><th>7–10</th>
+<th>1–3</th><th>4–6</th><th>7–10</th>
 </tr>
 </thead>
 <tbody id="out"></tbody>
 </table>
 </div>
-
-<!-- FEED PROJECTION -->
-<div class="card">
-<h2>🍚 दाना / भिटामिन / औषधी प्रोजेक्सन (Feed Projection)</h2>
-<p style="text-align:left">
-यो भाग <b>प्रजनन गणनाबाट आएको संख्या मात्र प्रयोग गर्छ</b>।<br>
-यहाँ दाना, भिटामिन र औषधीको दर परिवर्तन गर्दा <b>breeding logic असर हुँदैन</b>।
-</p>
-
-<h3>प्रतिदिन दाना खपत (केजी) – महिनागत</h3>
-<div class="flex">
-<div><label>बयस्क माउ (केजी/दिन)</label><input id="feedSow" value="3"></div>
-<div><label>बयस्क भाले (केजी/दिन)</label><input id="feedBoar" value="3"></div>
-</div>
-<div class="flex">
-<div><label>१–३ महिना (केजी/दिन)</label><input id="feed13" value="1"></div>
-<div><label>४–६ महिना (केजी/दिन)</label><input id="feed46" value="1.5"></div>
-<div><label>७–१० महिना (केजी/दिन)</label><input id="feed710" value="2.5"></div>
 </div>
 
-<h3>भिटामिन / औषधी (रु / पशु / महिना)</h3>
-<div class="flex">
-<div><label>१–३ महिना</label><input id="med13" value="100"></div>
-<div><label>४–६ महिना</label><input id="med46" value="150"></div>
-<div><label>७–१० महिना</label><input id="med710" value="200"></div>
-</div>
-<div class="flex">
-<div><label>बयस्क माउ</label><input id="medSow" value="300"></div>
-<div><label>बयस्क भाले</label><input id="medBoar" value="300"></div>
-</div>
-<div class="flex">
-<div><label>१–३ महिना</label><input id="feed13" value="1"></div>
-<div><label>४–६ महिना</label><input id="feed46" value="1.5"></div>
-<div><label>७–१० महिना</label><input id="feed710" value="2.5"></div>
-</div>
-
-<h3>लमसम विकल्प (चाहेमा)</h3>
-<label><input type="checkbox" id="lumpsumFeed"> लमसम फिड प्रयोग गर्ने</label>
-<input id="lumpsumAmount" placeholder="वार्षिक लमसम फिड खर्च (रु)" value="0">
-
-<h3>दर (प्रति केजी / प्रति पशु)</h3>
-<div class="flex">
-<div><label>दाना (रु/केजी)</label><input id="rateFeed" value="60"></div>
-<div><label>भिटामिन + औषधी (रु/पशु/दिन)</label><input id="rateMed" value="10"></div>
-</div>
-
-<button onclick="calcFeed()">फिड खर्च गणना</button>
-
-<table>
-<thead>
-<tr>
-<th>वर्ष</th>
-<th>कुल दाना (केजी)</th>
-<th>दाना खर्च (रु)</th>
-<th>भिटामिन/औषधी खर्च (रु)</th>
-<th>जम्मा फिड खर्च (रु)</th>
-</tr>
-</thead>
-<tbody id="feedOut"></tbody>
-</table>
-</div>
-
-</div>
 <script>
 function run(){
  let sow=+startSow.value;
@@ -177,98 +109,48 @@ function run(){
  out.innerHTML="";
 
  for(let y=1;y<=5;y++){
-   const soldSow=sow*sowSell[y-1];
-   const remSow=sow-soldSow;
+  const soldSow=sow*sowSell[y-1];
+  const remSow=sow-soldSow;
 
-   const bred=remSow*br;
-   let totalKids=bred*kids;
-   totalKids-=totalKids*mort;
+  const bred=remSow*br;
+  let totalKids=bred*kids;
+  totalKids-=totalKids*mort;
 
-   let male=totalKids/2;
-   let female=totalKids/2;
+  let male=totalKids/2;
+  let female=totalKids/2;
 
-   let soldMale13=0, soldMale46=0, soldMale710=0;
-   if(mk[0]){const s=male*mk[0]; soldMale13=s; male-=s;}
-   if(mk[1]){const s=male*mk[1]; soldMale46=s; male-=s;}
-   if(mk[2]){const s=male*mk[2]; soldMale710=s; male-=s;}(r=>{const s=male*r; soldMale+=s; male-=s;});
-   let soldFemale13=0, soldFemale46=0, soldFemale710=0;
-   if(fk[0]){const s=female*fk[0]; soldFemale13=s; female-=s;}
-   if(fk[1]){const s=female*fk[1]; soldFemale46=s; female-=s;}
-   if(fk[2]){const s=female*fk[2]; soldFemale710=s; female-=s;}(r=>{const s=female*r; soldFemale+=s; female-=s;});
+  const m13=male*mk[0]; male-=m13;
+  const m46=male*mk[1]; male-=m46;
+  const m710=male*mk[2]; male-=m710;
 
-   const newSow=female;
-   const boar=male*boarRate;
+  const f13=female*fk[0]; female-=f13;
+  const f46=female*fk[1]; female-=f46;
+  const f710=female*fk[2]; female-=f710;
 
-   const nextSow=remSow+newSow;
+  const newSow=female;
+  const boar=male*boarRate;
+  const nextSow=remSow+newSow;
 
-   out.innerHTML+=`<tr>
-<td>${y}</td>
-<td>${sow.toFixed(0)}</td>
-<td>${soldSow.toFixed(0)}</td>
-<td>${totalKids.toFixed(0)}</td>
-<td>${soldMale13.toFixed(0)}</td>
-<td>${soldMale46.toFixed(0)}</td>
-<td>${soldMale710.toFixed(0)}</td>
-<td>${soldFemale13.toFixed(0)}</td>
-<td>${soldFemale46.toFixed(0)}</td>
-<td>${soldFemale710.toFixed(0)}</td>
-<td>${newSow.toFixed(0)}</td>
-<td>${boar.toFixed(0)}</td>
-<td>${nextSow.toFixed(0)}</td>
-</tr>`;
+  out.innerHTML+=`<tr>
+   <td>${y}</td>
+   <td>${sow.toFixed(0)}</td>
+   <td>${soldSow.toFixed(0)}</td>
+   <td>${totalKids.toFixed(0)}</td>
+   <td>${m13.toFixed(0)}</td>
+   <td>${m46.toFixed(0)}</td>
+   <td>${m710.toFixed(0)}</td>
+   <td>${f13.toFixed(0)}</td>
+   <td>${f46.toFixed(0)}</td>
+   <td>${f710.toFixed(0)}</td>
+   <td>${newSow.toFixed(0)}</td>
+   <td>${boar.toFixed(0)}</td>
+   <td>${nextSow.toFixed(0)}</td>
+  </tr>`;
 
-   sow=nextSow;
+  sow=nextSow;
  }
 }
 run();
-
-function calcFeed(){
- const useLump=lumpsumFeed.checked;
- const rateFeedKg=+rateFeed.value;
- const rateMed=+rateMed.value;
- feedOut.innerHTML="";
-
- let rows=document.querySelectorAll('#out tr');
- rows.forEach(r=>{
-  const y=r.children[0].innerText;
-  const sow=+r.children[1].innerText;
-  const male13=+r.children[4].innerText;
-  const male46=+r.children[5].innerText;
-  const male710=+r.children[6].innerText;
-  const female13=+r.children[7].innerText;
-  const female46=+r.children[8].innerText;
-  const female710=+r.children[9].innerText;
-  const boar=+r.children[11].innerText;
-
-  let totalKg=0;
-  // Adult feed
-  totalKg += sow * feedSow.value * 365;
-  totalKg += boar * feedBoar.value * 365;
-
-  // Kids feed by age group
-  totalKg += (male13+female13) * feed13.value * 90;
-  totalKg += (male46+female46) * feed46.value * 90;
-  totalKg += (male710+female710) * feed710.value * 120;
-
-  let feedCost= useLump ? +lumpsumAmount.value : totalKg * rateFeedKg;
-  // Medicine / vitamin cost month-wise
-  let medCost=0;
-  medCost += (male13+female13) * med13.value;
-  medCost += (male46+female46) * med46.value;
-  medCost += (male710+female710) * med710.value;
-  medCost += sow * medSow.value * 12;
-  medCost += boar * medBoar.value * 12;
-
-  feedOut.innerHTML+=`<tr>
-   <td>${y}</td>
-   <td>${totalKg.toFixed(0)}</td>
-   <td>${feedCost.toFixed(0)}</td>
-   <td>${medCost.toFixed(0)}</td>
-   <td>${(feedCost+medCost).toFixed(0)}</td>
-  </tr>`;
- });
-}
-
 </script>
 </body>
 </html>
