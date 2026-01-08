@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Animal Breeding Projection (5 Years)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  font-family:"Noto Sans Devanagari","Kalimati",system-ui;
+  background:#f4f7f6;
+  margin:0;
+}
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+h1{color:#2c7a7b}
+.card{
+  background:#fff;
+  padding:15px;
+  margin-bottom:20px;
+  border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+label{font-weight:600}
+input{
+  width:100%;
+  padding:8px;
+  margin:6px 0 12px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+}
+th,td{
+  border:1px solid #ccc;
+  padding:6px;
+  text-align:right;
+}
+th{background:#e6fffa}
+tfoot td{
+  font-weight:bold;
+  background:#fafafa;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🐖 Pig Breeding – 5 Year Projection</h1>
+
+<div class="card">
+  <label>Initial Adult Female (माउ)</label>
+  <input type="number" id="adultFemale" value="100">
+
+  <label>Breeding Rate (%)</label>
+  <input type="number" id="breedingRate" value="90">
+
+  <label>Births per Female / Year</label>
+  <input type="number" id="birthPerFemale" value="20">
+
+  <label>Mortality (%)</label>
+  <input type="number" id="mortality" value="10">
+
+  <label>Sell % (Total Kids – any age)</label>
+  <input type="number" id="sellPercent" value="50">
+
+  <button onclick="calculate()">Calculate Projection</button>
+</div>
+
+<div class="card">
+<table>
+<thead>
+<tr>
+<th>Year</th>
+<th>Adult Female</th>
+<th>Bred Female</th>
+<th>Total Birth</th>
+<th>Death</th>
+<th>Male Left</th>
+<th>Female Left</th>
+<th>Sold</th>
+<th>Next Year Adult Female</th>
+</tr>
+</thead>
+<tbody id="result"></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+function calculate(){
+  let adultFemale = Number(document.getElementById("adultFemale").value);
+  const breedingRate = Number(document.getElementById("breedingRate").value)/100;
+  const birthPerFemale = Number(document.getElementById("birthPerFemale").value);
+  const mortality = Number(document.getElementById("mortality").value)/100;
+  const sellPercent = Number(document.getElementById("sellPercent").value)/100;
+
+  const tbody = document.getElementById("result");
+  tbody.innerHTML="";
+
+  for(let year=1; year<=5; year++){
+    const bred = adultFemale * breedingRate;
+    const birth = bred * birthPerFemale;
+    const death = birth * mortality;
+    const alive = birth - death;
+
+    let male = alive / 2;
+    let female = alive / 2;
+
+    const sold = alive * sellPercent;
+
+    const remaining = alive - sold;
+    const femaleLeft = remaining / 2;
+
+    const nextAdultFemale = adultFemale + femaleLeft;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${year}</td>
+        <td>${adultFemale.toFixed(0)}</td>
+        <td>${bred.toFixed(0)}</td>
+        <td>${birth.toFixed(0)}</td>
+        <td>${death.toFixed(0)}</td>
+        <td>${male.toFixed(0)}</td>
+        <td>${female.toFixed(0)}</td>
+        <td>${sold.toFixed(0)}</td>
+        <td>${nextAdultFemale.toFixed(0)}</td>
+      </tr>
+    `;
+
+    adultFemale = nextAdultFemale;
+  }
+}
+calculate();
+</script>
+
+</body>
+</html>
