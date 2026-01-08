@@ -69,13 +69,18 @@ button{cursor:pointer}
 </table>
 </div>
 
-<!-- YEAR WISE KID SALE -->
+<!-- AGE WISE KID SALE -->
 <div class="card">
-<h2>वर्ष अनुसार बच्चा बिक्री दर</h2>
+<h2>उमेर अनुसार बच्चा बिक्री (%)</h2>
 <table>
-<tr><th>वर्ष</th><th>बच्चा बिक्री दर (%)</th></tr>
+<tr>
+<th>उमेर (महिना)</th>
+<th>बेच्ने %</th>
+<th>Action</th>
+</tr>
 <tbody id="kidSellRows"></tbody>
 </table>
+<button onclick="addKidSell()">+ नयाँ उमेर समूह</button>
 </div>
 
 <button onclick="calculate()">५ वर्षे गणना गर्नुहोस्</button>
@@ -105,6 +110,8 @@ button{cursor:pointer}
 
 <script>
 /* ---------- DATA ---------- */
+
+// Year-wise adult culling
 let cullRates=[
  {year:1,percent:5},
  {year:2,percent:7},
@@ -113,63 +120,86 @@ let cullRates=[
  {year:5,percent:12},
 ];
 
-let kidSellRates=[
- {year:1,percent:50},
- {year:2,percent:40},
- {year:3,percent:30},
- {year:4,percent:30},
- {year:5,percent:25},
+// Age-wise kid selling (applies every year)
+let kidSellAges=[
+ {age:"१–३ महिना",percent:20},
+ {age:"४–६ महिना",percent:15},
+ {age:"७–९ महिना",percent:10},
+ {age:"१०–१२ महिना",percent:5},
 ];
 
 /* ---------- RENDER ---------- */
-function renderTables(){
+function renderCull(){
  cullRows.innerHTML="";
- kidSellRows.innerHTML="";
  cullRates.forEach(r=>{
   cullRows.innerHTML+=`
    <tr><td>${r.year}</td><td>${r.percent}</td></tr>`;
  });
- kidSellRates.forEach(r=>{
+}
+
+function renderKidSell(){
+ kidSellRows.innerHTML="";
+ kidSellAges.forEach((r,i)=>{
   kidSellRows.innerHTML+=`
-   <tr><td>${r.year}</td><td>${r.percent}</td></tr>`;
+   <tr>
+    <td>${r.age}</td>
+    <td>
+      <input type="number" value="${r.percent}"
+       onchange="kidSellAges[${i}].percent=this.value">
+    </td>
+    <td>
+      <button class="action-btn"
+        onclick="kidSellAges.splice(${i},1);renderKidSell()">
+        हटाउनुहोस्
+      </button>
+    </td>
+   </tr>`;
  });
 }
 
-/* ---------- CALCULATION (FIXED LOGIC) ---------- */
+function addKidSell(){
+ kidSellAges.push({age:"नयाँ उमेर",percent:0});
+ renderKidSell();
+}
+
+/* ---------- CALCULATION (CORRECT LOGIC) ---------- */
 function calculate(){
  let adult=+adultFemale.value;
  const rate=breedingRate.value/100;
  const birthRate=+birthPerFemale.value;
  const mort=mortality.value/100;
 
+ // total kid sell % (age-wise cumulative)
+ const totalKidSellPercent =
+   kidSellAges.reduce((s,r)=>s+(+r.percent),0)/100;
+
  result.innerHTML="";
 
  for(let y=1;y<=5;y++){
   const cullP=cullRates[y-1]?cullRates[y-1].percent/100:0;
-  const kidSellP=kidSellRates[y-1]?kidSellRates[y-1].percent/100:0;
 
-  // 1️⃣ Adult culling
+  // Adult culling
   const culledAdult = adult * cullP;
   const remainingAdult = adult - culledAdult;
 
-  // 2️⃣ Breeding
+  // Breeding
   const bred = remainingAdult * rate;
   const birth = bred * birthRate;
   const death = birth * mort;
   const alive = birth - death;
 
-  // 3️⃣ Kid sale
-  const soldKids = alive * kidSellP;
+  // Kid sale (age-wise applied)
+  const soldKids = alive * totalKidSellPercent;
   const remainingKids = alive - soldKids;
 
-  // 4️⃣ Female kids
+  // Female kids
   const femaleKids = remainingKids / 2;
 
-  // 5️⃣ Replacement + expansion
+  // Replacement + expansion
   const replacement = Math.min(culledAdult, femaleKids);
   const extraFemale = femaleKids - replacement;
 
-  // 6️⃣ NEXT YEAR ADULT (✅ CORRECT)
+  // NEXT YEAR ADULT (✔ correct)
   const nextAdult =
     remainingAdult +
     replacement +
@@ -193,7 +223,8 @@ function calculate(){
 }
 
 /* ---------- INIT ---------- */
-renderTables();
+renderCull();
+renderKidSell();
 calculate();
 </script>
 
