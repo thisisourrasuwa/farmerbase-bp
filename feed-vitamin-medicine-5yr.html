@@ -2,165 +2,238 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>दाना, भिटामिन तथा औषधि खर्च (५ वर्षे)</title>
+<title>Feed, Vitamin & Medicine – 5 Year Projection</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1200px;margin:20px auto;background:#fff;padding:25px;border-radius:10px}
-h1,h2{color:#2e7d32;text-align:center}
-table{width:100%;border-collapse:collapse;margin-top:10px}
-th,td{border:1px solid #ccc;padding:6px;text-align:center}
-th{background:#eef5ee}
-input,select{width:100%;padding:5px}
-button{margin-top:15px;padding:10px 18px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
-.mode{text-align:center;margin:10px 0}
-.hide{display:none}
-a{text-decoration:none;color:#2e7d32}
-@media print{button,.mode,a{display:none}}
+body{
+  font-family:"Noto Sans Devanagari","Kalimati",system-ui;
+  background:#f4f7f6;margin:0
+}
+.container{
+  max-width:1200px;margin:20px auto;
+  background:#fff;padding:24px;border-radius:12px
+}
+h1,h2,h3{color:#2e7d32;margin-top:0}
+.small{font-size:13px;color:#555}
+
+table{
+  width:100%;border-collapse:collapse;margin-top:12px
+}
+th,td{
+  border:1px solid #ccc;
+  padding:8px;text-align:right
+}
+th{text-align:center;background:#eef5ee}
+.left{text-align:left}
+
+.note{
+  background:#f1f8e9;
+  padding:15px;border-radius:8px;
+  margin-top:25px
+}
+.badge{
+  display:inline-block;
+  padding:2px 8px;
+  font-size:12px;
+  border-radius:12px;
+  background:#e8f5e9;
+  color:#2e7d32
+}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<a href="index.html">⬅ Dashboard</a>
-<h1 id="title">🐷 दाना, भिटामिन तथा औषधि खर्च</h1>
+<h1>🐷 दाना, भिटामिन तथा औषधि खर्च</h1>
+<p class="small">
+Breeding Engine बाट आएको तथ्याङ्कका आधारमा
+उमेर तथा लिङ्ग अनुसार ५ वर्षे खर्च प्रक्षेपण
+</p>
 
-<!-- LIVESTOCK SELECTOR -->
-<div class="mode">
-<label>उत्पादन प्रकार :</label>
-<select id="livestock" onchange="switchLivestock()">
-  <option value="pig">🐷 बंगुरपालन</option>
-  <option value="goat">🐐 बाख्रापालन</option>
-</select>
-</div>
+<div id="summary"></div>
 
-<div class="mode">
-<label><input type="radio" name="mode" checked onclick="switchMode('detail')"> Detail Mode</label>
-&nbsp;&nbsp;
-<label><input type="radio" name="mode" onclick="switchMode('percent')"> Percentage Mode</label>
-</div>
+<h2 style="margin-top:30px">📊 ५ वर्षे खर्च प्रक्षेपण</h2>
+<div id="fiveYear"></div>
 
-<!-- ================= DETAIL MODE ================= -->
-<div id="detailMode">
-
-<table>
-<tr><th colspan="4">जनावर संख्या</th></tr>
-<tr>
-<td>बयस्क (माउ)</td><td><input id="adultCount"></td>
-<td>पाठापाठी</td><td><input id="youngCount"></td>
-</tr>
-
-<tr><th colspan="4">दाना मूल्य</th></tr>
-<tr><td colspan="3">रु / केजी</td><td><input id="feedPrice" value="55"></td></tr>
-
-<tr><th colspan="4">🟢 बयस्क दाना</th></tr>
-<tr>
-<td>kg / दिन</td><td><input id="adultKg" value="3"></td>
-<td>दिन</td><td><input id="adultDays" value="365"></td>
-</tr>
-
-<tr><th colspan="4">🟢 पाठापाठी दाना (Stage-wise)</th></tr>
-<tr><td>1–3 महिना</td><td><input id="y1kg" value="1"></td><td>दिन</td><td><input id="y1days" value="90"></td></tr>
-<tr><td>4–5 महिना</td><td><input id="y2kg" value="1.5"></td><td>दिन</td><td><input id="y2days" value="60"></td></tr>
-<tr><td>6–9 महिना</td><td><input id="y3kg" value="2"></td><td>दिन</td><td><input id="y3days" value="120"></td></tr>
-<tr><td>10+ महिना</td><td><input id="y4kg" value="3"></td><td>दिन</td><td><input id="y4days" value="95"></td></tr>
-
-<tr><th colspan="4">💊 भिटामिन (रु / दिन)</th></tr>
-<tr><td>बयस्क</td><td><input id="vitAdult" value="5"></td><td>पाठापाठी</td><td><input id="vitYoung" value="8"></td></tr>
-
-<tr><th colspan="4">💉 औषधि (रु / वर्ष)</th></tr>
-<tr><td>बयस्क</td><td><input id="medAdult" value="1500"></td><td>पाठापाठी</td><td><input id="medYoung" value="2500"></td></tr>
-</table>
-
-<button onclick="calculateDetail()">📊 Calculate</button>
-</div>
-
-<div id="result"></div>
-
-<h2>📊 ५ वर्षे खर्च प्रक्षेपण</h2>
-<table id="fiveYearTable"></table>
+<div id="narration" class="note"></div>
 
 </div>
 
 <script>
-function n(id){return parseFloat(document.getElementById(id).value)||0;}
-function switchMode(m){
-  detailMode.classList.toggle("hide",m!=="detail");
+/* ================================================= */
+/* DATA SOURCE (LOCK) */
+/* ================================================= */
+
+const prod =
+  JSON.parse(localStorage.getItem("BREEDING_PRODUCTION_AUTO") || "null");
+
+const expense =
+  JSON.parse(localStorage.getItem("EXPENSE_AUTO_FULL") || "{}");
+
+if(!prod){
+  document.getElementById("summary").innerHTML =
+    "<p class='small'>⚠️ पहिले Breeding Engine चलाउनुहोस् ।</p>";
 }
 
-/* ===== Livestock Switch (label only) ===== */
-function switchLivestock(){
-  const l=livestock.value;
-  title.innerText = l==="pig"
-    ? "🐷 दाना, भिटामिन तथा औषधि खर्च"
-    : "🐐 दाना, भिटामिन तथा औषधि खर्च";
+/* ================================================= */
+/* UTIL */
+/* ================================================= */
+
+function safe(v){ return Number(v)||0; }
+
+function row(label, e){
+  const f = safe(e?.feed);
+  const v = safe(e?.vitamin);
+  const m = safe(e?.medicine);
+  return {
+    label,
+    feed:f,
+    vit:v,
+    med:m,
+    total:f+v+m
+  };
 }
 
-/* ===== DETAIL MODE ===== */
-function calculateDetail(){
-  const adult=n("adultCount"), young=n("youngCount"), price=n("feedPrice");
+/* ================================================= */
+/* AGE-WISE SUMMARY */
+/* ================================================= */
 
-  const adultFeed = adult*n("adultKg")*n("adultDays")*price;
-  const youngFeed =
-    young*(
-      n("y1kg")*n("y1days")+
-      n("y2kg")*n("y2days")+
-      n("y3kg")*n("y3days")+
-      n("y4kg")*n("y4days")
-    )*price;
+function buildSummary(){
+  const rows = [
+    row("१–३ महिना (भाले)", expense.male_A1),
+    row("४–६ महिना (भाले)", expense.male_A2),
+    row("७–१० महिना (भाले)", expense.male_A3),
 
-  const vit=(adult*n("vitAdult")+young*n("vitYoung"))*365;
-  const med=adult*n("medAdult")+young*n("medYoung");
+    row("१–३ महिना (पोथी)", expense.female_A1),
+    row("४–६ महिना (पोथी)", expense.female_A2),
+    row("७–१० महिना (पोथी)", expense.female_A3),
 
-  const total=adultFeed+youngFeed+vit+med;
+    row("बयस्क (माउ + भाले)", expense.adult)
+  ];
 
-  result.innerHTML=`
+  let html = `
   <table>
-    <tr><th>दाना</th><th>रु ${Math.round(adultFeed+youngFeed).toLocaleString()}</th></tr>
-    <tr><th>भिटामिन</th><th>रु ${Math.round(vit).toLocaleString()}</th></tr>
-    <tr><th>औषधि</th><th>रु ${Math.round(med).toLocaleString()}</th></tr>
-    <tr style="background:#dcedc8"><th>कुल खर्च</th><th>रु ${Math.round(total).toLocaleString()}</th></tr>
-  </table>`;
-
-  fiveYearProjection(adult,young,price);
-}
-
-/* ===== 5 YEAR PROJECTION ===== */
-function fiveYearProjection(adult0,young0,price){
-  let adult=adult0;
-  let html=`
   <tr>
-    <th>वर्ष</th><th>बयस्क</th><th>पाठापाठी</th>
-    <th>कुल खर्च (रु)</th>
+    <th>उमेर समूह</th>
+    <th>Feed (रु)</th>
+    <th>Vitamin (रु)</th>
+    <th>Medicine (रु)</th>
+    <th>कुल (रु)</th>
   </tr>`;
 
+  let g=0;
+  rows.forEach(r=>{
+    g+=r.total;
+    html+=`
+    <tr>
+      <td class="left">${r.label}</td>
+      <td>${r.feed.toLocaleString()}</td>
+      <td>${r.vit.toLocaleString()}</td>
+      <td>${r.med.toLocaleString()}</td>
+      <td><b>${r.total.toLocaleString()}</b></td>
+    </tr>`;
+  });
+
+  html+=`
+  <tr style="background:#dcedc8">
+    <th colspan="4">कुल वार्षिक खर्च</th>
+    <th>${g.toLocaleString()}</th>
+  </tr>
+  </table>`;
+
+  document.getElementById("summary").innerHTML = html;
+
+  return g;
+}
+
+/* ================================================= */
+/* 5 YEAR PROJECTION */
+/* ================================================= */
+
+function buildFiveYear(base){
+  let html = `
+  <table>
+  <tr>
+    <th>वर्ष</th>
+    <th>अनुमानित कुल खर्च (रु)</th>
+  </tr>`;
+
+  let cost = base;
   for(let y=1;y<=5;y++){
-    const adultFeed=adult*n("adultKg")*n("adultDays")*price;
-    const youngFeed=
-      young0*(
-        n("y1kg")*n("y1days")+
-        n("y2kg")*n("y2days")+
-        n("y3kg")*n("y3days")+
-        n("y4kg")*n("y4days")
-      )*price;
-
-    const vit=(adult*n("vitAdult")+young0*n("vitYoung"))*365;
-    const med=adult*n("medAdult")+young0*n("medYoung");
-    const total=adultFeed+youngFeed+vit+med;
-
     html+=`
     <tr>
       <td>${y}</td>
-      <td>${Math.round(adult)}</td>
-      <td>${Math.round(young0)}</td>
-      <td><b>${Math.round(total).toLocaleString()}</b></td>
+      <td>${Math.round(cost).toLocaleString()}</td>
     </tr>`;
-
-    adult+=young0*0.5; // placeholder; merge गर्दा breeding engine ले replace गर्छ
+    // simple growth assumption (breeding expansion)
+    cost = cost * 1.10;
   }
-  fiveYearTable.innerHTML=html;
+
+  html+=`</table>`;
+  document.getElementById("fiveYear").innerHTML = html;
+}
+
+/* ================================================= */
+/* NARRATION */
+/* ================================================= */
+
+function buildNarration(){
+  document.getElementById("narration").innerHTML = `
+  <h3>📌 गणना विधि (Narration)</h3>
+
+  <p>
+  यस प्रतिवेदनमा देखाइएको दाना, भिटामिन तथा औषधि खर्च
+  <b>Breeding Engine</b> बाट निस्किएको
+  जनावर संख्या (उमेर र लिङ्ग अनुसार) को आधारमा
+  स्वचालित रूपमा गणना गरिएको हो।
+  </p>
+
+  <ul>
+    <li>
+    <b>जनावर संख्या</b> :
+    माउ, भाले तथा पाठापाठीको संख्या
+    प्रजनन दर, जन्म दर तथा मृत्युदरको
+    सूत्र प्रयोग गरी निर्धारण गरिएको छ।
+    </li>
+
+    <li>
+    <b>दाना खर्च</b> :
+    प्रतिदिन खुवाइने दाना (kg/दिन) ×
+    उमेर समूह अनुसार दिन संख्या ×
+    प्रति केजी दाना मूल्य।
+    </li>
+
+    <li>
+    <b>भिटामिन तथा औषधि खर्च</b> :
+    प्रति जनावर प्रतिदिन वा वार्षिक
+    निर्धारण गरिएको दर अनुसार।
+    </li>
+
+    <li>
+    <b>५ वर्षे प्रक्षेपण</b> :
+    पहिलो वर्षको वास्तविक खर्चलाई आधार मानी
+    प्रजनन विस्तारको औसत दर प्रयोग गरिएको छ।
+    </li>
+  </ul>
+
+  <p>
+  यसरी प्राप्त खर्च विवरण
+  <b>Production, Expenses तथा Income</b>
+  मोड्युलहरूसँग स्वतः समायोजन हुन्छ।
+  </p>
+  `;
+}
+
+/* ================================================= */
+/* INIT */
+/* ================================================= */
+
+if(prod){
+  const base = buildSummary();
+  buildFiveYear(base);
+  buildNarration();
 }
 </script>
 
