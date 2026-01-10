@@ -2,98 +2,185 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Animal Breeding Engine – Age Group Wise</title>
+<title>Animal Breeding Engine | FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-body{font-family:Arial;background:#f4f6f8;padding:20px}
-table{width:100%;border-collapse:collapse;margin-top:15px;background:#fff}
-th,td{border:1px solid #ccc;padding:6px;text-align:center}
-th{background:#eaeff5}
-input{width:70px}
-h1,h2{text-align:center}
-.section{background:#fff;padding:15px;border-radius:6px}
+body{
+  font-family:"Noto Sans Devanagari","Kalimati",system-ui;
+  background:#f4f7f6;margin:0
+}
+.container{
+  max-width:1100px;margin:20px auto;
+  background:#fff;padding:22px;border-radius:12px
+}
+h1,h2{color:#2e7d32;margin-top:0}
+.small{font-size:13px;color:#555}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+th{background:#eef5ee}
+input{width:100%;padding:6px}
+button{
+  padding:10px 18px;
+  background:#2e7d32;color:#fff;
+  border:none;border-radius:6px;
+  cursor:pointer
+}
+hr{margin:30px 0}
 </style>
 </head>
+
 <body>
+<div class="container">
 
-<h1>🐖🐐 Animal Breeding Engine</h1>
-<h2>उमेर समूहगत भाले–पोथी (५ वर्ष)</h2>
+<h1>🐷 Animal Breeding Engine</h1>
+<p class="small">
+बंगुर पालनका लागि प्रजनन गणना (Age × Sex based) – ५ वर्षे।
+</p>
 
-<div class="section">
+<!-- ================= INPUT ================= -->
+<h2>🔢 प्रारम्भिक इनपुट</h2>
+
 <table>
-<tr><th>Input</th><th>Value</th></tr>
-<tr><td>Male Born / Year</td><td><input id="maleBorn" value="10"></td></tr>
-<tr><td>Female Born / Year</td><td><input id="femaleBorn" value="20"></td></tr>
-<tr><td>Chick Sale % (M)</td><td><input id="chickSaleMale" value="40"></td></tr>
-<tr><td>Grower Sale % (M)</td><td><input id="growerSaleMale" value="30"></td></tr>
-<tr><td>Chick Sale % (F)</td><td><input id="chickSaleFemale" value="20"></td></tr>
-<tr><td>Grower Sale % (F)</td><td><input id="growerSaleFemale" value="10"></td></tr>
+<tr>
+  <td>प्रारम्भिक बयस्क पोथी संख्या</td>
+  <td><input id="adultFemale" value="100"></td>
+</tr>
+<tr>
+  <td>एक माउले वार्षिक जन्माउने बच्चा</td>
+  <td><input id="kidsPerFemale" value="20"></td>
+</tr>
+<tr>
+  <td>व्याउने दर (%)</td>
+  <td><input id="breedRate" value="90"></td>
+</tr>
+<tr>
+  <td>मृत्युदर (%)</td>
+  <td><input id="deathRate" value="10"></td>
+</tr>
+</table>
+
+<h2 style="margin-top:25px">📤 बिक्री नियम (%)</h2>
+
+<table>
+<tr>
+  <th></th>
+  <th>१–३ महिना</th>
+  <th>४–६ महिना</th>
+  <th>७–१० महिना</th>
+</tr>
+<tr>
+  <td>भाले</td>
+  <td><input id="sale_m_A1" value="30"></td>
+  <td><input id="sale_m_A2" value="40"></td>
+  <td><input id="sale_m_A3" value="30"></td>
+</tr>
+<tr>
+  <td>पोथी</td>
+  <td><input id="sale_f_A1" value="10"></td>
+  <td><input id="sale_f_A2" value="20"></td>
+  <td><input id="sale_f_A3" value="10"></td>
+</tr>
 </table>
 
 <br>
-<button onclick="calculate()">📊 Calculate</button>
+<button onclick="runEngine()">⚙️ Run Breeding Engine (5 Years)</button>
+
+<hr>
+
+<h2>📊 ५ वर्षे नतिजा</h2>
+<div id="result"></div>
+
 </div>
 
-<table id="result" style="display:none">
-<thead>
-<tr>
-<th>Year</th>
-<th>M Chick</th><th>M Grower</th><th>M Adult</th>
-<th>F Chick</th><th>F Grower</th><th>F Adult</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-
 <script>
-function r(n){return Math.round(n)}
-
-function calculate(){
-
-let maleChick=0, maleGrower=0, maleAdult=0;
-let femaleChick=0, femaleGrower=0, femaleAdult=0;
-
-const maleBorn = +maleBornInput.value;
-const femaleBorn = +femaleBornInput.value;
-
-const cSM = +chickSaleMale.value;
-const gSM = +growerSaleMale.value;
-const cSF = +chickSaleFemale.value;
-const gSF = +growerSaleFemale.value;
-
-const tbody = document.querySelector("#result tbody");
-tbody.innerHTML = "";
-
-for(let y=1;y<=5;y++){
-
-  // Birth
-  maleChick += maleBorn;
-  femaleChick += femaleBorn;
-
-  // Chick sale
-  maleChick -= r(maleChick*cSM/100);
-  femaleChick -= r(femaleChick*cSF/100);
-
-  // Chick → Grower
-  maleGrower += maleChick; maleChick=0;
-  femaleGrower += femaleChick; femaleChick=0;
-
-  // Grower sale
-  maleGrower -= r(maleGrower*gSM/100);
-  femaleGrower -= r(femaleGrower*gSF/100);
-
-  // Grower → Adult
-  maleAdult += maleGrower; maleGrower=0;
-  femaleAdult += femaleGrower; femaleGrower=0;
-
-  tbody.innerHTML += `
-  <tr>
-    <td>${y}</td>
-    <td>${maleChick}</td><td>${maleGrower}</td><td>${maleAdult}</td>
-    <td>${femaleChick}</td><td>${femaleGrower}</td><td>${femaleAdult}</td>
-  </tr>`;
+/* ================= UTIL ================= */
+function n(id){
+  return Number(document.getElementById(id).value) || 0;
+}
+function sale(count, percent){
+  const sold = Math.round(count * percent / 100);
+  return { sold, remain: count - sold };
 }
 
-document.getElementById("result").style.display="table";
+/* ================= CORE ENGINE ================= */
+function runEngine(){
+
+  const kids = n("kidsPerFemale");
+  const breedRate = n("breedRate")/100;
+  const deathRate = n("deathRate")/100;
+
+  let adultFemale = n("adultFemale");
+  let adultMale = 0; // 🔒 FIX: carry forward adult male
+
+  let yearly = [];
+
+  for(let year=1; year<=5; year++){
+
+    /* ---- Birth ---- */
+    const born = adultFemale * kids * breedRate;
+    const survived = born * (1 - deathRate);
+
+    const maleBorn = Math.round(survived/2);
+    const femaleBorn = Math.round(survived/2);
+
+    /* ---- Male sale chain ---- */
+    const m1 = sale(maleBorn, n("sale_m_A1"));
+    const m2 = sale(m1.remain, n("sale_m_A2"));
+    const m3 = sale(m2.remain, n("sale_m_A3"));
+
+    // ✅ ONLY remaining male goes to adult
+    adultMale += m3.remain;
+
+    /* ---- Female sale chain ---- */
+    const f1 = sale(femaleBorn, n("sale_f_A1"));
+    const f2 = sale(f1.remain, n("sale_f_A2"));
+    const f3 = sale(f2.remain, n("sale_f_A3"));
+
+    // retained female becomes next year's breeder
+    adultFemale += f3.remain;
+
+    yearly.push({
+      year,
+      maleSold:{A1:m1.sold,A2:m2.sold,A3:m3.sold},
+      femaleSold:{A1:f1.sold,A2:f2.sold,A3:f3.sold},
+      adult:{
+        male: adultMale,
+        female: adultFemale
+      }
+    });
+  }
+
+  // 🔒 single source for other pages
+  localStorage.setItem(
+    "BREEDING_PRODUCTION_AUTO",
+    JSON.stringify(yearly)
+  );
+
+  renderResult(yearly);
+}
+
+/* ================= RENDER ================= */
+function renderResult(data){
+
+  let html = `<table>
+  <tr>
+    <th>वर्ष</th>
+    <th>बयस्क भाले</th>
+    <th>बयस्क पोथी</th>
+  </tr>`;
+
+  data.forEach(y=>{
+    html += `
+    <tr>
+      <td>${y.year}</td>
+      <td>${y.adult.male}</td>
+      <td>${y.adult.female}</td>
+    </tr>`;
+  });
+
+  html += `</table>`;
+  document.getElementById("result").innerHTML = html;
 }
 </script>
 
