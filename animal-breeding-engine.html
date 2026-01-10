@@ -18,34 +18,22 @@ button{padding:10px 20px;background:#2e7d32;color:#fff;border:none;border-radius
 
 /* PAGE FOLLOW */
 .page-follow-vertical{
-  position:fixed;
-  right:12px;
-  top:40%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-  z-index:999;
-  transition:top .3s ease;
+  position:fixed;right:12px;top:40%;
+  display:flex;flex-direction:column;align-items:center;
+  gap:10px;z-index:999;transition:top .3s ease;
 }
 .pf-arrow{
-  text-decoration:none;
-  font-size:22px;
-  background:#2e7d32;
-  color:#fff;
+  text-decoration:none;font-size:22px;
+  background:#2e7d32;color:#fff;
   width:42px;height:42px;
   display:flex;align-items:center;justify-content:center;
   border-radius:50%;
 }
 .pf-label{
-  writing-mode:vertical-rl;
-  transform:rotate(180deg);
-  font-size:13px;
-  color:#2e7d32;
-  background:#eef5ee;
-  padding:6px 4px;
-  border-radius:6px;
-  font-weight:bold;
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:13px;color:#2e7d32;
+  background:#eef5ee;padding:6px 4px;
+  border-radius:6px;font-weight:bold;
 }
 </style>
 </head>
@@ -68,8 +56,49 @@ button{padding:10px 20px;background:#2e7d32;color:#fff;border:none;border-radius
 <tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
 </table>
 
-<!-- (SALE RULE TABLE unchanged – as you provided) -->
-<!-- … तपाईंले दिएको SALE RULE table जस्ताको तस्तै … -->
+<h2>📤 उमेर समूहगत बिक्री नियम (%) – ५ वर्ष</h2>
+<table>
+<tr><th rowspan="2">समूह</th><th colspan="5">वर्ष</th></tr>
+<tr><th>१</th><th>२</th><th>३</th><th>४</th><th>५</th></tr>
+
+<tr class="group"><td colspan="6">भाले</td></tr>
+<tr><td>१–३ महिना</td>
+<td><input id="mA1Y1" value="30"></td><td><input id="mA1Y2" value="30"></td>
+<td><input id="mA1Y3" value="30"></td><td><input id="mA1Y4" value="30"></td>
+<td><input id="mA1Y5" value="30"></td></tr>
+<tr><td>४–६ महिना</td>
+<td><input id="mA2Y1" value="40"></td><td><input id="mA2Y2" value="40"></td>
+<td><input id="mA2Y3" value="40"></td><td><input id="mA2Y4" value="40"></td>
+<td><input id="mA2Y5" value="40"></td></tr>
+<tr><td>७–१० महिना</td>
+<td><input id="mA3Y1" value="30"></td><td><input id="mA3Y2" value="30"></td>
+<td><input id="mA3Y3" value="30"></td><td><input id="mA3Y4" value="30"></td>
+<td><input id="mA3Y5" value="30"></td></tr>
+
+<tr class="group"><td colspan="6">पोथी</td></tr>
+<tr><td>१–३ महिना</td>
+<td><input id="fA1Y1" value="20"></td><td><input id="fA1Y2" value="20"></td>
+<td><input id="fA1Y3" value="20"></td><td><input id="fA1Y4" value="20"></td>
+<td><input id="fA1Y5" value="20"></td></tr>
+<tr><td>४–६ महिना</td>
+<td><input id="fA2Y1" value="30"></td><td><input id="fA2Y2" value="30"></td>
+<td><input id="fA2Y3" value="30"></td><td><input id="fA2Y4" value="30"></td>
+<td><input id="fA2Y5" value="30"></td></tr>
+<tr><td>७–१० महिना</td>
+<td><input id="fA3Y1" value="10"></td><td><input id="fA3Y2" value="10"></td>
+<td><input id="fA3Y3" value="10"></td><td><input id="fA3Y4" value="10"></td>
+<td><input id="fA3Y5" value="10"></td></tr>
+
+<tr class="group"><td>अर्का वर्षका भाले बिक्री %</td>
+<td><input id="adultMY1" value="50"></td><td><input id="adultMY2" value="50"></td>
+<td><input id="adultMY3" value="50"></td><td><input id="adultMY4" value="50"></td>
+<td><input id="adultMY5" value="50"></td></tr>
+
+<tr class="group"><td>माउ बिक्री %</td>
+<td><input id="adultFY1" value="10"></td><td><input id="adultFY2" value="10"></td>
+<td><input id="adultFY3" value="10"></td><td><input id="adultFY4" value="10"></td>
+<td><input id="adultFY5" value="10"></td></tr>
+</table>
 
 <br>
 <button onclick="runEngine()">⚙️ Run Breeding Engine (5 Years)</button>
@@ -88,7 +117,10 @@ button{padding:10px 20px;background:#2e7d32;color:#fff;border:none;border-radius
 </div>
 
 <script>
-function n(id){return Number(document.getElementById(id).value)||0;}
+function n(id){
+  const el=document.getElementById(id);
+  return el?Number(el.value)||0:0;
+}
 function sale(total,p){
   p=Math.min(p,100);
   let s=Math.round(total*p/100);
@@ -120,7 +152,6 @@ function runEngine(){
     let adultMale=sale(maleCarry,n(`adultMY${y}`));
     let adultFemale=sale(female,n(`adultFY${y}`));
 
-    /* 🔧 PATCHED LINE (MAIN FIX) */
     maleCarry = adultMale.remain + mA3.remain;
     female = adultFemale.remain + fA3.remain;
 
@@ -134,17 +165,13 @@ function runEngine(){
   }
 
   render(out);
-
-  /* ✅ EXPORT (PATCH ONLY) */
-  localStorage.setItem(
-    "BREEDING_ENGINE_5YR_RESULT",
-    JSON.stringify(out)
-  );
+  localStorage.setItem("BREEDING_ENGINE_5YR_RESULT",JSON.stringify(out));
 }
 
 function render(d){
   let h=`<table>
   <tr><th>समूह \\ वर्ष</th>${d.map(x=>`<th>${x.year}</th>`).join("")}</tr>
+
   <tr class="group"><td colspan="${d.length+1}">भाले</td></tr>
   <tr><td>१–३ बिक्री</td>${d.map(x=>`<td>${x.m.A1}</td>`).join("")}</tr>
   <tr><td>४–६ बिक्री</td>${d.map(x=>`<td>${x.m.A2}</td>`).join("")}</tr>
