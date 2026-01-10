@@ -50,7 +50,8 @@ button{
 
 <h1>🐷 Animal Breeding Engine</h1>
 <p class="small">
-५ वर्षे उमेर समूहगत, लिङ्गगत तथा प्रजनन–रोटेशन आधारित FINAL Breeding Model
+५ वर्षे उमेर समूहगत, लिङ्गगत तथा प्रजनन–रोटेशन आधारित FINAL Breeding Model  
+(भाले र पोथी दुबैमा cumulative slab % लागू)
 </p>
 
 <!-- ================= INPUT ================= -->
@@ -125,13 +126,34 @@ button{
 </div>
 
 <script>
+/* ================= UTIL ================= */
 function n(id){ return Number(document.getElementById(id).value)||0; }
+
+/* cumulative slab sale (KEY FIX) */
+function saleBySlabs(total, p1, p2, p3){
+  let totalPercent = p1 + p2 + p3;
+  totalPercent = Math.min(totalPercent, 100);
+
+  const soldTotal = Math.round(total * totalPercent / 100);
+  const remain = total - soldTotal;
+
+  const s1 = Math.round(total * p1 / 100);
+  const s2 = Math.round(total * p2 / 100);
+  const s3 = soldTotal - s1 - s2; // auto-balance
+
+  return {
+    sold:{A1:s1, A2:s2, A3:s3},
+    remain
+  };
+}
+
 function sale(total, percent){
   percent = Math.min(percent,100);
   const sold = Math.round(total * percent / 100);
   return { sold, remain: total - sold };
 }
 
+/* ================= CORE ENGINE ================= */
 function runEngine(){
 
   let breedingFemale = n("openingFemale");
@@ -141,45 +163,54 @@ function runEngine(){
 
   for(let y=1;y<=5;y++){
 
-    // ---------------- BIRTH ----------------
+    /* ---------- Birth ---------- */
     let born = breedingFemale * n("kidsPerFemale") * (n("breedRate")/100);
     born *= (1 - n("deathRate")/100);
 
     let maleBorn = Math.round(born/2);
     let femaleBorn = Math.round(born/2);
 
-    // ---------------- MALE FLOW ----------------
-    let m1 = sale(maleBorn + breedingMale, n(`mA1Y${y}`));
-    let m2 = sale(m1.remain, n(`mA2Y${y}`));
-    let m3 = sale(m2.remain, n(`mA3Y${y}`));
+    /* ---------- Male (cumulative slabs) ---------- */
+    const maleFlow = saleBySlabs(
+      maleBorn + breedingMale,
+      n(`mA1Y${y}`),
+      n(`mA2Y${y}`),
+      n(`mA3Y${y}`)
+    );
 
-    let retainedMaleFromYoung = m3.remain;
-    let adultMaleSale = sale(retainedMaleFromYoung, n(`adultMY${y}`));
+    const adultMaleSale = sale(
+      maleFlow.remain,
+      n(`adultMY${y}`)
+    );
+
     breedingMale = adultMaleSale.remain;
 
-    // ---------------- FEMALE FLOW ----------------
-    let openingFemale = breedingFemale;
+    /* ---------- Female (cumulative slabs) ---------- */
+    const openingFemale = breedingFemale;
 
-    let f1 = sale(femaleBorn, n(`fA1Y${y}`));
-    let f2 = sale(f1.remain, n(`fA2Y${y}`));
-    let f3 = sale(f2.remain, n(`fA3Y${y}`));
+    const femaleFlow = saleBySlabs(
+      femaleBorn,
+      n(`fA1Y${y}`),
+      n(`fA2Y${y}`),
+      n(`fA3Y${y}`)
+    );
 
-    let newRetainedFemale = f3.remain;
+    const soldAdultFemale = sale(
+      openingFemale,
+      n(`adultFY${y}`)
+    );
 
-    let soldAdultFemale = sale(openingFemale, n(`adultFY${y}`));
-    breedingFemale = soldAdultFemale.remain + newRetainedFemale;
+    breedingFemale = soldAdultFemale.remain + femaleFlow.remain;
 
-    // ---------------- SAVE YEAR ----------------
+    /* ---------- Save year ---------- */
     data.push({
       year:y,
-
-      maleSold:{A1:m1.sold,A2:m2.sold,A3:m3.sold},
-      femaleSold:{A1:f1.sold,A2:f2.sold,A3:f3.sold},
-
+      maleSold:maleFlow.sold,
+      femaleSold:femaleFlow.sold,
       retained:{
         male:breedingMale,
-        newFemale:newRetainedFemale,
         openingFemale:openingFemale,
+        newFemale:femaleFlow.remain,
         nextFemale:breedingFemale
       }
     });
@@ -188,6 +219,7 @@ function runEngine(){
   renderResult(data);
 }
 
+/* ================= RENDER ================= */
 function renderResult(data){
 
   const rows = [
@@ -228,8 +260,8 @@ function renderResult(data){
     <td colspan="6" style="text-align:left">
       <strong>नोट:</strong><br>
       • सबै मानहरू संख्या (head count) हुन्, प्रतिशत होइनन्।<br>
-      • बिक्री नियम (%) माथिको तालिकामा लागू गरिएको छ।<br>
-      • 100% बिक्री राख्दा retained = 0 (fully matched)।<br>
+      • उमेर समूहका बिक्री % हरू cumulative हुन् (जोडिन्छन्)।<br>
+      • A1+A2+A3 = 100 ⇒ retained = 0 (भाले र पोथी दुबैमा)।<br>
       • बिक्री गरेर राखिएका भाले अर्को वर्ष पुनः बिक्रीमा जान्छन्।<br>
       • बिक्री गरेर राखिएका पोथी अर्को वर्ष प्रजननयोग्य माउ बन्छन्।
     </td>
