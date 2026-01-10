@@ -10,7 +10,7 @@ body{
   background:#f4f7f6;margin:0
 }
 .container{
-  max-width:1400px;
+  max-width:1500px;
   margin:20px auto;
   background:#fff;
   padding:24px;
@@ -50,13 +50,13 @@ button{
 
 <h1>🐷 Animal Breeding Engine</h1>
 <p class="small">
-५ वर्षे उमेर समूहगत, लिङ्गगत तथा प्रजनन-रोटेशन आधारित Breeding Model
+५ वर्षे उमेर समूहगत, लिङ्गगत तथा प्रजनन–रोटेशन आधारित FINAL Breeding Model
 </p>
 
 <!-- ================= INPUT ================= -->
 <h2>🔢 प्रारम्भिक इनपुट</h2>
 <table>
-<tr><td>प्रारम्भिक प्रजननयोग्य माउ</td><td><input id="adultFemale" value="100"></td></tr>
+<tr><td>प्रारम्भिक प्रजननयोग्य माउ</td><td><input id="openingFemale" value="100"></td></tr>
 <tr><td>एक माउले वार्षिक जन्माउने बच्चा</td><td><input id="kidsPerFemale" value="20"></td></tr>
 <tr><td>व्याउने दर (%)</td><td><input id="breedRate" value="90"></td></tr>
 <tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
@@ -134,41 +134,53 @@ function sale(total, percent){
 
 function runEngine(){
 
-  let breedingFemale = n("adultFemale");
+  let breedingFemale = n("openingFemale");
   let breedingMale = 0;
 
   let data = [];
 
   for(let y=1;y<=5;y++){
 
-    // Birth
+    // ---------------- BIRTH ----------------
     let born = breedingFemale * n("kidsPerFemale") * (n("breedRate")/100);
     born *= (1 - n("deathRate")/100);
 
     let maleBorn = Math.round(born/2);
     let femaleBorn = Math.round(born/2);
 
-    // Male sale (born + previous breeding male)
+    // ---------------- MALE FLOW ----------------
     let m1 = sale(maleBorn + breedingMale, n(`mA1Y${y}`));
     let m2 = sale(m1.remain, n(`mA2Y${y}`));
     let m3 = sale(m2.remain, n(`mA3Y${y}`));
 
-    // Female sale (born only)
+    let retainedMaleFromYoung = m3.remain;
+    let adultMaleSale = sale(retainedMaleFromYoung, n(`adultMY${y}`));
+    breedingMale = adultMaleSale.remain;
+
+    // ---------------- FEMALE FLOW ----------------
+    let openingFemale = breedingFemale;
+
     let f1 = sale(femaleBorn, n(`fA1Y${y}`));
     let f2 = sale(f1.remain, n(`fA2Y${y}`));
     let f3 = sale(f2.remain, n(`fA3Y${y}`));
 
-    // Adult sales
-    breedingMale = sale(m3.remain, n(`adultMY${y}`)).remain;
-    breedingFemale = sale(breedingFemale + f3.remain, n(`adultFY${y}`)).remain;
+    let newRetainedFemale = f3.remain;
 
+    let soldAdultFemale = sale(openingFemale, n(`adultFY${y}`));
+    breedingFemale = soldAdultFemale.remain + newRetainedFemale;
+
+    // ---------------- SAVE YEAR ----------------
     data.push({
       year:y,
+
       maleSold:{A1:m1.sold,A2:m2.sold,A3:m3.sold},
       femaleSold:{A1:f1.sold,A2:f2.sold,A3:f3.sold},
-      breeding:{
+
+      retained:{
         male:breedingMale,
-        female:breedingFemale
+        newFemale:newRetainedFemale,
+        openingFemale:openingFemale,
+        nextFemale:breedingFemale
       }
     });
   }
@@ -179,14 +191,18 @@ function runEngine(){
 function renderResult(data){
 
   const rows = [
-    {label:"भाले १–३ (बिक्री)", k:"maleSold", s:"A1"},
-    {label:"भाले ४–६ (बिक्री)", k:"maleSold", s:"A2"},
-    {label:"भाले ७–१० (बिक्री)", k:"maleSold", s:"A3"},
-    {label:"पोथी १–३ (बिक्री)", k:"femaleSold", s:"A1"},
-    {label:"पोथी ४–६ (बिक्री)", k:"femaleSold", s:"A2"},
-    {label:"पोथी ७–१० (बिक्री)", k:"femaleSold", s:"A3"},
-    {label:"बिक्री गरेर राखिएका भाले", k:"breeding", s:"male"},
-    {label:"बिक्री गरेर राखिएका माउ", k:"breeding", s:"female"}
+    ["भाले १–३ (बिक्री)","maleSold","A1"],
+    ["भाले ४–६ (बिक्री)","maleSold","A2"],
+    ["भाले ७–१० (बिक्री)","maleSold","A3"],
+
+    ["पोथी १–३ (बिक्री)","femaleSold","A1"],
+    ["पोथी ४–६ (बिक्री)","femaleSold","A2"],
+    ["पोथी ७–१० (बिक्री)","femaleSold","A3"],
+
+    ["बिक्री गरेर राखिएका भाले","retained","male"],
+    ["यसवर्ष बिक्री गरेर राखिएको पोथी","retained","newFemale"],
+    ["पहिलेदेखि भएका माउ","retained","openingFemale"],
+    ["अर्का वर्षका लागि कुल माउ","retained","nextFemale"]
   ];
 
   let html = `
@@ -200,10 +216,9 @@ function renderResult(data){
     </tr>`;
 
   rows.forEach(r=>{
-    html += `<tr><td><strong>${r.label}</strong></td>`;
+    html += `<tr><td><strong>${r[0]}</strong></td>`;
     data.forEach(y=>{
-      let v = (r.k==="breeding") ? y.breeding[r.s] : y[r.k][r.s];
-      html += `<td>${v}</td>`;
+      html += `<td>${y[r[1]][r[2]]}</td>`;
     });
     html += `</tr>`;
   });
@@ -212,9 +227,9 @@ function renderResult(data){
   <tr class="note">
     <td colspan="6" style="text-align:left">
       <strong>नोट:</strong><br>
-      • यो तालिकाका सबै मानहरू <b>संख्या (head count)</b> हुन्, प्रतिशत होइनन्।<br>
+      • सबै मानहरू संख्या (head count) हुन्, प्रतिशत होइनन्।<br>
       • बिक्री नियम (%) माथिको तालिकामा लागू गरिएको छ।<br>
-      • हरेक अवस्थामा: बिक्री + बिक्री गरेर राखिएको = 100% logically match हुन्छ।<br>
+      • 100% बिक्री राख्दा retained = 0 (fully matched)।<br>
       • बिक्री गरेर राखिएका भाले अर्को वर्ष पुनः बिक्रीमा जान्छन्।<br>
       • बिक्री गरेर राखिएका पोथी अर्को वर्ष प्रजननयोग्य माउ बन्छन्।
     </td>
