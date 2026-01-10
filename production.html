@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>उत्पादन (Production) – वर्षवर्ष</title>
+<title>उत्पादन (Production)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
@@ -24,22 +24,23 @@ button{padding:6px 14px;background:#2e7d32;color:#fff;border:none;border-radius:
 <h1>📦 उत्पादन (Production)</h1>
 
 <div class="note">
-✔️ संख्या (Head) = Breeding Engine बाट आएको, सच्याउन नमिल्ने<br>
-✔️ kg / head मात्र सच्याउन मिल्ने<br>
-✔️ सबै विवरण वर्ष–वर्ष देखाइन्छ
+✔️ Breeding आधारित उत्पादन = वर्ष–वर्ष<br>
+✔️ अन्य उत्पादन = ५ वर्षका लागि घोषणा मात्र (परिमाण छैन)
 </div>
 
+<!-- ================= BREEDING BASED ================= -->
 <h2>🐖 पशुजन्य उत्पादन (Breeding आधारित – Yearwise)</h2>
 <div id="breedingProduction"></div>
 
-<h2>➕ यस व्यवसायका अन्य उत्पादन (Yearwise)</h2>
+<!-- ================= OTHER PRODUCTION ================= -->
+<h2>➕ यस व्यवसायका अन्य उत्पादन (५ वर्षे)</h2>
 <div id="otherProduction"></div>
 
 </div>
 
 <script>
 // ===================================================
-// LOAD BREEDING DATA (YEARWISE)
+// LOAD BREEDING DATA
 // ===================================================
 const data = JSON.parse(
   localStorage.getItem("BREEDING_ENGINE_5YR_RESULT")
@@ -48,13 +49,13 @@ const data = JSON.parse(
 const years = data.map(d=>d.year);
 
 // ===================================================
-// BREEDING PRODUCTION
+// BREEDING BASED PRODUCTION (YEARWISE)
 // ===================================================
 function renderBreedingProduction(){
 
   if(data.length===0){
     document.getElementById("breedingProduction").innerHTML =
-      "<p>Breeding Engine को डाटा भेटिएन।</p>";
+      "<p style='color:red'>Breeding Engine चलाएर मात्र यो पेज खोल्नुहोस्।</p>";
     return;
   }
 
@@ -95,7 +96,7 @@ function renderBreedingProduction(){
 }
 
 // ===================================================
-// OTHER PRODUCTION (YEARWISE)
+// OTHER PRODUCTION (5 YEAR – NO QUANTITY)
 // ===================================================
 function renderOtherProduction(){
 
@@ -103,12 +104,12 @@ function renderOtherProduction(){
   <tr>
     <th>उत्पादन नाम</th>
     <th>इकाइ</th>
-    ${years.map(y=>`<th>${y}</th>`).join("")}
+    <th>टिप्पणी (५ वर्षे)</th>
   </tr>
   <tr>
     <td><input value="गोबर मल"></td>
     <td><input value="kg"></td>
-    ${years.map(()=>`<td><input value="0"></td>`).join("")}
+    <td>५ वर्षमा नियमित उत्पादन</td>
   </tr>
   </table>
   <button onclick="addOtherRow()">➕ थप्नुहोस्</button>`;
@@ -122,8 +123,7 @@ function addOtherRow(){
   r.innerHTML=`
     <td><input></td>
     <td><input></td>
-    ${years.map(()=>`<td><input value="0"></td>`).join("")}
-  `;
+    <td>५ वर्षे सह–उत्पादन</td>`;
 }
 
 // ===================================================
