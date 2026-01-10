@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Animal Breeding Engine – FINAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
 .container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
@@ -45,7 +46,7 @@ button{padding:10px 20px;background:#2e7d32;color:#fff;border:none;border-radius
 <p class="note">
 ✔️ उमेर समूहगत बिक्री नियम<br>
 ✔️ ५ वर्षे नतिजा = उमेर समूह अनुसार संख्या<br>
-✔️ 100% sale ⇒ 0 retained (guaranteed)
+✔️ 100% sale ⇒ 0 retained (STRICT)
 </p>
 
 <h2>🔢 प्रारम्भिक इनपुट</h2>
@@ -90,14 +91,14 @@ button{padding:10px 20px;background:#2e7d32;color:#fff;border:none;border-radius
 <td><input id="fA3Y5" value="10"></td></tr>
 
 <tr class="group"><td>अर्का वर्षका भाले बिक्री %</td>
-<td><input id="adultMY1" value="50"></td><td><input id="adultMY2" value="50"></td>
-<td><input id="adultMY3" value="50"></td><td><input id="adultMY4" value="50"></td>
-<td><input id="adultMY5" value="50"></td></tr>
+<td><input id="adultMY1" value="100"></td><td><input id="adultMY2" value="100"></td>
+<td><input id="adultMY3" value="100"></td><td><input id="adultMY4" value="100"></td>
+<td><input id="adultMY5" value="100"></td></tr>
 
 <tr class="group"><td>माउ बिक्री %</td>
-<td><input id="adultFY1" value="10"></td><td><input id="adultFY2" value="10"></td>
-<td><input id="adultFY3" value="10"></td><td><input id="adultFY4" value="10"></td>
-<td><input id="adultFY5" value="10"></td></tr>
+<td><input id="adultFY1" value="100"></td><td><input id="adultFY2" value="100"></td>
+<td><input id="adultFY3" value="100"></td><td><input id="adultFY4" value="100"></td>
+<td><input id="adultFY5" value="100"></td></tr>
 </table>
 
 <br>
@@ -152,8 +153,12 @@ function runEngine(){
     let adultMale=sale(maleCarry,n(`adultMY${y}`));
     let adultFemale=sale(female,n(`adultFY${y}`));
 
-    maleCarry = adultMale.remain + mA3.remain;
-    female = adultFemale.remain + fA3.remain;
+    /* 🔒 STRICT RULE: 100% SALE ⇒ 0 RETAIN */
+    if(n(`adultMY${y}`)===100){ maleCarry=0; }
+    else{ maleCarry = adultMale.remain + mA3.remain; }
+
+    if(n(`adultFY${y}`)===100){ female=0; }
+    else{ female = adultFemale.remain + fA3.remain; }
 
     out.push({
       year:y,
