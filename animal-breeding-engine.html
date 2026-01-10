@@ -12,7 +12,7 @@ body{
   margin:0;
 }
 .container{
-  max-width:1500px;
+  max-width:1600px;
   margin:20px auto;
   background:#fff;
   padding:24px;
@@ -24,7 +24,7 @@ th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
 input{width:80px}
 button{
-  padding:10px 18px;
+  padding:10px 20px;
   background:#2e7d32;
   color:#fff;
   border:none;
@@ -70,6 +70,7 @@ button{
 </head>
 
 <body>
+
 <div class="container">
 
 <h1>🐖 Animal Breeding Engine (५ वर्ष)</h1>
@@ -77,43 +78,30 @@ button{
 <p>
 ✔️ उमेर समूह: १–३, ४–६, ७–१०, बयस्क<br>
 ✔️ भाले / पोथी छुट्टाछुट्टै<br>
-✔️ ५ वर्षे परिणाम auto-generate
+✔️ बिक्री % अनुसार बिक्री + राखिने संख्या (BUG FIXED)
 </p>
 
 <h2>🔢 प्रारम्भिक संख्या (Year 1)</h2>
 
 <table>
-<tr>
-  <th>समूह</th>
-  <th>भाले</th>
-  <th>पोथी</th>
-</tr>
-<tr>
-  <td>१–३ महिना</td>
-  <td><input id="A1_m" value="50"></td>
-  <td><input id="A1_f" value="45"></td>
-</tr>
-<tr>
-  <td>४–६ महिना</td>
-  <td><input id="A2_m" value="30"></td>
-  <td><input id="A2_f" value="25"></td>
-</tr>
-<tr>
-  <td>७–१० महिना</td>
-  <td><input id="A3_m" value="20"></td>
-  <td><input id="A3_f" value="15"></td>
-</tr>
-<tr>
-  <td>बयस्क</td>
-  <td><input id="adult_m" value="10"></td>
-  <td><input id="adult_f" value="40"></td>
-</tr>
+<tr><th>समूह</th><th>भाले</th><th>पोथी</th></tr>
+<tr><td>१–३ महिना</td><td><input id="A1m" value="50"></td><td><input id="A1f" value="45"></td></tr>
+<tr><td>४–६ महिना</td><td><input id="A2m" value="30"></td><td><input id="A2f" value="25"></td></tr>
+<tr><td>७–१० महिना</td><td><input id="A3m" value="20"></td><td><input id="A3f" value="15"></td></tr>
+<tr><td>बयस्क</td><td><input id="Adm" value="10"></td><td><input id="Adf" value="40"></td></tr>
+</table>
+
+<h2>📉 बिक्री नियम (%)</h2>
+<table>
+<tr><th>समूह</th><th>भाले बिक्री %</th><th>पोथी बिक्री %</th></tr>
+<tr><td>७–१०</td><td><input id="saleA3m" value="98"></td><td><input id="saleA3f" value="90"></td></tr>
+<tr><td>बयस्क</td><td><input id="saleAdm" value="95"></td><td><input id="saleAdf" value="10"></td></tr>
 </table>
 
 <br>
 <button onclick="runEngine()">▶️ Run Breeding Engine</button>
 
-<h2>📊 ५ वर्षे नतिजा</h2>
+<h2>📊 ५ वर्षे नतिजा (संख्या)</h2>
 <div id="result"></div>
 
 </div>
@@ -126,35 +114,39 @@ button{
 </div>
 
 <script>
-// ================= ENGINE =================
 function runEngine(){
 
-  let out = [];
-
   let male = {
-    A1: +A1_m.value,
-    A2: +A2_m.value,
-    A3: +A3_m.value,
-    adult: +adult_m.value
+    A1:+A1m.value, A2:+A2m.value, A3:+A3m.value, adult:+Adm.value
   };
   let female = {
-    A1: +A1_f.value,
-    A2: +A2_f.value,
-    A3: +A3_f.value,
-    adult: +adult_f.value
+    A1:+A1f.value, A2:+A2f.value, A3:+A3f.value, adult:+Adf.value
   };
 
-  for(let y=1;y<=5;y++){
+  const out = [];
+
+  for(let year=1; year<=5; year++){
 
     out.push({
-      year:y,
+      year,
       male:{...male},
       female:{...female}
     });
 
-    // SIMPLE SHIFT LOGIC (demo-safe)
-    male.adult += male.A3;
-    female.adult += female.A3;
+    /* ---------- SALE + RETAIN (BUG FIX) ---------- */
+    const soldA3m = Math.round(male.A3 * saleA3m.value/100);
+    const soldAdm = Math.round(male.adult * saleAdm.value/100);
+    const soldA3f = Math.round(female.A3 * saleA3f.value/100);
+    const soldAdf = Math.round(female.adult * saleAdf.value/100);
+
+    const retainA3m = male.A3 - soldA3m;
+    const retainAdm = male.adult - soldAdm;
+    const retainA3f = female.A3 - soldA3f;
+    const retainAdf = female.adult - soldAdf;
+
+    /* ---------- NEXT YEAR SHIFT ---------- */
+    male.adult = retainAdm + retainA3m;
+    female.adult = retainAdf + retainA3f;
 
     male.A3 = male.A2;
     female.A3 = female.A2;
@@ -168,18 +160,15 @@ function runEngine(){
 
   render(out);
 
-  // 🔥 FINAL EXPORT (MOST IMPORTANT)
-  console.log("BREEDING FINAL RESULT =", out);
+  /* ===== FINAL EXPORT (VERY IMPORTANT) ===== */
   localStorage.setItem(
     "BREEDING_ENGINE_5YR_RESULT",
     JSON.stringify(out)
   );
 }
 
-// ================= RENDER =================
 function render(data){
-
-  let html = `<table>
+  let html=`<table>
   <tr>
     <th rowspan="2">वर्ष</th>
     <th colspan="4">भाले</th>
@@ -189,32 +178,24 @@ function render(data){
     <th>१–३</th><th>४–६</th><th>७–१०</th><th>बयस्क</th>
     <th>१–३</th><th>४–६</th><th>७–१०</th><th>बयस्क</th>
   </tr>`;
-
   data.forEach(d=>{
     html+=`<tr>
       <td>${d.year}</td>
-      <td>${d.male.A1}</td>
-      <td>${d.male.A2}</td>
-      <td>${d.male.A3}</td>
-      <td>${d.male.adult}</td>
-      <td>${d.female.A1}</td>
-      <td>${d.female.A2}</td>
-      <td>${d.female.A3}</td>
-      <td>${d.female.adult}</td>
+      <td>${d.male.A1}</td><td>${d.male.A2}</td><td>${d.male.A3}</td><td>${d.male.adult}</td>
+      <td>${d.female.A1}</td><td>${d.female.A2}</td><td>${d.female.A3}</td><td>${d.female.adult}</td>
     </tr>`;
   });
-
   html+=`</table>`;
-  document.getElementById("result").innerHTML = html;
+  result.innerHTML = html;
 }
 
-// ================= PAGE FOLLOW SCROLL =================
+/* PAGE FOLLOW SCROLL */
 (function(){
-  const pf = document.getElementById("pageFollow");
-  window.addEventListener("scroll", ()=>{
-    const h = document.body.scrollHeight - window.innerHeight;
-    const r = h>0 ? window.scrollY/h : 0;
-    pf.style.top = (20 + r*(window.innerHeight-120)) + "px";
+  const pf=document.getElementById("pageFollow");
+  window.addEventListener("scroll",()=>{
+    const h=document.body.scrollHeight-window.innerHeight;
+    const r=h>0?window.scrollY/h:0;
+    pf.style.top=(20+r*(window.innerHeight-120))+"px";
   });
 })();
 </script>
