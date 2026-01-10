@@ -7,13 +7,12 @@
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
 .container{max-width:1800px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
-h1,h2{color:#2e7d32;margin-top:0}
-table{width:100%;border-collapse:collapse;margin-top:16px}
+h1,h2,h3{color:#2e7d32;margin-top:0}
+table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-.group{background:#f1f8e9;font-weight:bold}
-.note{font-size:14px;background:#f9fff6;border:1px dashed #9ccc65;padding:12px;margin-top:12px}
-.small{font-size:12px;color:#444}
+.note{font-size:14px;background:#f9fff6;border:1px dashed #9ccc65;padding:12px;margin:12px 0}
+.small{font-size:13px;color:#444}
 </style>
 </head>
 
@@ -23,44 +22,56 @@ th{background:#eef5ee}
 <h1>🌾 Feed • Vitamin • Medicine — वर्षवर्ष</h1>
 
 <div class="note">
-✔️ उमेर समूह: १–३, ४–६, ७–१०, बयस्क<br>
-✔️ भाले / पोथी छुट्टाछुट्टै<br>
-✔️ दाना / भिटामिन / औषधि अलग<br>
-✔️ वर्ष १–५ स्पष्ट
+<b>डाटा स्रोत:</b><br>
+• Breeding Engine चलाइएको छ भने → त्यही डाटा प्रयोग हुन्छ<br>
+• नभए → demo sample डाटा प्रयोग हुन्छ
 </div>
 
-<h2>📊 वर्षवर्षको खर्च (Rs)</h2>
+<!-- ================= FEEDING METHOD ================= -->
+<h2>🍽️ दाना / भिटामिन / औषधि खुवाउने तरिका</h2>
+
+<ul class="small">
+<li><b>दाना:</b> हरेक दिन बिहान–साँझ (दिनको मात्रा ÷ 2)</li>
+<li><b>भिटामिन:</b> महिनामा 8–10 दिन, पानी वा दानामा मिसाएर</li>
+<li><b>औषधि:</b> वर्षमा 2–3 पटक (खोप, जुकाको औषधि)</li>
+</ul>
+
+<table>
+<tr><th>उमेर समूह</th><th>भाले (kg/day)</th><th>पोथी (kg/day)</th></tr>
+<tr><td>१–३ महिना</td><td>0.30</td><td>0.25</td></tr>
+<tr><td>४–६ महिना</td><td>0.80</td><td>0.70</td></tr>
+<tr><td>७–१० महिना</td><td>1.80</td><td>1.50</td></tr>
+<tr><td>बयस्क</td><td>2.50</td><td>3.00</td></tr>
+</table>
+
+<!-- ================= RESULT ================= -->
+<hr>
+<h2>📊 वर्षवर्ष Feed • Vitamin • Medicine खर्च (Rs)</h2>
 <div id="result"></div>
 
 </div>
 
 <script>
-// ---------------- RATE TABLE (UNCHANGED) ----------------
-const feedRate={
-  A1:{m:0.30,f:0.25},
-  A2:{m:0.80,f:0.70},
-  A3:{m:1.80,f:1.50},
-  adult:{m:2.50,f:3.00}
-};
-const vitaminRate={
-  A1:{m:30,f:35},
-  A2:{m:40,f:45},
-  A3:{m:50,f:55},
-  adult:{m:60,f:80}
-};
-const medicineRate={
-  A1:{m:150,f:160},
-  A2:{m:200,f:220},
-  A3:{m:300,f:320},
-  adult:{m:400,f:500}
-};
+// ================= RATE TABLE =================
+const feedRate={A1:{m:0.30,f:0.25},A2:{m:0.80,f:0.70},A3:{m:1.80,f:1.50},adult:{m:2.50,f:3.00}};
+const vitaminRate={A1:{m:30,f:35},A2:{m:40,f:45},A3:{m:50,f:55},adult:{m:60,f:80}};
+const medicineRate={A1:{m:150,f:160},A2:{m:200,f:220},A3:{m:300,f:320},adult:{m:400,f:500}};
 
-// ---------------- LOAD BREEDING DATA ----------------
-const data = JSON.parse(
-  localStorage.getItem("BREEDING_ENGINE_5YR_RESULT")
-) || [];
+// ================= LOAD DATA =================
+let data = JSON.parse(localStorage.getItem("BREEDING_ENGINE_5YR_RESULT"));
 
-// ---------------- CALC ----------------
+// Fallback sample data
+if(!data){
+  data=[
+    {year:1,male:{A1:50,A2:30,A3:20,adult:10},female:{A1:45,A2:25,A3:15,adult:40}},
+    {year:2,male:{A1:60,A2:35,A3:25,adult:15},female:{A1:50,A2:30,A3:20,adult:45}},
+    {year:3,male:{A1:70,A2:40,A3:30,adult:20},female:{A1:55,A2:35,A3:25,adult:50}},
+    {year:4,male:{A1:80,A2:45,A3:35,adult:25},female:{A1:60,A2:40,A3:30,adult:55}},
+    {year:5,male:{A1:90,A2:50,A3:40,adult:30},female:{A1:65,A2:45,A3:35,adult:60}}
+  ];
+}
+
+// ================= CALC =================
 function calc(count,age,sex){
   return {
     feed: count * feedRate[age][sex] * 365,
@@ -69,37 +80,19 @@ function calc(count,age,sex){
   };
 }
 
-// ---------------- RENDER ----------------
+// ================= RENDER =================
 function render(){
-
-  if(data.length===0){
-    document.getElementById("result").innerHTML =
-      "<p>Breeding Engine को डाटा भेटिएन।</p>";
-    return;
-  }
-
-  const ages=[
-    ["A1","१–३ महिना"],
-    ["A2","४–६ महिना"],
-    ["A3","७–१० महिना"],
-    ["adult","बयस्क"]
-  ];
-  const types=[
-    ["feed","दाना"],
-    ["vitamin","भिटामिन"],
-    ["medicine","औषधि"]
-  ];
-
   let html=`<table>
   <tr>
-    <th rowspan="2">उमेर समूह</th>
+    <th rowspan="2">उमेर</th>
     <th rowspan="2">लिङ्ग</th>
     <th rowspan="2">प्रकार</th>
     <th colspan="${data.length}">वर्ष</th>
   </tr>
-  <tr>
-    ${data.map(d=>`<th>${d.year}</th>`).join("")}
-  </tr>`;
+  <tr>${data.map(d=>`<th>${d.year}</th>`).join("")}</tr>`;
+
+  const ages=[["A1","१–३"],["A2","४–६"],["A3","७–१०"],["adult","बयस्क"]];
+  const types=[["feed","दाना"],["vitamin","भिटामिन"],["medicine","औषधि"]];
 
   ages.forEach(a=>{
     ["m","f"].forEach(sex=>{
@@ -109,11 +102,8 @@ function render(){
           <td>${sex==="m"?"भाले":"पोथी"}</td>
           <td>${t[1]}</td>`;
         data.forEach(y=>{
-          const count = sex==="m"
-            ? y.male[a[0]]
-            : y.female[a[0]];
-          const c = calc(count,a[0],sex);
-          html+=`<td>${Math.round(c[t[0]])}</td>`;
+          const count=sex==="m"?y.male[a[0]]:y.female[a[0]];
+          html+=`<td>${Math.round(calc(count,a[0],sex)[t[0]])}</td>`;
         });
         html+=`</tr>`;
       });
@@ -123,7 +113,6 @@ function render(){
   html+=`</table>`;
   document.getElementById("result").innerHTML=html;
 }
-
 render();
 </script>
 
