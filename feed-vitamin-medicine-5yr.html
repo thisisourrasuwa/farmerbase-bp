@@ -2,239 +2,108 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Feed, Vitamin & Medicine – 5 Year Projection</title>
+<title>Feed • Vitamin • Medicine (5 Years)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-body{
-  font-family:"Noto Sans Devanagari","Kalimati",system-ui;
-  background:#f4f7f6;margin:0
-}
-.container{
-  max-width:1200px;margin:20px auto;
-  background:#fff;padding:24px;border-radius:12px
-}
-h1,h2,h3{color:#2e7d32;margin-top:0}
-.small{font-size:13px;color:#555}
-
-table{
-  width:100%;border-collapse:collapse;margin-top:12px
-}
-th,td{
-  border:1px solid #ccc;
-  padding:8px;text-align:right
-}
-th{text-align:center;background:#eef5ee}
-.left{text-align:left}
-
-.note{
-  background:#f1f8e9;
-  padding:15px;border-radius:8px;
-  margin-top:25px
-}
-.badge{
-  display:inline-block;
-  padding:2px 8px;
-  font-size:12px;
-  border-radius:12px;
-  background:#e8f5e9;
-  color:#2e7d32
-}
+body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
+.container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+h1,h2{color:#2e7d32;margin-top:0}
+table{width:100%;border-collapse:collapse;margin-top:14px}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+th{background:#eef5ee}
+.group{background:#f1f8e9;font-weight:bold}
+.note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-top:12px}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>🐷 दाना, भिटामिन तथा औषधि खर्च</h1>
-<p class="small">
-Breeding Engine बाट आएको तथ्याङ्कका आधारमा
-उमेर तथा लिङ्ग अनुसार ५ वर्षे खर्च प्रक्षेपण
+<h1>🌾 Feed • Vitamin • Medicine – ५ वर्ष</h1>
+<p class="note">
+✔️ १–३, ४–६, ७–१० उमेर समूह <br>
+✔️ भाले / पोथी छुट्टाछुट्टै <br>
+✔️ Breeding Engine बाट आएको संख्या प्रयोग
 </p>
 
-<div id="summary"></div>
-
-<h2 style="margin-top:30px">📊 ५ वर्षे खर्च प्रक्षेपण</h2>
-<div id="fiveYear"></div>
-
-<div id="narration" class="note"></div>
+<h2>📊 ५ वर्षे खर्च (Rs)</h2>
+<div id="result"></div>
 
 </div>
 
 <script>
-/* ================================================= */
-/* DATA SOURCE (LOCK) */
-/* ================================================= */
+// ---------- RATE TABLE ----------
+const feedRate = {
+  A1:{m:0.30,f:0.25},
+  A2:{m:0.80,f:0.70},
+  A3:{m:1.80,f:1.50},
+  adult:{m:2.50,f:3.00}
+};
 
-const prod =
-  JSON.parse(localStorage.getItem("BREEDING_PRODUCTION_AUTO") || "null");
+const vitaminRate = {
+  A1:{m:30,f:35},
+  A2:{m:40,f:45},
+  A3:{m:50,f:55},
+  adult:{m:60,f:80}
+};
 
-const expense =
-  JSON.parse(localStorage.getItem("EXPENSE_AUTO_FULL") || "{}");
+const medicineRate = {
+  A1:{m:150,f:160},
+  A2:{m:200,f:220},
+  A3:{m:300,f:320},
+  adult:{m:400,f:500}
+};
 
-if(!prod){
-  document.getElementById("summary").innerHTML =
-    "<p class='small'>⚠️ पहिले Breeding Engine चलाउनुहोस् ।</p>";
-}
+// ---------- LOAD DATA ----------
+const data = JSON.parse(localStorage.getItem("BREEDING_ENGINE_5YR_RESULT")) || [];
 
-/* ================================================= */
-/* UTIL */
-/* ================================================= */
-
-function safe(v){ return Number(v)||0; }
-
-function row(label, e){
-  const f = safe(e?.feed);
-  const v = safe(e?.vitamin);
-  const m = safe(e?.medicine);
+function yearlyCost(count, feed, vit, med){
   return {
-    label,
-    feed:f,
-    vit:v,
-    med:m,
-    total:f+v+m
+    feed: count * feed * 365,
+    vitamin: count * vit * 12,
+    medicine: count * med
   };
 }
 
-/* ================================================= */
-/* AGE-WISE SUMMARY */
-/* ================================================= */
+function render(){
 
-function buildSummary(){
+  let html=`<table>
+  <tr>
+    <th>समूह \\ वर्ष</th>
+    ${data.map(d=>`<th>${d.year}</th>`).join("")}
+  </tr>`;
+
   const rows = [
-    row("१–३ महिना (भाले)", expense.male_A1),
-    row("४–६ महिना (भाले)", expense.male_A2),
-    row("७–१० महिना (भाले)", expense.male_A3),
-
-    row("१–३ महिना (पोथी)", expense.female_A1),
-    row("४–६ महिना (पोथी)", expense.female_A2),
-    row("७–१० महिना (पोथी)", expense.female_A3),
-
-    row("बयस्क (माउ + भाले)", expense.adult)
+    ["१–३ भाले","A1","m"],
+    ["१–३ पोथी","A1","f"],
+    ["४–६ भाले","A2","m"],
+    ["४–६ पोथी","A2","f"],
+    ["७–१० भाले","A3","m"],
+    ["७–१० पोथी","A3","f"],
+    ["बयस्क भाले","adult","m"],
+    ["माउ (बयस्क पोथी)","adult","f"]
   ];
 
-  let html = `
-  <table>
-  <tr>
-    <th>उमेर समूह</th>
-    <th>Feed (रु)</th>
-    <th>Vitamin (रु)</th>
-    <th>Medicine (रु)</th>
-    <th>कुल (रु)</th>
-  </tr>`;
-
-  let g=0;
   rows.forEach(r=>{
-    g+=r.total;
-    html+=`
-    <tr>
-      <td class="left">${r.label}</td>
-      <td>${r.feed.toLocaleString()}</td>
-      <td>${r.vit.toLocaleString()}</td>
-      <td>${r.med.toLocaleString()}</td>
-      <td><b>${r.total.toLocaleString()}</b></td>
-    </tr>`;
+    html+=`<tr><td>${r[0]}</td>`;
+    data.forEach(y=>{
+      const count = r[2]==="m" ? y.male[r[1]] : y.female[r[1]];
+      const c = yearlyCost(
+        count,
+        feedRate[r[1]][r[2]],
+        vitaminRate[r[1]][r[2]],
+        medicineRate[r[1]][r[2]]
+      );
+      html+=`<td>${Math.round(c.feed+c.vitamin+c.medicine)}</td>`;
+    });
+    html+=`</tr>`;
   });
 
-  html+=`
-  <tr style="background:#dcedc8">
-    <th colspan="4">कुल वार्षिक खर्च</th>
-    <th>${g.toLocaleString()}</th>
-  </tr>
-  </table>`;
-
-  document.getElementById("summary").innerHTML = html;
-
-  return g;
-}
-
-/* ================================================= */
-/* 5 YEAR PROJECTION */
-/* ================================================= */
-
-function buildFiveYear(base){
-  let html = `
-  <table>
-  <tr>
-    <th>वर्ष</th>
-    <th>अनुमानित कुल खर्च (रु)</th>
-  </tr>`;
-
-  let cost = base;
-  for(let y=1;y<=5;y++){
-    html+=`
-    <tr>
-      <td>${y}</td>
-      <td>${Math.round(cost).toLocaleString()}</td>
-    </tr>`;
-    // simple growth assumption (breeding expansion)
-    cost = cost * 1.10;
-  }
-
   html+=`</table>`;
-  document.getElementById("fiveYear").innerHTML = html;
+  document.getElementById("result").innerHTML=html;
 }
 
-/* ================================================= */
-/* NARRATION */
-/* ================================================= */
-
-function buildNarration(){
-  document.getElementById("narration").innerHTML = `
-  <h3>📌 गणना विधि (Narration)</h3>
-
-  <p>
-  यस प्रतिवेदनमा देखाइएको दाना, भिटामिन तथा औषधि खर्च
-  <b>Breeding Engine</b> बाट निस्किएको
-  जनावर संख्या (उमेर र लिङ्ग अनुसार) को आधारमा
-  स्वचालित रूपमा गणना गरिएको हो।
-  </p>
-
-  <ul>
-    <li>
-    <b>जनावर संख्या</b> :
-    माउ, भाले तथा पाठापाठीको संख्या
-    प्रजनन दर, जन्म दर तथा मृत्युदरको
-    सूत्र प्रयोग गरी निर्धारण गरिएको छ।
-    </li>
-
-    <li>
-    <b>दाना खर्च</b> :
-    प्रतिदिन खुवाइने दाना (kg/दिन) ×
-    उमेर समूह अनुसार दिन संख्या ×
-    प्रति केजी दाना मूल्य।
-    </li>
-
-    <li>
-    <b>भिटामिन तथा औषधि खर्च</b> :
-    प्रति जनावर प्रतिदिन वा वार्षिक
-    निर्धारण गरिएको दर अनुसार।
-    </li>
-
-    <li>
-    <b>५ वर्षे प्रक्षेपण</b> :
-    पहिलो वर्षको वास्तविक खर्चलाई आधार मानी
-    प्रजनन विस्तारको औसत दर प्रयोग गरिएको छ।
-    </li>
-  </ul>
-
-  <p>
-  यसरी प्राप्त खर्च विवरण
-  <b>Production, Expenses तथा Income</b>
-  मोड्युलहरूसँग स्वतः समायोजन हुन्छ।
-  </p>
-  `;
-}
-
-/* ================================================= */
-/* INIT */
-/* ================================================= */
-
-if(prod){
-  const base = buildSummary();
-  buildFiveYear(base);
-  buildNarration();
-}
+render();
 </script>
 
 </body>
