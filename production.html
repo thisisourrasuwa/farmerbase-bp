@@ -7,14 +7,13 @@
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
 .container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
-h1,h2,h3{color:#2e7d32;margin-top:0}
+h1,h2{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-.group{background:#f1f8e9;font-weight:bold}
 input{width:90px}
 .note{font-size:14px;background:#f9fff6;border:1px dashed #9ccc65;padding:12px;margin:12px 0}
-button{padding:6px 14px;background:#2e7d32;color:#fff;border:none;border-radius:6px}
+.group{background:#f1f8e9;font-weight:bold}
 </style>
 </head>
 
@@ -24,12 +23,12 @@ button{padding:6px 14px;background:#2e7d32;color:#fff;border:none;border-radius:
 <h1>📦 उत्पादन (Production)</h1>
 
 <div class="note">
-✔️ Breeding Engine को उमेर समूह र लिङ्गगत संरचना जस्ताको तस्तै<br>
-✔️ यहाँ <b>परिमाण (kg / unit)</b> मात्र देखाइन्छ<br>
-✔️ आम्दानी यहाँ गणना हुँदैन
+✔️ संख्या (Head) = Breeding Engine बाट आएको, सच्याउन नमिल्ने<br>
+✔️ kg/head मात्र प्रयोगकर्ताले दिन्छ<br>
+✔️ कुल उत्पादन (kg) = संख्या × kg/head
 </div>
 
-<h2>🐖 पशुजन्य उत्पादन (Breeding-based)</h2>
+<h2>🐖 पशुजन्य उत्पादन (Breeding आधारित)</h2>
 <div id="breedingProduction"></div>
 
 <h2>➕ यस व्यवसायका अन्य उत्पादन</h2>
@@ -69,7 +68,8 @@ function renderBreedingProduction(){
   let html = `<table>
   <tr>
     <th rowspan="2">समूह</th>
-    <th rowspan="2">औसत उत्पादन (kg / head)</th>
+    <th rowspan="2">संख्या (Head)</th>
+    <th rowspan="2">kg / Head</th>
     <th colspan="${data.length}">वर्ष</th>
   </tr>
   <tr>
@@ -79,21 +79,67 @@ function renderBreedingProduction(){
   rows.forEach(r=>{
     html += `<tr>
       <td>${r[0]}</td>
-      <td><input value="70"></td>`;
+      <td class="count">0</td>
+      <td>
+        <input value="70" oninput="recalc()">
+      </td>`;
 
     data.forEach(y=>{
       const count = r[2]==="m"
         ? y.male[r[1]]
         : y.female[r[1]];
 
-      html += `<td>${count}</td>`;
+      html += `<td class="yearCount">${count}</td>`;
     });
 
     html += `</tr>`;
   });
 
-  html += `</table>`;
+  html += `</table>
+  <p class="note">🔹 तल कुल उत्पादन (kg) स्वतः गणना हुन्छ</p>
+  <div id="totalKg"></div>`;
+
   document.getElementById("breedingProduction").innerHTML = html;
+  recalc();
+}
+
+// ===================================================
+// RECALCULATE TOTAL KG
+// ===================================================
+function recalc(){
+
+  let html = `<table>
+  <tr>
+    <th>समूह</th>
+    <th>कुल संख्या (५ वर्ष)</th>
+    <th>kg / Head</th>
+    <th>कुल उत्पादन (kg)</th>
+  </tr>`;
+
+  document.querySelectorAll("#breedingProduction table tr").forEach((r,i)=>{
+    if(i<2) return;
+
+    const tds = r.querySelectorAll("td");
+    const name = tds[0].innerText;
+    const kg = Number(tds[2].querySelector("input").value)||0;
+
+    let totalCount = 0;
+    r.querySelectorAll(".yearCount").forEach(c=>{
+      totalCount += Number(c.innerText)||0;
+    });
+
+    const totalKg = totalCount * kg;
+
+    html += `<tr>
+      <td>${name}</td>
+      <td>${totalCount}</td>
+      <td>${kg}</td>
+      <td>${totalKg.toFixed(1)}</td>
+    </tr>`;
+  });
+
+  html += `</table>`;
+  document.getElementById("totalKg").innerHTML = html;
 }
 
 // ===================================================
@@ -104,9 +150,9 @@ function renderOtherProduction(){
   let html = `<table>
   <tr>
     <th>उत्पादन नाम</th>
-    <th>इकाइ (kg / unit)</th>
+    <th>इकाइ</th>
     <th>वार्षिक परिमाण</th>
-    <th>कार्य</th>
+    <th></th>
   </tr>
   <tr>
     <td><input value="गोबर मल"></td>
@@ -121,8 +167,8 @@ function renderOtherProduction(){
 }
 
 function addRow(){
-  const table = document.querySelector("#otherProduction table");
-  const r = table.insertRow(-1);
+  const t = document.querySelector("#otherProduction table");
+  const r = t.insertRow(-1);
   r.innerHTML = `
     <td><input></td>
     <td><input></td>
