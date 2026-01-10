@@ -34,9 +34,13 @@ button{
   border-radius:6px;
   cursor:pointer
 }
-.group{
-  background:#f1f8e9;
-  font-weight:bold
+.group{background:#f1f8e9;font-weight:bold}
+.note{
+  background:#f9fff6;
+  border:1px dashed #9ccc65;
+  padding:10px;
+  margin-top:10px;
+  font-size:13px;
 }
 </style>
 </head>
@@ -46,7 +50,7 @@ button{
 
 <h1>🐷 Animal Breeding Engine</h1>
 <p class="small">
-५ वर्षे उमेर समूहगत, लिङ्गगत तथा प्रजनन–रोटेशन आधारित Breeding Model
+५ वर्षे उमेर समूहगत, लिङ्गगत तथा प्रजनन-रोटेशन आधारित Breeding Model
 </p>
 
 <!-- ================= INPUT ================= -->
@@ -58,6 +62,7 @@ button{
 <tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
 </table>
 
+<!-- ================= SALE RULES ================= -->
 <h2>📤 ५ वर्षे बिक्री नियम (%)</h2>
 <table>
 <tr>
@@ -114,17 +119,17 @@ button{
 
 <hr>
 
-<h2>📊 ५ वर्षे नतिजा</h2>
+<h2>📊 ५ वर्षे नतिजा (संख्या)</h2>
 <div id="result"></div>
 
 </div>
 
 <script>
 function n(id){ return Number(document.getElementById(id).value)||0; }
-function sale(c,p){
-  p=Math.min(p,100);
-  const s=Math.round(c*p/100);
-  return {sold:s,remain:c-s};
+function sale(total, percent){
+  percent = Math.min(percent,100);
+  const sold = Math.round(total * percent / 100);
+  return { sold, remain: total - sold };
 }
 
 function runEngine(){
@@ -132,70 +137,91 @@ function runEngine(){
   let breedingFemale = n("adultFemale");
   let breedingMale = 0;
 
-  let result=[];
+  let data = [];
 
   for(let y=1;y<=5;y++){
 
+    // Birth
     let born = breedingFemale * n("kidsPerFemale") * (n("breedRate")/100);
     born *= (1 - n("deathRate")/100);
 
     let maleBorn = Math.round(born/2);
     let femaleBorn = Math.round(born/2);
 
-    let m = sale(maleBorn + breedingMale, n(`mA1Y${y}`));
-    m = sale(m.remain, n(`mA2Y${y}`));
-    m = sale(m.remain, n(`mA3Y${y}`));
+    // Male sale (born + previous breeding male)
+    let m1 = sale(maleBorn + breedingMale, n(`mA1Y${y}`));
+    let m2 = sale(m1.remain, n(`mA2Y${y}`));
+    let m3 = sale(m2.remain, n(`mA3Y${y}`));
 
-    let f = sale(femaleBorn, n(`fA1Y${y}`));
-    f = sale(f.remain, n(`fA2Y${y}`));
-    f = sale(f.remain, n(`fA3Y${y}`));
+    // Female sale (born only)
+    let f1 = sale(femaleBorn, n(`fA1Y${y}`));
+    let f2 = sale(f1.remain, n(`fA2Y${y}`));
+    let f3 = sale(f2.remain, n(`fA3Y${y}`));
 
-    breedingMale = sale(m.remain, n(`adultMY${y}`)).remain;
-    breedingFemale = sale(breedingFemale + f.remain, n(`adultFY${y}`)).remain;
+    // Adult sales
+    breedingMale = sale(m3.remain, n(`adultMY${y}`)).remain;
+    breedingFemale = sale(breedingFemale + f3.remain, n(`adultFY${y}`)).remain;
 
-    result.push({
+    data.push({
       year:y,
-      mA1:n(`mA1Y${y}`), mA2:n(`mA2Y${y}`), mA3:n(`mA3Y${y}`),
-      fA1:n(`fA1Y${y}`), fA2:n(`fA2Y${y}`), fA3:n(`fA3Y${y}`),
-      adultMale:breedingMale,
-      adultFemale:breedingFemale
+      maleSold:{A1:m1.sold,A2:m2.sold,A3:m3.sold},
+      femaleSold:{A1:f1.sold,A2:f2.sold,A3:f3.sold},
+      breeding:{
+        male:breedingMale,
+        female:breedingFemale
+      }
     });
   }
 
-  renderResult(result);
+  renderResult(data);
 }
 
 function renderResult(data){
 
-  const rows=[
-    ["भाले १–३","mA1"],
-    ["भाले ४–६","mA2"],
-    ["भाले ७–१०","mA3"],
-    ["पोथी १–३","fA1"],
-    ["पोथी ४–६","fA2"],
-    ["पोथी ७–१०","fA3"],
-    ["बयस्क भाले बिक्री","adultMale"],
-    ["बयस्क माउ बिक्री","adultFemale"]
+  const rows = [
+    {label:"भाले १–३ (बिक्री)", k:"maleSold", s:"A1"},
+    {label:"भाले ४–६ (बिक्री)", k:"maleSold", s:"A2"},
+    {label:"भाले ७–१० (बिक्री)", k:"maleSold", s:"A3"},
+    {label:"पोथी १–३ (बिक्री)", k:"femaleSold", s:"A1"},
+    {label:"पोथी ४–६ (बिक्री)", k:"femaleSold", s:"A2"},
+    {label:"पोथी ७–१० (बिक्री)", k:"femaleSold", s:"A3"},
+    {label:"बिक्री गरेर राखिएका भाले", k:"breeding", s:"male"},
+    {label:"बिक्री गरेर राखिएका माउ", k:"breeding", s:"female"}
   ];
 
-  let html=`
+  let html = `
   <table>
-  <tr>
-    <th rowspan="2">समूह</th>
-    <th colspan="5">५ वर्षे नतिजा</th>
-  </tr>
-  <tr>
-    <th>१</th><th>२</th><th>३</th><th>४</th><th>५</th>
-  </tr>`;
+    <tr>
+      <th rowspan="2">समूह</th>
+      <th colspan="5">५ वर्षे नतिजा (संख्या)</th>
+    </tr>
+    <tr>
+      <th>१</th><th>२</th><th>३</th><th>४</th><th>५</th>
+    </tr>`;
 
   rows.forEach(r=>{
-    html+=`<tr><td><strong>${r[0]}</strong></td>`;
-    data.forEach(y=> html+=`<td>${y[r[1]]}</td>`);
-    html+=`</tr>`;
+    html += `<tr><td><strong>${r.label}</strong></td>`;
+    data.forEach(y=>{
+      let v = (r.k==="breeding") ? y.breeding[r.s] : y[r.k][r.s];
+      html += `<td>${v}</td>`;
+    });
+    html += `</tr>`;
   });
 
-  html+=`</table>`;
-  document.getElementById("result").innerHTML=html;
+  html += `
+  <tr class="note">
+    <td colspan="6" style="text-align:left">
+      <strong>नोट:</strong><br>
+      • यो तालिकाका सबै मानहरू <b>संख्या (head count)</b> हुन्, प्रतिशत होइनन्।<br>
+      • बिक्री नियम (%) माथिको तालिकामा लागू गरिएको छ।<br>
+      • हरेक अवस्थामा: बिक्री + बिक्री गरेर राखिएको = 100% logically match हुन्छ।<br>
+      • बिक्री गरेर राखिएका भाले अर्को वर्ष पुनः बिक्रीमा जान्छन्।<br>
+      • बिक्री गरेर राखिएका पोथी अर्को वर्ष प्रजननयोग्य माउ बन्छन्।
+    </td>
+  </tr>
+  </table>`;
+
+  document.getElementById("result").innerHTML = html;
 }
 </script>
 
