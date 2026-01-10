@@ -2,17 +2,18 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Production</title>
+<title>उत्पादन (Production) – वर्षवर्ष</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
-h1,h2{color:#2e7d32;margin-top:0}
+.container{max-width:1800px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+h1,h2,h3{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-input{width:90px}
+input{width:70px}
 .note{font-size:14px;background:#f9fff6;border:1px dashed #9ccc65;padding:12px;margin:12px 0}
+button{padding:6px 14px;background:#2e7d32;color:#fff;border:none;border-radius:6px}
 .group{background:#f1f8e9;font-weight:bold}
 </style>
 </head>
@@ -24,35 +25,38 @@ input{width:90px}
 
 <div class="note">
 ✔️ संख्या (Head) = Breeding Engine बाट आएको, सच्याउन नमिल्ने<br>
-✔️ kg/head मात्र प्रयोगकर्ताले दिन्छ<br>
-✔️ कुल उत्पादन (kg) = संख्या × kg/head
+✔️ kg / head मात्र सच्याउन मिल्ने<br>
+✔️ सबै विवरण वर्ष–वर्ष देखाइन्छ
 </div>
 
-<h2>🐖 पशुजन्य उत्पादन (Breeding आधारित)</h2>
+<h2>🐖 पशुजन्य उत्पादन (Breeding आधारित – Yearwise)</h2>
 <div id="breedingProduction"></div>
 
-<h2>➕ यस व्यवसायका अन्य उत्पादन</h2>
+<h2>➕ यस व्यवसायका अन्य उत्पादन (Yearwise)</h2>
 <div id="otherProduction"></div>
 
 </div>
 
 <script>
 // ===================================================
-// LOAD BREEDING DATA
+// LOAD BREEDING DATA (YEARWISE)
 // ===================================================
 const data = JSON.parse(
   localStorage.getItem("BREEDING_ENGINE_5YR_RESULT")
 ) || [];
 
-if(data.length===0){
-  document.getElementById("breedingProduction").innerHTML =
-    "<p>Breeding Engine को डाटा भेटिएन।</p>";
-}
+const years = data.map(d=>d.year);
 
 // ===================================================
-// RENDER BREEDING-BASED PRODUCTION
+// BREEDING PRODUCTION
 // ===================================================
 function renderBreedingProduction(){
+
+  if(data.length===0){
+    document.getElementById("breedingProduction").innerHTML =
+      "<p>Breeding Engine को डाटा भेटिएन।</p>";
+    return;
+  }
 
   const rows = [
     ["१–३ महिना भाले","A1","m"],
@@ -65,115 +69,61 @@ function renderBreedingProduction(){
     ["बयस्क माउ","adult","f"]
   ];
 
-  let html = `<table>
+  let html=`<table>
   <tr>
     <th rowspan="2">समूह</th>
-    <th rowspan="2">संख्या (Head)</th>
     <th rowspan="2">kg / Head</th>
-    <th colspan="${data.length}">वर्ष</th>
+    <th colspan="${years.length}">वर्ष अनुसार संख्या (Head)</th>
   </tr>
-  <tr>
-    ${data.map(d=>`<th>${d.year}</th>`).join("")}
-  </tr>`;
+  <tr>${years.map(y=>`<th>${y}</th>`).join("")}</tr>`;
 
   rows.forEach(r=>{
-    html += `<tr>
+    html+=`<tr>
       <td>${r[0]}</td>
-      <td class="count">0</td>
-      <td>
-        <input value="70" oninput="recalc()">
-      </td>`;
-
+      <td><input value="70"></td>`;
     data.forEach(y=>{
       const count = r[2]==="m"
         ? y.male[r[1]]
         : y.female[r[1]];
-
-      html += `<td class="yearCount">${count}</td>`;
+      html+=`<td>${count}</td>`;
     });
-
-    html += `</tr>`;
+    html+=`</tr>`;
   });
 
-  html += `</table>
-  <p class="note">🔹 तल कुल उत्पादन (kg) स्वतः गणना हुन्छ</p>
-  <div id="totalKg"></div>`;
-
-  document.getElementById("breedingProduction").innerHTML = html;
-  recalc();
+  html+=`</table>`;
+  document.getElementById("breedingProduction").innerHTML=html;
 }
 
 // ===================================================
-// RECALCULATE TOTAL KG
-// ===================================================
-function recalc(){
-
-  let html = `<table>
-  <tr>
-    <th>समूह</th>
-    <th>कुल संख्या (५ वर्ष)</th>
-    <th>kg / Head</th>
-    <th>कुल उत्पादन (kg)</th>
-  </tr>`;
-
-  document.querySelectorAll("#breedingProduction table tr").forEach((r,i)=>{
-    if(i<2) return;
-
-    const tds = r.querySelectorAll("td");
-    const name = tds[0].innerText;
-    const kg = Number(tds[2].querySelector("input").value)||0;
-
-    let totalCount = 0;
-    r.querySelectorAll(".yearCount").forEach(c=>{
-      totalCount += Number(c.innerText)||0;
-    });
-
-    const totalKg = totalCount * kg;
-
-    html += `<tr>
-      <td>${name}</td>
-      <td>${totalCount}</td>
-      <td>${kg}</td>
-      <td>${totalKg.toFixed(1)}</td>
-    </tr>`;
-  });
-
-  html += `</table>`;
-  document.getElementById("totalKg").innerHTML = html;
-}
-
-// ===================================================
-// OTHER PRODUCTION (MANUAL)
+// OTHER PRODUCTION (YEARWISE)
 // ===================================================
 function renderOtherProduction(){
 
-  let html = `<table>
+  let html=`<table id="otherTable">
   <tr>
     <th>उत्पादन नाम</th>
     <th>इकाइ</th>
-    <th>वार्षिक परिमाण</th>
-    <th></th>
+    ${years.map(y=>`<th>${y}</th>`).join("")}
   </tr>
   <tr>
     <td><input value="गोबर मल"></td>
     <td><input value="kg"></td>
-    <td><input value="0"></td>
-    <td></td>
+    ${years.map(()=>`<td><input value="0"></td>`).join("")}
   </tr>
   </table>
-  <button onclick="addRow()">➕ थप्नुहोस्</button>`;
+  <button onclick="addOtherRow()">➕ थप्नुहोस्</button>`;
 
-  document.getElementById("otherProduction").innerHTML = html;
+  document.getElementById("otherProduction").innerHTML=html;
 }
 
-function addRow(){
-  const t = document.querySelector("#otherProduction table");
-  const r = t.insertRow(-1);
-  r.innerHTML = `
+function addOtherRow(){
+  const t=document.getElementById("otherTable");
+  const r=t.insertRow(-1);
+  r.innerHTML=`
     <td><input></td>
     <td><input></td>
-    <td><input></td>
-    <td></td>`;
+    ${years.map(()=>`<td><input value="0"></td>`).join("")}
+  `;
 }
 
 // ===================================================
