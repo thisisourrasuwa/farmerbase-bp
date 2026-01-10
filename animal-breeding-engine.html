@@ -4,29 +4,17 @@
 <meta charset="UTF-8">
 <title>Animal Breeding Engine | FarmerBase BP Engine</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-body{
-  font-family:"Noto Sans Devanagari","Kalimati",system-ui;
-  background:#f4f7f6;margin:0
-}
-.container{
-  max-width:1200px;margin:20px auto;
-  background:#fff;padding:22px;border-radius:12px
-}
+body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
+.container{max-width:1400px;margin:20px auto;background:#fff;padding:22px;border-radius:12px}
 h1,h2{color:#2e7d32;margin-top:0}
-.small{font-size:13px;color:#555}
 table{width:100%;border-collapse:collapse;margin-top:12px}
-th,td{border:1px solid #ccc;padding:8px;text-align:center}
+th,td{border:1px solid #ccc;padding:6px;text-align:center}
 th{background:#eef5ee}
-input{width:100%;padding:6px}
-button{
-  padding:10px 18px;
-  background:#2e7d32;color:#fff;
-  border:none;border-radius:6px;
-  cursor:pointer
-}
+input{width:60px}
+button{padding:10px 18px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
 strong{color:#1b5e20}
+.small{font-size:12px;color:#555}
 </style>
 </head>
 
@@ -34,11 +22,8 @@ strong{color:#1b5e20}
 <div class="container">
 
 <h1>🐷 Animal Breeding Engine</h1>
-<p class="small">
-उमेर समूह × लिङ्ग आधारित ५ वर्षे प्रजनन गणना (Rotation Model)
-</p>
+<p class="small">५ वर्षे Dynamic बिक्री नियम सहित (Male–Female Rotation Model)</p>
 
-<!-- INPUT -->
 <h2>🔢 प्रारम्भिक इनपुट</h2>
 <table>
 <tr><td>प्रारम्भिक प्रजननयोग्य माउ</td><td><input id="adultFemale" value="100"></td></tr>
@@ -47,25 +32,48 @@ strong{color:#1b5e20}
 <tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
 </table>
 
-<h2 style="margin-top:25px">📤 बिक्री नियम (%)</h2>
+<h2>📤 ५ वर्षे बिक्री नियम (%)</h2>
+
 <table>
 <tr>
-  <th></th>
-  <th>१–३ महिना</th>
-  <th>४–६ महिना</th>
-  <th>७–१० महिना</th>
+  <th rowspan="2">Category</th>
+  <th colspan="5">Year 1 → Year 5</th>
 </tr>
-<tr>
-  <td>भाले</td>
-  <td><input id="sale_m_A1" value="30"></td>
-  <td><input id="sale_m_A2" value="40"></td>
-  <td><input id="sale_m_A3" value="30"></td>
+
+<tr><th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th></tr>
+
+<tr><td>भाले १–३</td>
+<td><input id="mA1Y1" value="30"></td><td><input id="mA1Y2" value="30"></td><td><input id="mA1Y3" value="30"></td><td><input id="mA1Y4" value="30"></td><td><input id="mA1Y5" value="30"></td>
 </tr>
-<tr>
-  <td>पोथी</td>
-  <td><input id="sale_f_A1" value="10"></td>
-  <td><input id="sale_f_A2" value="20"></td>
-  <td><input id="sale_f_A3" value="10"></td>
+
+<tr><td>भाले ४–६</td>
+<td><input id="mA2Y1" value="40"></td><td><input id="mA2Y2" value="40"></td><td><input id="mA2Y3" value="40"></td><td><input id="mA2Y4" value="40"></td><td><input id="mA2Y5" value="40"></td>
+</tr>
+
+<tr><td>भाले ७–१०</td>
+<td><input id="mA3Y1" value="30"></td><td><input id="mA3Y2" value="30"></td><td><input id="mA3Y3" value="30"></td><td><input id="mA3Y4" value="30"></td><td><input id="mA3Y5" value="30"></td>
+</tr>
+
+<tr><td>पोथी १–३</td>
+<td><input id="fA1Y1" value="10"></td><td><input id="fA1Y2" value="10"></td><td><input id="fA1Y3" value="10"></td><td><input id="fA1Y4" value="10"></td><td><input id="fA1Y5" value="10"></td>
+</tr>
+
+<tr><td>पोथी ४–६</td>
+<td><input id="fA2Y1" value="20"></td><td><input id="fA2Y2" value="20"></td><td><input id="fA2Y3" value="20"></td><td><input id="fA2Y4" value="20"></td><td><input id="fA2Y5" value="20"></td>
+</tr>
+
+<tr><td>पोथी ७–१०</td>
+<td><input id="fA3Y1" value="10"></td><td><input id="fA3Y2" value="10"></td><td><input id="fA3Y3" value="10"></td><td><input id="fA3Y4" value="10"></td><td><input id="fA3Y5" value="10"></td>
+</tr>
+
+<tr style="background:#f1f8e9">
+<td><strong>बयस्क भाले बिक्री</strong></td>
+<td><input id="adultMY1" value="20"></td><td><input id="adultMY2" value="30"></td><td><input id="adultMY3" value="40"></td><td><input id="adultMY4" value="50"></td><td><input id="adultMY5" value="60"></td>
+</tr>
+
+<tr style="background:#f1f8e9">
+<td><strong>बयस्क माउ बिक्री</strong></td>
+<td><input id="adultFY1" value="5"></td><td><input id="adultFY2" value="5"></td><td><input id="adultFY3" value="10"></td><td><input id="adultFY4" value="10"></td><td><input id="adultFY5" value="15"></td>
 </tr>
 </table>
 
@@ -73,114 +81,51 @@ strong{color:#1b5e20}
 <button onclick="runEngine()">⚙️ Run Breeding Engine (5 Years)</button>
 
 <hr>
-
 <h2>📊 ५ वर्षे नतिजा</h2>
 <div id="result"></div>
 
 </div>
 
 <script>
-/* ================= UTIL ================= */
-function n(id){
-  return Number(document.getElementById(id).value) || 0;
-}
-function sale(count, percent){
-  const sold = Math.round(count * percent / 100);
-  return { sold, remain: count - sold };
-}
+function n(id){ return Number(document.getElementById(id).value)||0; }
+function sale(c,p){ p=Math.min(p,100); let s=Math.round(c*p/100); return {sold:s,remain:c-s}; }
 
-/* ================= CORE ENGINE ================= */
 function runEngine(){
 
-  const kids = n("kidsPerFemale");
-  const breedRate = n("breedRate")/100;
-  const deathRate = n("deathRate")/100;
+let female = n("adultFemale");
+let male = 0;
+let out=[];
 
-  let breedingFemale = n("adultFemale"); // 🔒 माउ
-  let breedingMale = 0;                  // 🔒 प्रजनन्का लागि भाले
+for(let y=1;y<=5;y++){
 
-  let yearly = [];
+  let born = female*n("kidsPerFemale")*(n("breedRate")/100);
+  born*= (1-n("deathRate")/100);
 
-  for(let year=1; year<=5; year++){
+  let mBorn=Math.round(born/2), fBorn=Math.round(born/2);
 
-    /* ---- Birth (female only) ---- */
-    const born = breedingFemale * kids * breedRate;
-    const survived = born * (1 - deathRate);
+  let sm = sale(mBorn+male, n(`mA1Y${y}`));
+  sm = sale(sm.remain, n(`mA2Y${y}`));
+  sm = sale(sm.remain, n(`mA3Y${y}`));
 
-    const maleBorn = Math.round(survived/2);
-    const femaleBorn = Math.round(survived/2);
+  let sf = sale(fBorn, n(`fA1Y${y}`));
+  sf = sale(sf.remain, n(`fA2Y${y}`));
+  sf = sale(sf.remain, n(`fA3Y${y}`));
 
-    /* ---- SALE BASE ---- */
-    const saleBaseMale = maleBorn + breedingMale;
-    const saleBaseFemale = femaleBorn;
+  male = sale(sm.remain, n(`adultMY${y}`)).remain;
+  female = sale(female+sf.remain, n(`adultFY${y}`)).remain;
 
-    /* ---- Male sale slabs ---- */
-    const m1 = sale(saleBaseMale, n("sale_m_A1"));
-    const m2 = sale(m1.remain, n("sale_m_A2"));
-    const m3 = sale(m2.remain, n("sale_m_A3"));
-
-    /* ---- Female sale slabs ---- */
-    const f1 = sale(saleBaseFemale, n("sale_f_A1"));
-    const f2 = sale(f1.remain, n("sale_f_A2"));
-    const f3 = sale(f2.remain, n("sale_f_A3"));
-
-    /* ---- Retain for next year ---- */
-    breedingMale = m3.remain;        // 🔁 rotate male
-    breedingFemale += f3.remain;     // 🔁 accumulate female
-
-    yearly.push({
-      year,
-      maleSold:{A1:m1.sold,A2:m2.sold,A3:m3.sold},
-      femaleSold:{A1:f1.sold,A2:f2.sold,A3:f3.sold},
-      breeding:{
-        male: breedingMale,
-        female: breedingFemale
-      }
-    });
-  }
-
-  localStorage.setItem(
-    "BREEDING_PRODUCTION_AUTO",
-    JSON.stringify(yearly)
-  );
-
-  renderResult(yearly);
+  out.push({year:y,male,female});
 }
 
-/* ================= RENDER ================= */
-function renderResult(data){
+localStorage.setItem("BREEDING_PRODUCTION_AUTO",JSON.stringify(out));
+render(out);
+}
 
-  let html = `
-  <table>
-  <tr>
-    <th rowspan="2">वर्ष</th>
-    <th colspan="4">भाले</th>
-    <th colspan="4">पोथी</th>
-  </tr>
-  <tr>
-    <th>१–३</th><th>४–६</th><th>७–१०</th><th>प्रजनन्का लागि</th>
-    <th>१–३</th><th>४–६</th><th>७–१०</th><th>प्रजननयोग्य माउ</th>
-  </tr>
-  `;
-
-  data.forEach(y=>{
-    html += `
-    <tr>
-      <td>${y.year}</td>
-      <td>${y.maleSold.A1}</td>
-      <td>${y.maleSold.A2}</td>
-      <td>${y.maleSold.A3}</td>
-      <td><strong>${y.breeding.male}</strong></td>
-
-      <td>${y.femaleSold.A1}</td>
-      <td>${y.femaleSold.A2}</td>
-      <td>${y.femaleSold.A3}</td>
-      <td><strong>${y.breeding.female}</strong></td>
-    </tr>`;
-  });
-
-  html += `</table>`;
-  document.getElementById("result").innerHTML = html;
+function render(d){
+let h="<table><tr><th>वर्ष</th><th>प्रजनन्का लागि भाले</th><th>प्रजननयोग्य माउ</th></tr>";
+d.forEach(r=>h+=`<tr><td>${r.year}</td><td>${r.male}</td><td>${r.female}</td></tr>`);
+h+="</table>";
+document.getElementById("result").innerHTML=h;
 }
 </script>
 
