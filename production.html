@@ -3,197 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <title>Production</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{
- font-family:Arial, sans-serif;
- background:#f7f7f7;
- margin:0
-}
-
-/* ===== CLEAN & BRIGHT HEADER ===== */
-.app-header{
- background:linear-gradient(90deg,#2e7d32,#43a047);
- padding:16px 20px;
- text-align:center;
- box-shadow:0 2px 8px rgba(0,0,0,0.15)
-}
-.app-title{
- color:#e8f5e9;
- font-size:22px;
- font-weight:700;
- letter-spacing:.5px
-}
-.page-title{
- margin-top:4px;
- color:#ffffff;
- font-size:18px;
- font-weight:600;
- border-top:1px solid rgba(255,255,255,.4);
- padding-top:6px
-}
-
-/* ===== SIDE PAGE FOLLOW (SUMMARY STYLE) ===== */
-.side-nav{
- position:fixed;
- top:50%;
- transform:translateY(-50%);
- width:48px;
- height:48px;
- border-radius:50%;
- background:#2e7d32;
- color:#fff;
- font-size:26px;
- display:flex;
- align-items:center;
- justify-content:center;
- cursor:pointer;
- z-index:999;
- box-shadow:0 4px 10px rgba(0,0,0,.25)
-}
-.side-nav.prev{left:15px}
-.side-nav.next{right:15px}
-.side-nav:hover{background:#1b5e20}
-
-/* ===== PAGE BODY ===== */
-.container{
- padding:20px;
- max-width:1000px;
- margin:auto;
- background:#fff;
- min-height:70vh
-}
-
-table{
- width:100%;
- border-collapse:collapse;
- margin-top:15px
-}
-th,td{
- border:1px solid #ccc;
- padding:10px;
- text-align:center;
- font-size:15px
-}
-th{background:#e8f5e9}
-
-input{
- width:95%;
- padding:6px;
- font-size:14px
-}
-
-.btn{
- padding:6px 12px;
- cursor:pointer;
- border:none;
- font-size:14px
-}
-.add-btn{
- background:#2e7d32;
- color:#fff;
- margin-top:10px
-}
-.delete-btn{
- background:#c62828;
- color:#fff
-}
-
-footer{
- background:#2e7d32;
- color:#fff;
- padding:12px 20px;
- text-align:center
-}
+body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
+.container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+h1,h2,h3{color:#2e7d32;margin-top:0}
+table{width:100%;border-collapse:collapse;margin-top:14px}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+th{background:#eef5ee}
+.group{background:#f1f8e9;font-weight:bold}
+input{width:90px}
+.note{font-size:14px;background:#f9fff6;border:1px dashed #9ccc65;padding:12px;margin:12px 0}
+button{padding:6px 14px;background:#2e7d32;color:#fff;border:none;border-radius:6px}
 </style>
 </head>
 
 <body>
-
-<!-- ===== SIDE PAGE FOLLOW ===== -->
-<div class="side-nav prev" onclick="location.href='business-detail.html'">⬅</div>
-<div class="side-nav next" onclick="location.href='expense-demo.html'">➡</div>
-
-<!-- ===== HEADER ===== -->
-<header class="app-header">
-  <div class="app-title">FarmerBase BP Engine</div>
-  <div class="page-title">उत्पादन विवरण</div>
-</header>
-
 <div class="container">
 
-<table id="productionTable">
-<thead>
-<tr>
- <th>उत्पादन नाम</th>
- <th>इकाई</th>
- <th>परिमाण</th>
- <th>कैफियत</th>
- <th>Action</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
+<h1>📦 उत्पादन (Production)</h1>
 
-<button class="btn add-btn" onclick="addRow()">➕ उत्पादन थप्नुहोस्</button>
+<div class="note">
+✔️ Breeding Engine को उमेर समूह र लिङ्गगत संरचना जस्ताको तस्तै<br>
+✔️ यहाँ <b>परिमाण (kg / unit)</b> मात्र देखाइन्छ<br>
+✔️ आम्दानी यहाँ गणना हुँदैन
+</div>
+
+<h2>🐖 पशुजन्य उत्पादन (Breeding-based)</h2>
+<div id="breedingProduction"></div>
+
+<h2>➕ यस व्यवसायका अन्य उत्पादन</h2>
+<div id="otherProduction"></div>
 
 </div>
 
-<footer>
-  🌱 FarmerBase BP Engine – Production Module
-</footer>
-
 <script>
-/* ===== EXISTING LOGIC (UNCHANGED) ===== */
-let productions = JSON.parse(localStorage.getItem("productions")) || [];
+// ===================================================
+// LOAD BREEDING DATA
+// ===================================================
+const data = JSON.parse(
+  localStorage.getItem("BREEDING_ENGINE_5YR_RESULT")
+) || [];
 
-function saveData(){
- localStorage.setItem("productions", JSON.stringify(productions));
+if(data.length===0){
+  document.getElementById("breedingProduction").innerHTML =
+    "<p>Breeding Engine को डाटा भेटिएन।</p>";
 }
 
-function renderTable(){
- const tbody = document.querySelector("#productionTable tbody");
- tbody.innerHTML = "";
+// ===================================================
+// RENDER BREEDING-BASED PRODUCTION
+// ===================================================
+function renderBreedingProduction(){
 
- productions.forEach((p, index)=>{
-  const row = document.createElement("tr");
-  row.innerHTML = `
-<td><input value="${p.name}" onchange="update(${index},'name',this.value)"></td>
-<td><input value="${p.unit}" onchange="update(${index},'unit',this.value)"></td>
-<td><input type="number" value="${p.quantity}" onchange="update(${index},'quantity',this.value)"></td>
-<td><input value="${p.note}" onchange="update(${index},'note',this.value)"></td>
-<td><button class="btn delete-btn" onclick="removeRow(${index})">🗑️</button></td>
-`;
-  tbody.appendChild(row);
- });
+  const rows = [
+    ["१–३ महिना भाले","A1","m"],
+    ["१–३ महिना पोथी","A1","f"],
+    ["४–६ महिना भाले","A2","m"],
+    ["४–६ महिना पोथी","A2","f"],
+    ["७–१० महिना भाले","A3","m"],
+    ["७–१० महिना पोथी","A3","f"],
+    ["बयस्क भाले","adult","m"],
+    ["बयस्क माउ","adult","f"]
+  ];
+
+  let html = `<table>
+  <tr>
+    <th rowspan="2">समूह</th>
+    <th rowspan="2">औसत उत्पादन (kg / head)</th>
+    <th colspan="${data.length}">वर्ष</th>
+  </tr>
+  <tr>
+    ${data.map(d=>`<th>${d.year}</th>`).join("")}
+  </tr>`;
+
+  rows.forEach(r=>{
+    html += `<tr>
+      <td>${r[0]}</td>
+      <td><input value="70"></td>`;
+
+    data.forEach(y=>{
+      const count = r[2]==="m"
+        ? y.male[r[1]]
+        : y.female[r[1]];
+
+      html += `<td>${count}</td>`;
+    });
+
+    html += `</tr>`;
+  });
+
+  html += `</table>`;
+  document.getElementById("breedingProduction").innerHTML = html;
+}
+
+// ===================================================
+// OTHER PRODUCTION (MANUAL)
+// ===================================================
+function renderOtherProduction(){
+
+  let html = `<table>
+  <tr>
+    <th>उत्पादन नाम</th>
+    <th>इकाइ (kg / unit)</th>
+    <th>वार्षिक परिमाण</th>
+    <th>कार्य</th>
+  </tr>
+  <tr>
+    <td><input value="गोबर मल"></td>
+    <td><input value="kg"></td>
+    <td><input value="0"></td>
+    <td></td>
+  </tr>
+  </table>
+  <button onclick="addRow()">➕ थप्नुहोस्</button>`;
+
+  document.getElementById("otherProduction").innerHTML = html;
 }
 
 function addRow(){
- productions.push({
-  id:"p"+Date.now(),
-  name:"",
-  unit:"",
-  quantity:"",
-  note:""
- });
- saveData();
- renderTable();
+  const table = document.querySelector("#otherProduction table");
+  const r = table.insertRow(-1);
+  r.innerHTML = `
+    <td><input></td>
+    <td><input></td>
+    <td><input></td>
+    <td></td>`;
 }
 
-function update(index, field, value){
- productions[index][field] = value;
- saveData();
-}
-
-function removeRow(index){
- if(confirm("यो उत्पादन हटाउने हो ?")){
-  productions.splice(index,1);
-  saveData();
-  renderTable();
- }
-}
-
-renderTable();
+// ===================================================
+renderBreedingProduction();
+renderOtherProduction();
 </script>
 
 </body>
