@@ -7,141 +7,129 @@
 
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1700px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+.container{max-width:1750px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
 h1,h2,h3{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-input{width:70px}
+input,textarea{width:120px}
+textarea{width:100%;min-height:80px}
 .note{font-size:14px;background:#f9fff6;border:1px dashed #9ccc65;padding:12px;margin:12px 0}
 .small{font-size:13px;color:#444}
 button{padding:8px 18px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
 
 /* PAGE FOLLOW */
 .page-follow{
-  position:fixed;
-  right:14px;
-  top:50%;
+  position:fixed;right:14px;top:50%;
   transform:translateY(-50%);
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  z-index:999;
+  display:flex;flex-direction:column;gap:12px;z-index:999
 }
 .pf-btn{
   width:46px;height:46px;border-radius:50%;
   background:#2e7d32;color:#fff;
   display:flex;align-items:center;justify-content:center;
-  text-decoration:none;font-size:22px;position:relative;
+  text-decoration:none;font-size:22px;position:relative
 }
 .pf-btn:hover::after{
   content:attr(data-title);
-  position:absolute;
-  right:52px;
+  position:absolute;right:52px;
   background:#2e7d32;color:#fff;
   padding:6px 10px;border-radius:6px;
-  font-size:12px;white-space:nowrap;
+  font-size:12px;white-space:nowrap
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-<h1>🌾 Feed • Vitamin • Medicine — वर्षवर्ष</h1>
+<h1>🌾 Feed • Vitamin • Medicine — उमेर अनुसार</h1>
 
 <div class="note">
-✔️ Breeding Engine को Inventory डाटा प्रयोग<br>
-✔️ Feed / Vitamin / Medicine = Adult पशु मात्र<br>
-✔️ Formula fixed (kg/day × 365, month × 12)
+✔️ उमेर समूह अनुसार दाना हिसाब<br>
+✔️ ९–१२ महिना = बयस्क सरह<br>
+✔️ भिटामिन / औषधि = प्रतिवर्ष / प्रतिजनावर<br>
+✔️ Breeding Engine को गोठ डाटा प्रयोग
 </div>
 
-<h2>🍽️ बयस्क खुवाउने दर (Editable)</h2>
-
-<h3>दाना (kg / पशु / दिन)</h3>
+<h2>🍽️ दाना दर (kg / जनावर / दिन)</h2>
 <table>
-<tr><th>लिङ्ग</th><th>दर</th></tr>
-<tr><td>भाले</td><td><input id="f_adult_m" value="2.50"></td></tr>
-<tr><td>पोथी (माउ)</td><td><input id="f_adult_f" value="3.00"></td></tr>
+<tr><th>उमेर समूह</th><th>दर (kg)</th></tr>
+<tr><td>१–३</td><td><input id="r13" value="1.0"></td></tr>
+<tr><td>४–५</td><td><input id="r45" value="1.5"></td></tr>
+<tr><td>६–८</td><td><input id="r68" value="2.0"></td></tr>
+<tr><td>९–१२ + बयस्क</td><td><input id="r912" value="3.0"></td></tr>
 </table>
 
-<h3>भिटामिन (Rs / पशु / महिना)</h3>
+<h2>💊 भिटामिन / औषधि (Rs / जनावर / वर्ष)</h2>
 <table>
-<tr><th>लिङ्ग</th><th>दर</th></tr>
-<tr><td>भाले</td><td><input id="v_adult_m" value="60"></td></tr>
-<tr><td>पोथी (माउ)</td><td><input id="v_adult_f" value="80"></td></tr>
+<tr><th>प्रकार</th><th>दर</th></tr>
+<tr><td>भिटामिन</td><td><input id="vit" value="800"></td></tr>
+<tr><td>औषधि / खोप</td><td><input id="med" value="600"></td></tr>
 </table>
 
-<h3>औषधि / खोप (Rs / पशु / वर्ष)</h3>
-<table>
-<tr><th>लिङ्ग</th><th>दर</th></tr>
-<tr><td>भाले</td><td><input id="m_adult_m" value="400"></td></tr>
-<tr><td>पोथी (माउ)</td><td><input id="m_adult_f" value="500"></td></tr>
-</table>
+<h2>✍️ न्यारेसन / टिप्पणी</h2>
+<textarea placeholder="यो वर्ष दाना/औषधि खर्च किन यस्तो भयो ?"></textarea>
 
 <br>
 <button onclick="render()">🔄 Recalculate</button>
 
 <hr>
-<h2>📊 वर्षवर्ष Feed • Vitamin • Medicine खर्च (Rs)</h2>
+<h2>📊 वर्षवर्ष खर्च (Rs)</h2>
 <div id="result"></div>
 
 </div>
 
-<!-- PAGE FOLLOW -->
+<!-- PAGE FLOW -->
 <div class="page-follow">
   <a href="animal-breeding-engine.html" class="pf-btn" data-title="Breeding Engine (Previous)">⬅️</a>
-  <a href="profit-loss.html" class="pf-btn" data-title="Profit & Loss (Next)">➡️</a>
+  <a href="production.html" class="pf-btn" data-title="Production (Next)">➡️</a>
 </div>
 
 <script>
-// ================= LOAD BREEDING INVENTORY =================
+// Load breeding inventory
 const data = JSON.parse(localStorage.getItem("BREEDING_ENGINE_5YR_RESULT")) || [];
 
-// ================= GET VALUE =================
-function val(id){ return Number(document.getElementById(id)?.value)||0; }
+function v(id){return Number(document.getElementById(id).value)||0;}
 
-// ================= RENDER =================
 function render(){
   if(!data.length){
     document.getElementById("result").innerHTML =
-      "<p class='small'>Breeding Engine को डाटा भेटिएन। पहिला breeding engine run गर्नुहोस्।</p>";
+      "<p class='small'>पहिला Breeding Engine run गर्नुहोस्।</p>";
     return;
   }
 
   let html=`<table>
   <tr>
-    <th rowspan="2">वर्ष</th>
-    <th colspan="3">भाले</th>
-    <th colspan="3">पोथी (माउ)</th>
-  </tr>
-  <tr>
-    <th>दाना</th><th>भिटामिन</th><th>औषधि</th>
-    <th>दाना</th><th>भिटामिन</th><th>औषधि</th>
+    <th>वर्ष</th>
+    <th>दाना खर्च</th>
+    <th>भिटामिन खर्च</th>
+    <th>औषधि खर्च</th>
+    <th>कुल खर्च</th>
   </tr>`;
 
   data.forEach(y=>{
-    const m = y.stockMale || 0;
-    const f = y.stockFemale || 0;
+    const total = (y.stockMale||0)+(y.stockFemale||0);
 
-    const mFeed = m * val("f_adult_m") * 365;
-    const mVit  = m * val("v_adult_m") * 12;
-    const mMed  = m * val("m_adult_m");
+    // age distribution
+    const a13 = total*0.25;
+    const a45 = total*0.20;
+    const a68 = total*0.25;
+    const a912 = total*0.30;
 
-    const fFeed = f * val("f_adult_f") * 365;
-    const fVit  = f * val("v_adult_f") * 12;
-    const fMed  = f * val("m_adult_f");
+    const feed =
+      (a13*v("r13")+a45*v("r45")+a68*v("r68")+a912*v("r912"))*365;
+
+    const vit = total*v("vit");
+    const med = total*v("med");
 
     html+=`
     <tr>
       <td>${y.year}</td>
-      <td>${Math.round(mFeed)}</td>
-      <td>${Math.round(mVit)}</td>
-      <td>${Math.round(mMed)}</td>
-      <td>${Math.round(fFeed)}</td>
-      <td>${Math.round(fVit)}</td>
-      <td>${Math.round(fMed)}</td>
+      <td>${Math.round(feed)}</td>
+      <td>${Math.round(vit)}</td>
+      <td>${Math.round(med)}</td>
+      <td><b>${Math.round(feed+vit+med)}</b></td>
     </tr>`;
   });
 
