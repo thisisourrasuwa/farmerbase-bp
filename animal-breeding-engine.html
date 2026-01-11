@@ -2,23 +2,20 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Animal Breeding Engine – FINAL (Option A | Patched)</title>
+<title>Animal Breeding Engine – FINAL FINAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+.container{max-width:1400px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
 h1,h2,h3{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-input{width:64px}
-button{padding:10px 20px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
-.group{background:#f1f8e9;font-weight:bold}
+input{width:70px}
+button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
 .note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-top:12px}
-.page-follow{position:fixed;right:12px;top:45%;display:flex;flex-direction:column;gap:10px;z-index:999}
-.pf-btn{width:44px;height:44px;border-radius:50%;background:#2e7d32;color:#fff;
-display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:20px}
 .small{font-size:12px;color:#555}
+.group{background:#f1f8e9;font-weight:bold}
 </style>
 </head>
 
@@ -27,10 +24,10 @@ display:flex;align-items:center;justify-content:center;text-decoration:none;font
 
 <h1>🐷 Animal Breeding Engine</h1>
 <p class="note">
-✔️ Locked Logic: <b>Next-Year Breeding Female = Adult Female Remain ONLY</b><br>
-✔️ Juvenile कहिल्यै breeding मा जाँदैन<br>
-✔️ 100% माउ बिक्री ⇒ अर्को वर्ष उत्पादन = 0 (AUTOMATIC)<br>
-✔️ Juvenile accounting = 100% MATCH (Patched)
+✔️ बेच्ने समय = <b>९–१२ महिना मात्र</b><br>
+✔️ Juvenile (१–३, ४–६) मा बिक्री छैन<br>
+✔️ <b>Next-Year Breeding = Adult Female Remain ONLY</b><br>
+✔️ 100% हिसाब मिल्ने (single sale point)
 </p>
 
 <h2>🔢 प्रारम्भिक इनपुट</h2>
@@ -41,52 +38,18 @@ display:flex;align-items:center;justify-content:center;text-decoration:none;font
 <tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
 </table>
 
-<h2>📤 उमेर समूहगत बिक्री नियम (%) – ५ वर्ष</h2>
+<h2>📤 ९–१२ महिना बिक्री % (Year-wise)</h2>
 <table>
-<tr><th rowspan="2">समूह</th><th colspan="5">वर्ष</th></tr>
-<tr><th>१</th><th>२</th><th>३</th><th>४</th><th>५</th></tr>
-
-<tr class="group"><td colspan="6">भाले (Juvenile)</td></tr>
-<tr><td>१–३</td>
-<td><input id="mA1Y1" value="30"></td><td><input id="mA1Y2" value="30"></td>
-<td><input id="mA1Y3" value="30"></td><td><input id="mA1Y4" value="30"></td>
-<td><input id="mA1Y5" value="30"></td></tr>
-<tr><td>४–६</td>
-<td><input id="mA2Y1" value="40"></td><td><input id="mA2Y2" value="40"></td>
-<td><input id="mA2Y3" value="40"></td><td><input id="mA2Y4" value="40"></td>
-<td><input id="mA2Y5" value="40"></td></tr>
-<tr><td>७–१०</td>
-<td><input id="mA3Y1" value="30"></td><td><input id="mA3Y2" value="30"></td>
-<td><input id="mA3Y3" value="30"></td><td><input id="mA3Y4" value="30"></td>
-<td><input id="mA3Y5" value="30"></td></tr>
-
-<tr class="group"><td colspan="6">पोथी (Juvenile)</td></tr>
-<tr><td>१–३</td>
-<td><input id="fA1Y1" value="20"></td><td><input id="fA1Y2" value="20"></td>
-<td><input id="fA1Y3" value="20"></td><td><input id="fA1Y4" value="20"></td>
-<td><input id="fA1Y5" value="20"></td></tr>
-<tr><td>४–६</td>
-<td><input id="fA2Y1" value="30"></td><td><input id="fA2Y2" value="30"></td>
-<td><input id="fA2Y3" value="30"></td><td><input id="fA2Y4" value="30"></td>
-<td><input id="fA2Y5" value="30"></td></tr>
-<tr><td>७–१०</td>
-<td><input id="fA3Y1" value="30"></td><td><input id="fA3Y2" value="30"></td>
-<td><input id="fA3Y3" value="30"></td><td><input id="fA3Y4" value="30"></td>
-<td><input id="fA3Y5" value="30"></td></tr>
-
-<tr class="group"><td colspan="6">बयस्क</td></tr>
-<tr><td>बयस्क भाले बिक्री %</td>
-<td><input id="adultMY1" value="50"></td><td><input id="adultMY2" value="50"></td>
-<td><input id="adultMY3" value="50"></td><td><input id="adultMY4" value="50"></td>
-<td><input id="adultMY5" value="50"></td></tr>
-<tr><td>माउ बिक्री %</td>
-<td><input id="adultFY1" value="10"></td><td><input id="adultFY2" value="10"></td>
-<td><input id="adultFY3" value="10"></td><td><input id="adultFY4" value="10"></td>
-<td><input id="adultFY5" value="10"></td></tr>
+<tr><th>वर्ष</th><th>भाले बिक्री %</th><th>पोथी बिक्री %</th></tr>
+<tr><td>१</td><td><input id="mY1" value="50"></td><td><input id="fY1" value="40"></td></tr>
+<tr><td>२</td><td><input id="mY2" value="60"></td><td><input id="fY2" value="50"></td></tr>
+<tr><td>३</td><td><input id="mY3" value="70"></td><td><input id="fY3" value="60"></td></tr>
+<tr><td>४</td><td><input id="mY4" value="60"></td><td><input id="fY4" value="50"></td></tr>
+<tr><td>५</td><td><input id="mY5" value="50"></td><td><input id="fY5" value="40"></td></tr>
 </table>
 
 <br>
-<button onclick="runEngine()">⚙️ Run Breeding Engine (5 Years)</button>
+<button onclick="runEngine()">⚙️ Run Engine (5 Years)</button>
 
 <hr>
 <h2>📊 ५ वर्षे नतिजा</h2>
@@ -96,84 +59,75 @@ display:flex;align-items:center;justify-content:center;text-decoration:none;font
 
 <script>
 function n(id){return Number(document.getElementById(id)?.value)||0;}
-function sale(total,p){
-  p=Math.min(Math.max(p,0),100);
-  const sold=Math.round(total*p/100);
-  return {sold,remain:total-sold};
-}
 
 function runEngine(){
   let breedingFemale = n("openingFemale");
   let adultMaleStock = 0;
-  const out=[];
+  const rows=[];
 
   for(let y=1;y<=5;y++){
     // Birth
     const births = breedingFemale * n("kidsPerFemale") * (n("breedRate")/100) * (1-n("deathRate")/100);
     const maleBorn = Math.floor(births/2);
-    const femaleBorn = Math.round(births-maleBorn);
+    const femaleBorn = Math.round(births - maleBorn);
 
-    // ===== PATCHED JUVENILE BUCKET SPLIT (100% MATCH) =====
-    // Male
-    let mRemain = maleBorn;
-    const mA1 = sale(mRemain,n(`mA1Y${y}`)); mRemain -= mA1.sold;
-    const mA2 = sale(mRemain,n(`mA2Y${y}`)); mRemain -= mA2.sold;
-    const mA3 = sale(mRemain,n(`mA3Y${y}`));
+    // --- 9–12 month sale ONLY (single point) ---
+    const mSalePct = n(`mY${y}`)/100;
+    const fSalePct = n(`fY${y}`)/100;
 
-    // Female
-    let fRemain = femaleBorn;
-    const fA1 = sale(fRemain,n(`fA1Y${y}`)); fRemain -= fA1.sold;
-    const fA2 = sale(fRemain,n(`fA2Y${y}`)); fRemain -= fA2.sold;
-    const fA3 = sale(fRemain,n(`fA3Y${y}`));
+    const maleSold = Math.round(maleBorn * mSalePct);
+    const femaleSold = Math.round(femaleBorn * fSalePct);
+
+    const maleRemain = maleBorn - maleSold;
+    const femaleRemain = femaleBorn - femaleSold;
 
     // Adult pools
-    let adultMalePool   = adultMaleStock + mA3.remain;
-    let adultFemalePool = fA3.remain;
+    adultMaleStock += maleRemain;
+    breedingFemale = femaleRemain;
 
-    // Adult sales
-    const adultMaleSale   = sale(adultMalePool,n(`adultMY${y}`));
-    const adultFemaleSale = sale(adultFemalePool,n(`adultFY${y}`));
-
-    // Next year
-    adultMaleStock = adultMaleSale.remain;
-    breedingFemale = adultFemaleSale.remain;
-
-    out.push({
+    rows.push({
       year:y,
-      sold:{mA1:mA1.sold,mA2:mA2.sold,mA3:mA3.sold,fA1:fA1.sold,fA2:fA2.sold,fA3:fA3.sold,adultM:adultMaleSale.sold,adultF:adultFemaleSale.sold},
-      inventory:{male:adultMaleStock},
-      breeding:{nextFemale:breedingFemale}
+      bornM:maleBorn,bornF:femaleBorn,
+      soldM:maleSold,soldF:femaleSold,
+      nextBreeding:breedingFemale,
+      maleInventory:adultMaleStock
     });
   }
-  render(out);
+
+  render(rows);
 }
 
 function render(d){
-  let h=`<h3>A) बिक्री</h3><table>
-  <tr><th>समूह</th>${d.map(x=>`<th>${x.year}</th>`).join("")}</tr>
-  <tr class="group"><td colspan="${d.length+1}">भाले</td></tr>
-  <tr><td>१–३</td>${d.map(x=>`<td>${x.sold.mA1}</td>`).join("")}</tr>
-  <tr><td>४–६</td>${d.map(x=>`<td>${x.sold.mA2}</td>`).join("")}</tr>
-  <tr><td>७–१०</td>${d.map(x=>`<td>${x.sold.mA3}</td>`).join("")}</tr>
-  <tr><td>बयस्क</td>${d.map(x=>`<td>${x.sold.adultM}</td>`).join("")}</tr>
-  <tr class="group"><td colspan="${d.length+1}">पोथी</td></tr>
-  <tr><td>१–३</td>${d.map(x=>`<td>${x.sold.fA1}</td>`).join("")}</tr>
-  <tr><td>४–६</td>${d.map(x=>`<td>${x.sold.fA2}</td>`).join("")}</tr>
-  <tr><td>७–१०</td>${d.map(x=>`<td>${x.sold.fA3}</td>`).join("")}</tr>
-  <tr><td>माउ</td>${d.map(x=>`<td>${x.sold.adultF}</td>`).join("")}</tr>
+  let h = `
+  <h3>A) जन्म र बिक्री (९–१२ महिना)</h3>
+  <table>
+  <tr><th>वर्ष</th><th>जन्म भाले</th><th>बेचेको भाले</th>
+      <th>जन्म पोथी</th><th>बेचेको पोथी</th></tr>
+  ${d.map(x=>`
+    <tr>
+      <td>${x.year}</td>
+      <td>${x.bornM}</td><td>${x.soldM}</td>
+      <td>${x.bornF}</td><td>${x.soldF}</td>
+    </tr>`).join("")}
   </table>
 
-  <h3>B) Inventory</h3>
-  <table><tr><th>वर्ष</th><th>बाँकी भाले</th></tr>
-  ${d.map(x=>`<tr><td>${x.year}</td><td>${x.inventory.male}</td></tr>`).join("")}
+  <h3>B) Inventory (गोठमा बाँकी)</h3>
+  <table>
+  <tr><th>वर्ष</th><th>बाँकी भाले</th></tr>
+  ${d.map(x=>`<tr><td>${x.year}</td><td>${x.maleInventory}</td></tr>`).join("")}
   </table>
 
-  <h3>C) Next Year Breeding</h3>
-  <table><tr><th>वर्ष</th><th>अर्का वर्षका माउ</th></tr>
-  ${d.map(x=>`<tr><td>${x.year}</td><td><b>${x.breeding.nextFemale}</b></td></tr>`).join("")}
+  <h3>C) Next-Year Breeding (माउ gate)</h3>
+  <table>
+  <tr><th>वर्ष</th><th>अर्को वर्षका माउ</th></tr>
+  ${d.map(x=>`<tr><td>${x.year}</td><td><b>${x.nextBreeding}</b></td></tr>`).join("")}
   </table>
+
+  <p class="small">
+  नोट: Juvenile मा कुनै बिक्री छैन। ९–१२ मा एकैचोटि बिक्री गर्दा rounding error न्यून हुन्छ।
+  </p>
   `;
-  document.getElementById("result").innerHTML=h;
+  document.getElementById("result").innerHTML = h;
 }
 </script>
 
