@@ -2,153 +2,148 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Animal Breeding Engine – Final Stable (% Based)</title>
+<title>Animal Breeding Engine – Final (3 Table Model)</title>
 <style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  h1, h2 { margin-top: 25px; }
-  table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-  th, td { border: 1px solid #999; padding: 6px; text-align: center; }
-  th { background: #f0f0f0; }
-  input { width: 70px; }
-  .box { background: #eef; padding: 10px; margin: 10px 0; }
+ body{font-family:Arial;padding:20px}
+ table{border-collapse:collapse;width:100%;margin:15px 0}
+ th,td{border:1px solid #999;padding:6px;text-align:center}
+ th{background:#f0f0f0}
+ h2{margin-top:30px}
+ .note{background:#eef;padding:10px}
 </style>
 </head>
 <body>
 
-<h1>🐖 Animal Breeding Engine (Final – Stable)</h1>
+<h1>🐖 Animal Breeding Engine – FINAL</h1>
 
-<div class="box">
-✔️ भाले / पोथी छुट्टाछुट्टै  
-✔️ Breeding र Sale छुट्टाछुट्टै  
-✔️ उमेर समूह अलग step  
-✔️ सबै निर्णय % बाट  
-✔️ झ्यारझ्यार नआउने design
+<div class="note">
+✔️ Birth / Sale / Next-Year Breeding छुट्टाछुट्टै  
+✔️ भाले–पोथी अलग  
+✔️ Year-wise default policy  
+✔️ Male : Female cap = 1 : 10  
 </div>
 
-<h2>1️⃣ प्रारम्भिक बयस्क संख्या</h2>
-<table>
-<tr><td>Adult Female (Breeding)</td><td><input id="startFemale" value="100"></td></tr>
-<tr><td>Adult Male (Breeding)</td><td><input id="startMale" value="10"></td></tr>
-</table>
-
-<h2>2️⃣ जैविक Parameter (% editable)</h2>
-<table>
-<tr><td>ब्याउने दर (%)</td><td><input id="birthRate" value="90"></td></tr>
-<tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
-<tr><td>प्रति पोथी बच्चा / वर्ष</td><td><input id="birthPerFemale" value="20"></td></tr>
-</table>
-
-<h2>3️⃣ बिक्री % (उमेर अनुसार – editable)</h2>
-<table>
-<tr><td>Piglet Sale %</td><td><input id="salePiglet" value="0"></td></tr>
-<tr><td>Grower Sale %</td><td><input id="saleGrower" value="100"></td></tr>
-<tr><td>Adult Sale %</td><td><input id="saleAdult" value="0"></td></tr>
-</table>
-
-<button onclick="runEngine()">Run Engine</button>
-
-<h2>4️⃣ ५ वर्षको Stable Table (Year-end Snapshot)</h2>
-<div id="output"></div>
-
 <script>
-function runEngine() {
+// =======================
+// BASIC INPUTS
+// =======================
+const YEARS = 5;
+const MALE_RATIO = 10;
 
-  // ===== INPUTS =====
-  let adultFemale = +startFemale.value;
-  let adultMale   = +startMale.value;
+// Start
+let breedingFemale = 100;
+let breedingMale   = 10;
 
-  const birthRate = +birthRateInput.value / 100;
-  const deathRate = +deathRateInput.value / 100;
-  const birthPerFemale = +birthPerFemaleInput.value;
+// Biology
+const BIRTH_RATE = 0.9;
+const BIRTH_PER_FEMALE = 20;
+const DEATH_RATE = 0.1;
 
-  const salePiglet = +salePigletInput.value / 100;
-  const saleGrower = +saleGrowerInput.value / 100;
-  const saleAdult  = +saleAdultInput.value / 100;
+// Default Year-wise Sale Policy
+const SALE_POLICY = {
+  1:{gM:.70,gF:.60,aM:.30,aF:.05},
+  2:{gM:.70,gF:.60,aM:.30,aF:.05},
+  3:{gM:.60,gF:.50,aM:.20,aF:.05},
+  4:{gM:.50,gF:.40,aM:.10,aF:.00},
+  5:{gM:.40,gF:.30,aM:.05,aF:.00}
+};
 
-  // ===== AGE STOCK =====
-  let pigletF = 0, pigletM = 0;
-  let growerF = 0, growerM = 0;
+// Age buckets
+let pigletF=0,pigletM=0,growerF=0,growerM=0;
 
-  let html = `<table>
-    <tr>
-      <th>वर्ष</th>
-      <th>Breeding Female</th>
-      <th>Breeding Male</th>
-      <th>Grower Sale</th>
-      <th>Adult Sale</th>
-      <th>कुल बिक्री</th>
-    </tr>`;
+// HTML containers
+let birthTable = `<table><tr>
+<th>वर्ष</th><th>Piglet F</th><th>Piglet M</th>
+<th>Grower F</th><th>Grower M</th>
+<th>Adult F</th><th>Adult M</th></tr>`;
 
-  for (let year = 1; year <= 5; year++) {
+let saleTable = `<table><tr>
+<th>वर्ष</th><th>Grower F Sale</th><th>Grower M Sale</th>
+<th>Adult F Sale</th><th>Adult M Sale</th></tr>`;
 
-    // --- Breeding (Female only) ---
-    const effectiveFemale = adultFemale * birthRate;
-    let totalBirths = effectiveFemale * birthPerFemale;
+let carryTable = `<table><tr>
+<th>वर्ष</th><th>Next Breeding Female</th>
+<th>Next Breeding Male</th></tr>`;
 
-    // Gender split
-    let bornF = totalBirths * 0.5;
-    let bornM = totalBirths * 0.5;
+// =======================
+// YEAR LOOP
+// =======================
+for(let y=1;y<=YEARS;y++){
 
-    // Mortality
-    bornF *= (1 - deathRate);
-    bornM *= (1 - deathRate);
+  // ---------- BIRTH ----------
+  let effectiveFemale = breedingFemale * BIRTH_RATE;
+  let totalBirth = effectiveFemale * BIRTH_PER_FEMALE;
+  let bornF = totalBirth * .5 * (1-DEATH_RATE);
+  let bornM = totalBirth * .5 * (1-DEATH_RATE);
 
-    // --- Aging ---
-    let newAdultF = growerF;
-    let newAdultM = growerM;
+  // ---------- AGING ----------
+  let newAdultF = growerF;
+  let newAdultM = growerM;
 
-    let newGrowerF = pigletF;
-    let newGrowerM = pigletM;
+  growerF = pigletF;
+  growerM = pigletM;
 
-    pigletF = bornF;
-    pigletM = bornM;
+  pigletF = bornF;
+  pigletM = bornM;
 
-    growerF = newGrowerF;
-    growerM = newGrowerM;
+  let adultF = breedingFemale + newAdultF;
+  let adultM = breedingMale   + newAdultM;
 
-    adultFemale += newAdultF;
-    adultMale   += newAdultM;
+  // ---------- RECORD BIRTH TABLE ----------
+  birthTable += `<tr>
+  <td>${y}</td>
+  <td>${pigletF.toFixed(0)}</td>
+  <td>${pigletM.toFixed(0)}</td>
+  <td>${growerF.toFixed(0)}</td>
+  <td>${growerM.toFixed(0)}</td>
+  <td>${adultF.toFixed(0)}</td>
+  <td>${adultM.toFixed(0)}</td></tr>`;
 
-    // --- Sales ---
-    let soldPiglet = (pigletF + pigletM) * salePiglet;
-    let soldGrower = (growerF + growerM) * saleGrower;
-    let soldAdult  = (adultFemale + adultMale) * saleAdult;
+  // ---------- SALE ----------
+  let p = SALE_POLICY[y];
 
-    // Apply sales
-    pigletF *= (1 - salePiglet);
-    pigletM *= (1 - salePiglet);
+  let saleGF = growerF * p.gF;
+  let saleGM = growerM * p.gM;
+  let saleAF = adultF  * p.aF;
+  let saleAM = adultM  * p.aM;
 
-    growerF *= (1 - saleGrower);
-    growerM *= (1 - saleGrower);
+  growerF -= saleGF;
+  growerM -= saleGM;
+  adultF  -= saleAF;
+  adultM  -= saleAM;
 
-    adultFemale *= (1 - saleAdult);
-    adultMale   *= (1 - saleAdult);
+  saleTable += `<tr>
+  <td>${y}</td>
+  <td>${saleGF.toFixed(0)}</td>
+  <td>${saleGM.toFixed(0)}</td>
+  <td>${saleAF.toFixed(0)}</td>
+  <td>${saleAM.toFixed(0)}</td></tr>`;
 
-    let totalSold = soldPiglet + soldGrower + soldAdult;
-
-    html += `<tr>
-      <td>${year}</td>
-      <td>${adultFemale.toFixed(0)}</td>
-      <td>${adultMale.toFixed(0)}</td>
-      <td>${soldGrower.toFixed(0)}</td>
-      <td>${soldAdult.toFixed(0)}</td>
-      <td>${totalSold.toFixed(0)}</td>
-    </tr>`;
+  // ---------- MALE CAP ----------
+  let allowedMale = adultF / MALE_RATIO;
+  if(adultM > allowedMale){
+    adultM = allowedMale; // excess male auto-sale
   }
 
-  html += `</table>`;
-  output.innerHTML = html;
+  // ---------- NEXT YEAR BREEDING ----------
+  breedingFemale = adultF;
+  breedingMale   = adultM;
+
+  carryTable += `<tr>
+  <td>${y}</td>
+  <td>${breedingFemale.toFixed(0)}</td>
+  <td>${breedingMale.toFixed(0)}</td></tr>`;
 }
 
-// Input refs
-const birthRateInput = document.getElementById("birthRate");
-const deathRateInput = document.getElementById("deathRate");
-const birthPerFemaleInput = document.getElementById("birthPerFemale");
-const salePigletInput = document.getElementById("salePiglet");
-const saleGrowerInput = document.getElementById("saleGrower");
-const saleAdultInput = document.getElementById("saleAdult");
+// Close tables
+birthTable += "</table>";
+saleTable  += "</table>";
+carryTable += "</table>";
 
-runEngine();
+// Render
+document.body.innerHTML += "<h2>🟩 Birth & Growth Table</h2>"+birthTable;
+document.body.innerHTML += "<h2>🟥 Sale Decision Table</h2>"+saleTable;
+document.body.innerHTML += "<h2>🟦 Next-Year Breeding Table</h2>"+carryTable;
 </script>
 
 </body>
