@@ -2,44 +2,23 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Animal Breeding Engine – FINAL (Male Included)</title>
+<title>Animal Breeding Engine – FINAL (Option A)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-body{
-  font-family:"Noto Sans Devanagari","Kalimati",system-ui;
-  background:#f4f7f6;margin:0
-}
-.container{
-  max-width:1600px;margin:20px auto;
-  background:#fff;padding:24px;border-radius:12px
-}
-h1,h2{color:#2e7d32;margin-top:0}
+body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
+.container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+h1,h2,h3{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-input{width:60px}
-button{
-  padding:10px 20px;background:#2e7d32;
-  color:#fff;border:none;border-radius:6px;cursor:pointer
-}
+input{width:64px}
+button{padding:10px 20px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
 .group{background:#f1f8e9;font-weight:bold}
-.note{
-  font-size:13px;background:#f9fff6;
-  border:1px dashed #9ccc65;padding:10px;margin-top:12px
-}
-
-/* PAGE FLOW */
-.page-follow{
-  position:fixed;right:12px;top:45%;
-  display:flex;flex-direction:column;gap:10px;z-index:999
-}
-.pf-btn{
-  width:44px;height:44px;border-radius:50%;
-  background:#2e7d32;color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  text-decoration:none;font-size:20px
-}
+.note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-top:12px}
+.page-follow{position:fixed;right:12px;top:45%;display:flex;flex-direction:column;gap:10px;z-index:999}
+.pf-btn{width:44px;height:44px;border-radius:50%;background:#2e7d32;color:#fff;
+display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:20px}
+.small{font-size:12px;color:#555}
 </style>
 </head>
 
@@ -48,12 +27,11 @@ button{
 
 <h1>🐷 Animal Breeding Engine</h1>
 <p class="note">
-✔️ Locked Logic: Next-Year Breeding = Adult Female Remain ONLY<br>
-✔️ भाले = reporting / inventory मात्र (breeding मा जाँदैन)<br>
-✔️ 100% माउ बिक्री ⇒ अर्को वर्ष उत्पादन = 0 (automatic)
+✔️ Locked Logic: <b>Next-Year Breeding Female = Adult Female Remain ONLY</b><br>
+✔️ Juvenile कहिल्यै breeding मा जाँदैन<br>
+✔️ 100% माउ बिक्री ⇒ अर्को वर्ष उत्पादन = 0 (AUTOMATIC)
 </p>
 
-<!-- INPUT -->
 <h2>🔢 प्रारम्भिक इनपुट</h2>
 <table>
 <tr><td>प्रारम्भिक माउ</td><td><input id="openingFemale" value="100"></td></tr>
@@ -62,36 +40,35 @@ button{
 <tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
 </table>
 
-<!-- SALE RULES -->
 <h2>📤 उमेर समूहगत बिक्री नियम (%) – ५ वर्ष</h2>
 <table>
 <tr><th rowspan="2">समूह</th><th colspan="5">वर्ष</th></tr>
 <tr><th>१</th><th>२</th><th>३</th><th>४</th><th>५</th></tr>
 
 <tr class="group"><td colspan="6">भाले (Juvenile)</td></tr>
-<tr><td>१–३ महिना</td>
+<tr><td>१–३</td>
 <td><input id="mA1Y1" value="30"></td><td><input id="mA1Y2" value="30"></td>
 <td><input id="mA1Y3" value="30"></td><td><input id="mA1Y4" value="30"></td>
 <td><input id="mA1Y5" value="30"></td></tr>
-<tr><td>४–६ महिना</td>
+<tr><td>४–६</td>
 <td><input id="mA2Y1" value="40"></td><td><input id="mA2Y2" value="40"></td>
 <td><input id="mA2Y3" value="40"></td><td><input id="mA2Y4" value="40"></td>
 <td><input id="mA2Y5" value="40"></td></tr>
-<tr><td>७–१० महिना</td>
+<tr><td>७–१०</td>
 <td><input id="mA3Y1" value="30"></td><td><input id="mA3Y2" value="30"></td>
 <td><input id="mA3Y3" value="30"></td><td><input id="mA3Y4" value="30"></td>
 <td><input id="mA3Y5" value="30"></td></tr>
 
 <tr class="group"><td colspan="6">पोथी (Juvenile)</td></tr>
-<tr><td>१–३ महिना</td>
+<tr><td>१–३</td>
 <td><input id="fA1Y1" value="20"></td><td><input id="fA1Y2" value="20"></td>
 <td><input id="fA1Y3" value="20"></td><td><input id="fA1Y4" value="20"></td>
 <td><input id="fA1Y5" value="20"></td></tr>
-<tr><td>४–६ महिना</td>
+<tr><td>४–६</td>
 <td><input id="fA2Y1" value="30"></td><td><input id="fA2Y2" value="30"></td>
 <td><input id="fA2Y3" value="30"></td><td><input id="fA2Y4" value="30"></td>
 <td><input id="fA2Y5" value="30"></td></tr>
-<tr><td>७–१० महिना</td>
+<tr><td>७–१०</td>
 <td><input id="fA3Y1" value="30"></td><td><input id="fA3Y2" value="30"></td>
 <td><input id="fA3Y3" value="30"></td><td><input id="fA3Y4" value="30"></td>
 <td><input id="fA3Y5" value="30"></td></tr>
@@ -101,7 +78,6 @@ button{
 <td><input id="adultMY1" value="50"></td><td><input id="adultMY2" value="50"></td>
 <td><input id="adultMY3" value="50"></td><td><input id="adultMY4" value="50"></td>
 <td><input id="adultMY5" value="50"></td></tr>
-
 <tr><td>माउ बिक्री %</td>
 <td><input id="adultFY1" value="10"></td><td><input id="adultFY2" value="10"></td>
 <td><input id="adultFY3" value="10"></td><td><input id="adultFY4" value="10"></td>
@@ -112,78 +88,67 @@ button{
 <button onclick="runEngine()">⚙️ Run Breeding Engine (5 Years)</button>
 
 <hr>
-<h2>📊 ५ वर्षे नतिजा (उमेर + लिङ्ग + बिक्री + बाँकी)</h2>
+<h2>📊 ५ वर्षे नतिजा</h2>
 <div id="result"></div>
 
 </div>
 
-<!-- PAGE FLOW -->
 <div class="page-follow">
   <a href="business-detail.html" class="pf-btn" title="Previous">⬅️</a>
   <a href="feed-vitamin-medicine-5yr.html" class="pf-btn" title="Next">➡️</a>
 </div>
 
 <script>
-function n(id){
-  const e=document.getElementById(id);
-  return e?Number(e.value)||0:0;
-}
-function sale(total,p){
-  p=Math.min(p,100);
-  const s=Math.round(total*p/100);
-  return{sold:s,remain:total-s};
-}
+function n(id){const e=document.getElementById(id);return e?Number(e.value)||0:0;}
+function sale(total,p){p=Math.min(p,100);const s=Math.round(total*p/100);return{sold:s,remain:total-s};}
 
 function runEngine(){
-
-  let breedingFemale = n("openingFemale"); // ONLY breeding gate
-  let adultMaleStock = 0;                  // reporting only
+  let breedingFemale = n("openingFemale");   // ONLY breeding gate
+  let adultMaleStock = 0;                    // inventory only
   const out=[];
 
   for(let y=1;y<=5;y++){
-
-    // 1. Birth
-    let births = breedingFemale * n("kidsPerFemale")
-               * (n("breedRate")/100)
-               * (1 - n("deathRate")/100);
-
+    // Birth
+    let births = breedingFemale * n("kidsPerFemale") * (n("breedRate")/100) * (1-n("deathRate")/100);
     let maleBorn = Math.floor(births/2);
     let femaleBorn = Math.round(births - maleBorn);
 
-    // 2. Male juvenile sales
-    let mA1 = sale(maleBorn, n(`mA1Y${y}`));
-    let mA2 = sale(mA1.remain, n(`mA2Y${y}`));
-    let mA3 = sale(mA2.remain, n(`mA3Y${y}`));
+    // Male juveniles
+    let mA1=sale(maleBorn,n(`mA1Y${y}`));
+    let mA2=sale(mA1.remain,n(`mA2Y${y}`));
+    let mA3=sale(mA2.remain,n(`mA3Y${y}`));
 
-    // 3. Female juvenile sales
-    let fA1 = sale(femaleBorn, n(`fA1Y${y}`));
-    let fA2 = sale(fA1.remain, n(`fA2Y${y}`));
-    let fA3 = sale(fA2.remain, n(`fA3Y${y}`));
+    // Female juveniles
+    let fA1=sale(femaleBorn,n(`fA1Y${y}`));
+    let fA2=sale(fA1.remain,n(`fA2Y${y}`));
+    let fA3=sale(fA2.remain,n(`fA3Y${y}`));
 
-    // 4. Adult stage
+    // Adult pools
     let adultMalePool = adultMaleStock + mA3.remain;
     let adultFemalePool = fA3.remain;
 
-    // 5. Adult sales
-    let adultMaleSale = sale(adultMalePool, n(`adultMY${y}`));
-    let adultFemaleSale = sale(adultFemalePool, n(`adultFY${y}`));
+    // Adult sales
+    let adultMaleSale = sale(adultMalePool,n(`adultMY${y}`));
+    let adultFemaleSale = sale(adultFemalePool,n(`adultFY${y}`));
 
-    // 6. NEXT YEAR (LOCKED LOGIC)
-    adultMaleStock = adultMaleSale.remain;           // inventory only
-    breedingFemale = adultFemaleSale.remain;         // ONLY breeding gate
+    // Next year
+    adultMaleStock = adultMaleSale.remain;       // inventory (non-breeding)
+    breedingFemale = adultFemaleSale.remain;     // BREEDING ELIGIBLE ONLY
 
     out.push({
       year:y,
       born:{male:maleBorn,female:femaleBorn},
       sold:{
-        mA1:mA1.sold, mA2:mA2.sold, mA3:mA3.sold,
-        fA1:fA1.sold, fA2:fA2.sold, fA3:fA3.sold,
-        adultM:adultMaleSale.sold,
-        adultF:adultFemaleSale.sold
+        mA1:mA1.sold,mA2:mA2.sold,mA3:mA3.sold,
+        fA1:fA1.sold,fA2:fA2.sold,fA3:fA3.sold,
+        adultM:adultMaleSale.sold,adultF:adultFemaleSale.sold
       },
-      remain:{
-        adultMale:adultMaleStock,
-        adultFemale:breedingFemale
+      inventory:{
+        male:adultMaleStock,
+        femaleNonBreeding:adultFemalePool - adultFemaleSale.remain // informational
+      },
+      breeding:{
+        nextFemale:breedingFemale
       }
     });
   }
@@ -193,29 +158,38 @@ function runEngine(){
 }
 
 function render(d){
-  let h=`<table>
-  <tr>
-    <th rowspan="2">समूह \\ वर्ष</th>
-    ${d.map(x=>`<th>${x.year}</th>`).join("")}
-  </tr>
-  <tr></tr>
+  let h = `
+  <h3>A) बिक्री (Sales)</h3>
+  <table>
+    <tr><th rowspan="2">समूह \\ वर्ष</th>${d.map(x=>`<th>${x.year}</th>`).join("")}</tr><tr></tr>
+    <tr class="group"><td colspan="${d.length+1}">भाले</td></tr>
+    <tr><td>१–३</td>${d.map(x=>`<td>${x.sold.mA1}</td>`).join("")}</tr>
+    <tr><td>४–६</td>${d.map(x=>`<td>${x.sold.mA2}</td>`).join("")}</tr>
+    <tr><td>७–१०</td>${d.map(x=>`<td>${x.sold.mA3}</td>`).join("")}</tr>
+    <tr><td>बयस्क</td>${d.map(x=>`<td>${x.sold.adultM}</td>`).join("")}</tr>
 
-  <tr class="group"><td colspan="${d.length+1}">भाले बिक्री</td></tr>
-  <tr><td>१–३</td>${d.map(x=>`<td>${x.sold.mA1}</td>`).join("")}</tr>
-  <tr><td>४–६</td>${d.map(x=>`<td>${x.sold.mA2}</td>`).join("")}</tr>
-  <tr><td>७–१०</td>${d.map(x=>`<td>${x.sold.mA3}</td>`).join("")}</tr>
-  <tr><td>बयस्क</td>${d.map(x=>`<td>${x.sold.adultM}</td>`).join("")}</tr>
-  <tr><td>बाँकी भाले</td>${d.map(x=>`<td>${x.remain.adultMale}</td>`).join("")}</tr>
+    <tr class="group"><td colspan="${d.length+1}">पोथी</td></tr>
+    <tr><td>१–३</td>${d.map(x=>`<td>${x.sold.fA1}</td>`).join("")}</tr>
+    <tr><td>४–६</td>${d.map(x=>`<td>${x.sold.fA2}</td>`).join("")}</tr>
+    <tr><td>७–१०</td>${d.map(x=>`<td>${x.sold.fA3}</td>`).join("")}</tr>
+    <tr><td>माउ</td>${d.map(x=>`<td>${x.sold.adultF}</td>`).join("")}</tr>
+  </table>
 
-  <tr class="group"><td colspan="${d.length+1}">पोथी बिक्री</td></tr>
-  <tr><td>१–३</td>${d.map(x=>`<td>${x.sold.fA1}</td>`).join("")}</tr>
-  <tr><td>४–६</td>${d.map(x=>`<td>${x.sold.fA2}</td>`).join("")}</tr>
-  <tr><td>७–१०</td>${d.map(x=>`<td>${x.sold.fA3}</td>`).join("")}</tr>
-  <tr><td>माउ</td>${d.map(x=>`<td>${x.sold.adultF}</td>`).join("")}</tr>
-  <tr><td><b>अर्का वर्ष माउ</b></td>${d.map(x=>`<td><b>${x.remain.adultFemale}</b></td>`).join("")}</tr>
-  </table>`;
+  <h3>B) Inventory (गोठमा बाँकी – breeding होइन)</h3>
+  <table>
+    <tr><th>वर्ष</th><th>बाँकी भाले</th><th>बाँकी पोथी (non-breeding)</th></tr>
+    ${d.map(x=>`<tr><td>${x.year}</td><td>${x.inventory.male}</td><td>${x.inventory.femaleNonBreeding}</td></tr>`).join("")}
+  </table>
 
-  document.getElementById("result").innerHTML=h;
+  <h3>C) Breeding Eligible (अर्का वर्ष उत्पादन)</h3>
+  <table>
+    <tr><th>वर्ष</th><th>अर्का वर्षका माउ</th></tr>
+    ${d.map(x=>`<tr><td>${x.year}</td><td><b>${x.breeding.nextFemale}</b></td></tr>`).join("")}
+  </table>
+
+  <p class="small">नोट: 100% माउ बिक्री हुँदा C तालिकामा अर्को वर्षका माउ = 0 देखिन्छ।</p>
+  `;
+  document.getElementById("result").innerHTML = h;
 }
 </script>
 
