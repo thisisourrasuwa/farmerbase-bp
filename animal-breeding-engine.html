@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Animal Breeding Engine – FINAL FINAL</title>
+<title>Animal Breeding Engine – FINAL FINAL (Baseline Safe)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
@@ -15,7 +15,6 @@ input{width:70px}
 button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
 .note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-top:12px}
 .small{font-size:12px;color:#555}
-.group{background:#f1f8e9;font-weight:bold}
 </style>
 </head>
 
@@ -25,14 +24,14 @@ button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius
 <h1>🐷 Animal Breeding Engine</h1>
 <p class="note">
 ✔️ बेच्ने समय = <b>९–१२ महिना मात्र</b><br>
-✔️ Juvenile (१–३, ४–६) मा बिक्री छैन<br>
-✔️ <b>Next-Year Breeding = Adult Female Remain ONLY</b><br>
-✔️ 100% हिसाब मिल्ने (single sale point)
+✔️ Juvenile मा बिक्री छैन<br>
+✔️ <b>Baseline-safe breeding:</b> अर्को वर्ष माउ ≥ प्रारम्भिक माउ<br>
+✔️ Replacement बढी भए मात्र growth
 </p>
 
 <h2>🔢 प्रारम्भिक इनपुट</h2>
 <table>
-<tr><td>प्रारम्भिक माउ</td><td><input id="openingFemale" value="100"></td></tr>
+<tr><td>प्रारम्भिक माउ (Baseline)</td><td><input id="openingFemale" value="100"></td></tr>
 <tr><td>एक माउले वार्षिक बच्चा</td><td><input id="kidsPerFemale" value="20"></td></tr>
 <tr><td>व्याउने दर (%)</td><td><input id="breedRate" value="90"></td></tr>
 <tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
@@ -61,7 +60,8 @@ button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius
 function n(id){return Number(document.getElementById(id)?.value)||0;}
 
 function runEngine(){
-  let breedingFemale = n("openingFemale");
+  const openingFemale = n("openingFemale");
+  let breedingFemale = openingFemale;
   let adultMaleStock = 0;
   const rows=[];
 
@@ -71,19 +71,16 @@ function runEngine(){
     const maleBorn = Math.floor(births/2);
     const femaleBorn = Math.round(births - maleBorn);
 
-    // --- 9–12 month sale ONLY (single point) ---
-    const mSalePct = n(`mY${y}`)/100;
-    const fSalePct = n(`fY${y}`)/100;
-
-    const maleSold = Math.round(maleBorn * mSalePct);
-    const femaleSold = Math.round(femaleBorn * fSalePct);
+    // 9–12 month sale only
+    const maleSold = Math.round(maleBorn * n(`mY${y}`)/100);
+    const femaleSold = Math.round(femaleBorn * n(`fY${y}`)/100);
 
     const maleRemain = maleBorn - maleSold;
     const femaleRemain = femaleBorn - femaleSold;
 
-    // Adult pools
+    // Inventory & next-year breeding (BASELINE SAFE)
     adultMaleStock += maleRemain;
-    breedingFemale = femaleRemain;
+    breedingFemale = Math.max(openingFemale, femaleRemain);
 
     rows.push({
       year:y,
@@ -93,7 +90,6 @@ function runEngine(){
       maleInventory:adultMaleStock
     });
   }
-
   render(rows);
 }
 
@@ -111,21 +107,17 @@ function render(d){
     </tr>`).join("")}
   </table>
 
-  <h3>B) Inventory (गोठमा बाँकी)</h3>
+  <h3>B) Inventory</h3>
   <table>
   <tr><th>वर्ष</th><th>बाँकी भाले</th></tr>
   ${d.map(x=>`<tr><td>${x.year}</td><td>${x.maleInventory}</td></tr>`).join("")}
   </table>
 
-  <h3>C) Next-Year Breeding (माउ gate)</h3>
+  <h3>C) Next-Year Breeding (Baseline Safe)</h3>
   <table>
   <tr><th>वर्ष</th><th>अर्को वर्षका माउ</th></tr>
   ${d.map(x=>`<tr><td>${x.year}</td><td><b>${x.nextBreeding}</b></td></tr>`).join("")}
   </table>
-
-  <p class="small">
-  नोट: Juvenile मा कुनै बिक्री छैन। ९–१२ मा एकैचोटि बिक्री गर्दा rounding error न्यून हुन्छ।
-  </p>
   `;
   document.getElementById("result").innerHTML = h;
 }
