@@ -2,19 +2,32 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Animal Breeding Engine – FINAL LOCKED</title>
+<title>Animal Breeding Engine — FINAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+body{
+  font-family:"Noto Sans Devanagari","Kalimati",system-ui;
+  background:#f4f7f6;margin:0
+}
+.container{
+  max-width:1650px;margin:20px auto;
+  background:#fff;padding:24px;border-radius:12px
+}
 h1,h2,h3{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-input{width:70px}
-button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
-.note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-top:12px}
+input,textarea{width:80px}
+textarea{width:100%;min-height:90px}
+button{
+  padding:10px 22px;background:#2e7d32;
+  color:#fff;border:none;border-radius:6px;cursor:pointer
+}
+.note{
+  font-size:13px;background:#f9fff6;
+  border:1px dashed #9ccc65;padding:10px;margin-top:12px
+}
 .small{font-size:12px;color:#555}
 
 /* PAGE FOLLOW */
@@ -32,7 +45,7 @@ button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius
   width:46px;height:46px;border-radius:50%;
   background:#2e7d32;color:#fff;
   display:flex;align-items:center;justify-content:center;
-  text-decoration:none;font-size:22px;position:relative;
+  text-decoration:none;font-size:22px;position:relative
 }
 .pf-btn:hover::after{
   content:attr(data-title);
@@ -40,7 +53,7 @@ button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius
   right:52px;
   background:#2e7d32;color:#fff;
   padding:6px 10px;border-radius:6px;
-  font-size:12px;white-space:nowrap;
+  font-size:12px;white-space:nowrap
 }
 </style>
 </head>
@@ -52,10 +65,10 @@ button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius
 <h1>🐷 Animal Breeding Engine</h1>
 
 <p class="note">
-✔️ Year 1 उत्पादन = Input माउ मात्र<br>
+✔️ Year 1 उत्पादन = Input मा राखिएका माउ मात्र<br>
 ✔️ नयाँ पोथी = अर्को वर्षदेखि मात्र उत्पादन<br>
 ✔️ बिक्री = 9–12 महिना र बयस्कमा मात्र<br>
-✔️ भाले / पोथी सबै छुट्टाछुट्टै देखिन्छ
+✔️ Run गरेपछि डाटा सुरक्षित रहन्छ
 </p>
 
 <h2>🔢 प्रारम्भिक इनपुट</h2>
@@ -80,8 +93,11 @@ button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius
 <tr><td>५</td><td><input id="m9Y5" value="50"></td><td><input id="f9Y5" value="40"></td><td><input id="amY5" value="20"></td><td><input id="afY5" value="12"></td></tr>
 </table>
 
-<br>
-<button onclick="runEngine()">⚙️ Run Engine</button>
+<h2>✍️ न्यारेसन / टिप्पणी</h2>
+<textarea id="narration" placeholder="यो breeding योजना सम्बन्धी टिप्पणी यहाँ लेख्नुहोस्..."></textarea>
+
+<br><br>
+<button onclick="runEngine()">⚙️ Run Breeding Engine</button>
 
 <hr>
 <h2>📊 नतिजा</h2>
@@ -104,25 +120,24 @@ function runEngine(){
   const out=[];
 
   for(let y=1;y<=5;y++){
-    // Birth
-    const births = adultFemale * n("kidsPerFemale") * (n("breedRate")/100) * (1-n("deathRate")/100);
+    const births = adultFemale * n("kidsPerFemale")
+      * (n("breedRate")/100) * (1-n("deathRate")/100);
+
     const maleBorn = Math.floor(births/2);
     const femaleBorn = Math.round(births - maleBorn);
 
-    // 9–12 sale
     const m9Sold = Math.round(maleBorn * n(`m9Y${y}`)/100);
     const f9Sold = Math.round(femaleBorn * n(`f9Y${y}`)/100);
+
     const m9Remain = maleBorn - m9Sold;
     const f9Remain = femaleBorn - f9Sold;
 
-    // Adult sale
     const adultMSold = Math.round(adultMale * n(`amY${y}`)/100);
     const adultFSold = Math.round(adultFemale * n(`afY${y}`)/100);
 
     adultMale -= adultMSold;
     adultFemale -= adultFSold;
 
-    // Next year stock
     adultMale += m9Remain;
     adultFemale += f9Remain;
 
@@ -135,39 +150,51 @@ function runEngine(){
       stockFemale:adultFemale
     });
   }
+
+  localStorage.setItem(
+    "BREEDING_ENGINE_5YR_RESULT",
+    JSON.stringify(out)
+  );
+  localStorage.setItem(
+    "BREEDING_ENGINE_NARRATION",
+    document.getElementById("narration").value
+  );
+
   render(out);
 }
 
 function render(d){
   let h=`
-  <h3>A) जन्म र बिक्री</h3>
   <table>
   <tr>
     <th>वर्ष</th>
-    <th>जन्म भाले</th><th>9–12 भाले बिक्री</th><th>बयस्क भाले बिक्री</th>
-    <th>जन्म पोथी</th><th>9–12 पोथी बिक्री</th><th>बयस्क माउ बिक्री</th>
+    <th>भाले बाँकी</th>
+    <th>माउ बाँकी</th>
   </tr>
-  ${d.map(x=>`
-    <tr>
-      <td>${x.year}</td>
-      <td>${x.bornM}</td><td>${x.sold9M}</td><td>${x.soldAdultM}</td>
-      <td>${x.bornF}</td><td>${x.sold9F}</td><td>${x.soldAdultF}</td>
-    </tr>`).join("")}
-  </table>
-
-  <h3>B) गोठमा बाँकी (Inventory)</h3>
-  <table>
-  <tr><th>वर्ष</th><th>भाले बाँकी</th><th>माउ बाँकी</th></tr>
   ${d.map(x=>`
     <tr>
       <td>${x.year}</td>
       <td>${x.stockMale}</td>
       <td><b>${x.stockFemale}</b></td>
     </tr>`).join("")}
-  </table>
-  `;
+  </table>`;
   document.getElementById("result").innerHTML=h;
 }
+
+// AUTO LOAD LAST RUN
+document.addEventListener("DOMContentLoaded",()=>{
+  const saved = localStorage.getItem("BREEDING_ENGINE_5YR_RESULT");
+  if(saved){
+    try{
+      const data = JSON.parse(saved);
+      if(Array.isArray(data) && data.length){
+        render(data);
+      }
+    }catch(e){}
+  }
+  const narr = localStorage.getItem("BREEDING_ENGINE_NARRATION");
+  if(narr) document.getElementById("narration").value = narr;
+});
 </script>
 
 </body>
