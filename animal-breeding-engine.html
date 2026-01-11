@@ -2,30 +2,74 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Animal Breeding Engine – FINAL FINAL (Baseline Safe)</title>
+<title>Animal Breeding Engine – FINAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1400px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+body{
+  font-family:"Noto Sans Devanagari","Kalimati",system-ui;
+  background:#f4f7f6;margin:0
+}
+.container{
+  max-width:1400px;margin:20px auto;
+  background:#fff;padding:24px;border-radius:12px
+}
 h1,h2,h3{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
 input{width:70px}
-button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
-.note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-top:12px}
+button{
+  padding:10px 22px;background:#2e7d32;
+  color:#fff;border:none;border-radius:6px;cursor:pointer
+}
+.note{
+  font-size:13px;background:#f9fff6;
+  border:1px dashed #9ccc65;padding:10px;margin-top:12px
+}
 .small{font-size:12px;color:#555}
+
+/* ---------- PAGE FOLLOW (FINAL) ---------- */
+.page-follow{
+  position:fixed;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  z-index:999;
+}
+.pf-btn{
+  width:46px;height:46px;border-radius:50%;
+  background:#2e7d32;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;font-size:22px;position:relative;
+}
+.pf-btn:hover::after{
+  content:attr(data-title);
+  position:absolute;
+  right:52px;
+  background:#2e7d32;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:6px;
+  font-size:12px;
+  white-space:nowrap;
+}
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
 <h1>🐷 Animal Breeding Engine</h1>
+
 <p class="note">
 ✔️ बेच्ने समय = <b>९–१२ महिना मात्र</b><br>
-✔️ Juvenile मा बिक्री छैन<br>
-✔️ <b>Baseline-safe breeding:</b> अर्को वर्ष माउ ≥ प्रारम्भिक माउ<br>
+✔️ Juvenile (१–३, ४–६) मा बिक्री छैन<br>
+✔️ <b>Baseline-safe:</b> अर्को वर्ष माउ ≥ प्रारम्भिक माउ<br>
 ✔️ Replacement बढी भए मात्र growth
 </p>
 
@@ -56,8 +100,21 @@ button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius
 
 </div>
 
+<!-- PAGE FOLLOW -->
+<div class="page-follow">
+  <a href="business-detail.html"
+     class="pf-btn"
+     data-title="Business Detail (Previous)">⬅️</a>
+
+  <a href="feed-vitamin-medicine-5yr.html"
+     class="pf-btn"
+     data-title="Feed • Vitamin • Medicine (Next)">➡️</a>
+</div>
+
 <script>
-function n(id){return Number(document.getElementById(id)?.value)||0;}
+function n(id){
+  return Number(document.getElementById(id)?.value)||0;
+}
 
 function runEngine(){
   const openingFemale = n("openingFemale");
@@ -67,7 +124,11 @@ function runEngine(){
 
   for(let y=1;y<=5;y++){
     // Birth
-    const births = breedingFemale * n("kidsPerFemale") * (n("breedRate")/100) * (1-n("deathRate")/100);
+    const births = breedingFemale
+      * n("kidsPerFemale")
+      * (n("breedRate")/100)
+      * (1-n("deathRate")/100);
+
     const maleBorn = Math.floor(births/2);
     const femaleBorn = Math.round(births - maleBorn);
 
@@ -78,14 +139,14 @@ function runEngine(){
     const maleRemain = maleBorn - maleSold;
     const femaleRemain = femaleBorn - femaleSold;
 
-    // Inventory & next-year breeding (BASELINE SAFE)
+    // Inventory & baseline-safe breeding
     adultMaleStock += maleRemain;
     breedingFemale = Math.max(openingFemale, femaleRemain);
 
     rows.push({
       year:y,
-      bornM:maleBorn,bornF:femaleBorn,
-      soldM:maleSold,soldF:femaleSold,
+      bornM:maleBorn, soldM:maleSold,
+      bornF:femaleBorn, soldF:femaleSold,
       nextBreeding:breedingFemale,
       maleInventory:adultMaleStock
     });
@@ -97,8 +158,11 @@ function render(d){
   let h = `
   <h3>A) जन्म र बिक्री (९–१२ महिना)</h3>
   <table>
-  <tr><th>वर्ष</th><th>जन्म भाले</th><th>बेचेको भाले</th>
-      <th>जन्म पोथी</th><th>बेचेको पोथी</th></tr>
+  <tr>
+    <th>वर्ष</th>
+    <th>जन्म भाले</th><th>बेचेको भाले</th>
+    <th>जन्म पोथी</th><th>बेचेको पोथी</th>
+  </tr>
   ${d.map(x=>`
     <tr>
       <td>${x.year}</td>
@@ -107,17 +171,24 @@ function render(d){
     </tr>`).join("")}
   </table>
 
-  <h3>B) Inventory</h3>
+  <h3>B) Inventory (गोठमा बाँकी)</h3>
   <table>
   <tr><th>वर्ष</th><th>बाँकी भाले</th></tr>
-  ${d.map(x=>`<tr><td>${x.year}</td><td>${x.maleInventory}</td></tr>`).join("")}
+  ${d.map(x=>`
+    <tr><td>${x.year}</td><td>${x.maleInventory}</td></tr>`).join("")}
   </table>
 
   <h3>C) Next-Year Breeding (Baseline Safe)</h3>
   <table>
   <tr><th>वर्ष</th><th>अर्को वर्षका माउ</th></tr>
-  ${d.map(x=>`<tr><td>${x.year}</td><td><b>${x.nextBreeding}</b></td></tr>`).join("")}
+  ${d.map(x=>`
+    <tr><td>${x.year}</td><td><b>${x.nextBreeding}</b></td></tr>`).join("")}
   </table>
+
+  <p class="small">
+  नोट: प्रारम्भिक माउभन्दा कम replacement भए पनि माउ घट्दैन।
+  Replacement बढी भए मात्र growth देखिन्छ।
+  </p>
   `;
   document.getElementById("result").innerHTML = h;
 }
