@@ -1,169 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ne">
 <head>
-  <meta charset="UTF-8">
-  <title>Animal Breeding Engine – Basic & Final</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
-    th, td { border: 1px solid #999; padding: 6px; text-align: center; }
-    th { background: #f0f0f0; }
-    h2 { margin-top: 40px; }
-    pre { background: #111; color: #0f0; padding: 10px; overflow-x: auto; }
-  </style>
+<meta charset="UTF-8">
+<title>Animal Breeding Engine – % Based (Stable)</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  h1, h2 { margin-top: 30px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+  th, td { border: 1px solid #999; padding: 6px; text-align: center; }
+  th { background: #f2f2f2; }
+  input { width: 70px; }
+  .note { background: #eef; padding: 10px; margin-top: 20px; }
+</style>
 </head>
 <body>
 
-<h1>🐄 Animal Breeding Engine (Basic – Stable)</h1>
+<h1>🐖 Animal Breeding Engine (Pure % Based)</h1>
 
-<div id="output"></div>
+<div class="note">
+<b>Editable % मात्र change गर्नुहोस्:</b><br>
+सबै हिसाब automatic हुन्छ, कुनै fixed संख्या छैन।
+</div>
+
+<h2>1️⃣ Editable Parameters</h2>
+
+<table>
+<tr><th>Parameter</th><th>Value</th></tr>
+<tr><td>ब्याउने दर (%)</td><td><input id="birthRate" value="90"></td></tr>
+<tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
+<tr><td>प्रति पोथी बच्चा / वर्ष</td><td><input id="birthPerFemale" value="20"></td></tr>
+
+<tr><th colspan="2">उमेर अनुसार बिक्री %</th></tr>
+<tr><td>Piglet बेच्ने %</td><td><input id="sellPiglet" value="0"></td></tr>
+<tr><td>Grower बेच्ने %</td><td><input id="sellGrower" value="60"></td></tr>
+<tr><td>Adult बेच्ने %</td><td><input id="sellAdult" value="30"></td></tr>
+</table>
+
+<button onclick="runEngine()">Run Engine</button>
+
+<h2>2️⃣ ५ वर्षको एकै टेबल (Year-end Snapshot)</h2>
+<div id="result"></div>
 
 <script>
-/* =========================
-   1. CONFIG (ONLY INPUT)
-========================= */
-const breedingConfig = {
-  animal: "Pig",
-  years: 5,
+function runEngine() {
 
-  cohorts: ["piglet", "grower", "adult"],
+  // ===== Inputs =====
+  const birthRate = +birthRateInput.value / 100;
+  const deathRate = +deathRateInput.value / 100;
+  const birthPerFemale = +birthPerFemaleInput.value;
 
-  initialStock: {
-    piglet: { male: 0, female: 0 },
-    grower: { male: 0, female: 0 },
-    adult:  { male: 5, female: 20 }
-  },
+  const sellPiglet = +sellPigletInput.value / 100;
+  const sellGrower = +sellGrowerInput.value / 100;
+  const sellAdult = +sellAdultInput.value / 100;
 
-  reproduction: {
-    adult: {
-      birthPerFemalePerYear: 10,
-      maleRatio: 50,
-      femaleRatio: 50
-    }
-  },
+  // ===== Start Stock =====
+  let piglet = 0;
+  let grower = 0;
+  let adult = 110; // 100 female + 10 male (base)
 
-  // ✅ SALES AGE % + GENDER %
-  salesPolicy: {
-    piglet: {
-      male:   { sell: 0, retain: 100 },
-      female: { sell: 0, retain: 100 }
-    },
-    grower: {
-      male:   { sell: 50, retain: 50 },
-      female: { sell: 30, retain: 70 }
-    },
-    adult: {
-      male:   { sell: 80, retain: 20 },
-      female: { sell: 60, retain: 40 }
-    }
-  }
-};
-
-/* =========================
-   2. VALIDATION
-========================= */
-function validateSalesPolicy(policy) {
-  for (let c in policy) {
-    ["male", "female"].forEach(g => {
-      if (policy[c][g].sell + policy[c][g].retain !== 100) {
-        throw new Error(`Invalid sales policy: ${c} ${g}`);
-      }
-    });
-  }
-}
-
-/* =========================
-   3. ENGINE
-========================= */
-function runBreedingEngine(config) {
-
-  validateSalesPolicy(config.salesPolicy);
-
-  let stock = JSON.parse(JSON.stringify(config.initialStock));
-  let results = [];
-
-  for (let year = 1; year <= config.years; year++) {
-
-    let yearData = {
-      year,
-      beforeSale: JSON.parse(JSON.stringify(stock)),
-      sold: {},
-      afterSale: {}
-    };
-
-    /* ---- Birth ---- */
-    const adultFemales = stock.adult.female;
-    const births = adultFemales * config.reproduction.adult.birthPerFemalePerYear;
-
-    const maleBirths = births * (config.reproduction.adult.maleRatio / 100);
-    const femaleBirths = births * (config.reproduction.adult.femaleRatio / 100);
-
-    /* ---- Aging ---- */
-    let nextStock = {
-      piglet: { male: maleBirths, female: femaleBirths },
-      grower: { ...stock.piglet },
-      adult: {
-        male: stock.grower.male + stock.adult.male,
-        female: stock.grower.female + stock.adult.female
-      }
-    };
-
-    /* ---- Sales (Age % + Gender %) ---- */
-    for (let c in nextStock) {
-      yearData.sold[c] = { male: 0, female: 0 };
-
-      ["male", "female"].forEach(g => {
-        const total = nextStock[c][g];
-        const sellPct = config.salesPolicy[c][g].sell / 100;
-        const soldQty = total * sellPct;
-
-        yearData.sold[c][g] = soldQty;
-        nextStock[c][g] = total - soldQty;
-      });
-    }
-
-    yearData.afterSale = JSON.parse(JSON.stringify(nextStock));
-    results.push(yearData);
-    stock = nextStock;
-  }
-
-  return results;
-}
-
-/* =========================
-   4. RUN & DISPLAY
-========================= */
-const data = runBreedingEngine(breedingConfig);
-const output = document.getElementById("output");
-
-data.forEach(y => {
-  output.innerHTML += `<h2>Year ${y.year}</h2>`;
-
-  let table = `<table>
+  let html = `<table>
     <tr>
-      <th>Cohort</th>
-      <th>Male (Remain)</th>
-      <th>Female (Remain)</th>
-      <th>Male Sold</th>
-      <th>Female Sold</th>
+      <th>वर्ष</th>
+      <th>Piglet बाँकी</th>
+      <th>Grower बाँकी</th>
+      <th>Adult बाँकी</th>
+      <th>त्यस वर्ष बिक्री</th>
     </tr>`;
 
-  for (let c in y.afterSale) {
-    table += `
-      <tr>
-        <td>${c}</td>
-        <td>${y.afterSale[c].male.toFixed(1)}</td>
-        <td>${y.afterSale[c].female.toFixed(1)}</td>
-        <td>${y.sold[c].male.toFixed(1)}</td>
-        <td>${y.sold[c].female.toFixed(1)}</td>
-      </tr>`;
+  for (let year = 1; year <= 5; year++) {
+
+    // ----- Breeding -----
+    const adultFemale = adult * (100 / 110); // proportionally female
+    let births = adultFemale * birthRate * birthPerFemale;
+
+    // male/female 50/50, mortality
+    births = births * (1 - deathRate);
+
+    // ----- Aging -----
+    let newAdult = grower;
+    let newGrower = piglet;
+    let newPiglet = births;
+
+    // ----- Sales -----
+    let soldPiglet = newPiglet * sellPiglet;
+    let soldGrower = newGrower * sellGrower;
+    let soldAdult = newAdult * sellAdult;
+
+    piglet = newPiglet - soldPiglet;
+    grower = newGrower - soldGrower;
+    adult = newAdult - soldAdult;
+
+    let totalSold = soldPiglet + soldGrower + soldAdult;
+
+    html += `<tr>
+      <td>${year}</td>
+      <td>${piglet.toFixed(0)}</td>
+      <td>${grower.toFixed(0)}</td>
+      <td>${adult.toFixed(0)}</td>
+      <td>${totalSold.toFixed(0)}</td>
+    </tr>`;
   }
 
-  table += `</table>`;
-  output.innerHTML += table;
-});
+  html += `</table>`;
+  result.innerHTML = html;
+}
 
-output.innerHTML += `<h2>🔍 Raw JSON (Debug)</h2><pre>${JSON.stringify(data, null, 2)}</pre>`;
+// input shortcuts
+const birthRateInput = document.getElementById("birthRate");
+const deathRateInput = document.getElementById("deathRate");
+const birthPerFemaleInput = document.getElementById("birthPerFemale");
+const sellPigletInput = document.getElementById("sellPiglet");
+const sellGrowerInput = document.getElementById("sellGrower");
+const sellAdultInput = document.getElementById("sellAdult");
+
+runEngine();
 </script>
 
 </body>
