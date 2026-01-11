@@ -2,369 +2,128 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>खर्च विवरण</title>
+<title>Expenses (5-Year)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
- font-family:Arial, sans-serif;
- background:#f5f5f5;
- margin:0
-}
+body{font-family:system-ui;background:#f4f7f6;margin:0}
+.container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+h1{color:#2e7d32;margin-top:0}
 
-/* ===== HEADER (MATCHED STYLE) ===== */
-header{
- background:#2e7d32;
- color:#fff;
- padding:18px 20px;
- text-align:center;
- font-size:22px;
- font-weight:700;
- letter-spacing:.4px;
- box-shadow:0 2px 6px rgba(0,0,0,0.2)
-}
+table{width:100%;border-collapse:collapse;margin-top:14px}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+th{background:#eef5ee}
 
-/* ===== SIDE PAGE FOLLOW ===== */
-.side-nav{
- position:fixed;
- top:50%;
+input{width:90px;padding:6px}
+.lock{background:#f1f8e9;font-weight:600}
+
+/* PAGE FLOW */
+.page-follow{
+ position:fixed;right:14px;top:50%;
  transform:translateY(-50%);
- width:48px;
- height:48px;
- border-radius:50%;
- background:#2e7d32;
- color:#fff;
- font-size:26px;
- display:flex;
- align-items:center;
- justify-content:center;
- cursor:pointer;
- z-index:999;
- box-shadow:0 4px 10px rgba(0,0,0,.25)
+ display:flex;flex-direction:column;gap:12px;z-index:999
 }
-.side-nav.prev{left:15px}
-.side-nav.next{right:15px}
-.side-nav:hover{background:#1b5e20}
-
-/* ===== PAGE BODY ===== */
-.container{
- max-width:1400px;
- margin:auto;
- background:#fff;
- padding:20px 70px;   /* 🔑 SIDE SAFE ZONE */
- min-height:70vh
-}
-
-h2{margin-top:30px}
-
-table{
- width:100%;
- border-collapse:collapse;
- margin-top:10px
-}
-th,td{
- border:1px solid #ccc;
- padding:6px;
- text-align:center;
- font-size:14px
-}
-th{background:#e8f5e9}
-
-input{
- width:100%;
- box-sizing:border-box
-}
-
-.mapBox{text-align:left;font-size:13px}
-.mapNote{font-size:12px;color:#777}
-
-.percentBox{
- width:55px;
- font-size:12px
-}
-
-.btn{
- padding:6px 10px;
- border:none;
- cursor:pointer
-}
-.add{background:#2e7d32;color:#fff}
-.del{background:#c62828;color:#fff}
-
-.preview{
- background:#f1f8e9;
- padding:12px;
- margin-top:20px;
- font-size:14px
-}
-
-textarea{
- width:100%;
- min-height:70px;
- box-sizing:border-box;
- padding:8px
-}
-
-footer{
- background:#2e7d32;
- color:#fff;
- padding:12px 20px;
- text-align:center;
- font-size:14px
+.pf-btn{
+ width:46px;height:46px;border-radius:50%;
+ background:#2e7d32;color:#fff;
+ display:flex;align-items:center;justify-content:center;
+ text-decoration:none;font-size:22px
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== SIDE NAVIGATION ===== -->
-<div class="side-nav prev" onclick="location.href='production.html'">⬅</div>
-<div class="side-nav next" onclick="location.href='capital-source.html'">➡</div>
-
-<!-- ===== HEADER ===== -->
-<header>
-  खर्च विवरण
-</header>
-
 <div class="container">
+<h1>💸 खर्च विवरण (५ वर्ष)</h1>
 
-<!-- ================= VARIABLE ================= -->
-<h2>🔄 चालु खर्च</h2>
+<p>
+✔️ Breeding Engine बाट संख्या<br>
+✔️ Feed / Vitamin / Medicine छुट्टाछुट्टै<br>
+✔️ ९–१२ र बयस्क स्पष्ट
+</p>
+
+<h2>🍽️ दर (Editable)</h2>
 <table>
-<thead>
-<tr>
- <th>खर्च शीर्षक</th>
- <th>इकाई</th>
- <th>परिमाण</th>
- <th>दर</th>
- <th>जम्मा</th>
- <th>कुन उत्पादनमा (% सहित)</th>
- <th>🗑️</th>
-</tr>
-</thead>
-<tbody id="varBody"></tbody>
+<tr><th>प्रकार</th><th>दर</th><th>एकाइ</th></tr>
+<tr><td>Feed (9–12)</td><td><input id="f912" value="3"></td><td>kg / दिन</td></tr>
+<tr><td>Feed (Adult)</td><td><input id="fadult" value="3"></td><td>kg / दिन</td></tr>
+<tr><td>Vitamin</td><td><input id="vit" value="800"></td><td>Rs / वर्ष</td></tr>
+<tr><td>Medicine</td><td><input id="med" value="600"></td><td>Rs / वर्ष</td></tr>
 </table>
-<button class="btn add" id="addVar">➕ चालु खर्च थप्नुहोस्</button>
 
-<!-- ================= FIXED ================= -->
-<h2>🏗️ स्थिर खर्च</h2>
-<table>
-<thead>
-<tr>
- <th>खर्च शीर्षक</th>
- <th>इकाई</th>
- <th>परिमाण</th>
- <th>दर</th>
- <th>आयु</th>
- <th>वार्षिक ह्रास</th>
- <th>कुन उत्पादनमा (% सहित)</th>
- <th>🗑️</th>
-</tr>
-</thead>
-<tbody id="fixBody"></tbody>
-</table>
-<button class="btn add" id="addFix">➕ स्थिर खर्च थप्नुहोस्</button>
+<button onclick="render()">🔄 Recalculate</button>
 
-<!-- ================= NARRATION ================= -->
-<div class="preview">
-<b>खर्च सम्बन्धी समग्र Narration</b>
-<textarea id="expenseNarration"
- placeholder="उदाहरण: यस व्यवसायका सबै चालु तथा स्थिर खर्चहरू स्थानीय बजार मूल्य, प्राविधिक सिफारिस तथा उत्पादन अनुपातको आधारमा अनुमान गरिएको हो।"
- oninput="saveNarration()"></textarea>
-</div>
-
-<div class="preview" id="previewBox"></div>
+<hr>
+<h2>📊 ५ वर्षे खर्च (Rs)</h2>
+<div id="result"></div>
 
 </div>
 
-<footer>
-  🌱 FarmerBase BP Engine- Expenses Detail
-</footer>
+<!-- PAGE FLOW -->
+<div class="page-follow">
+ <a href="production.html" class="pf-btn">⬅️</a>
+ <a href="capital-source.html" class="pf-btn">➡️</a>
+</div>
 
 <script>
-/* =================================================
-   DATA LOAD (UNCHANGED)
-================================================= */
-const productions =
- JSON.parse(localStorage.getItem("productions")) || [];
+// ================= LOAD BREEDING DATA =================
+const breeding =
+ JSON.parse(localStorage.getItem("BREEDING_ENGINE_5YR_RESULT")) || [];
 
-let expenses =
- JSON.parse(localStorage.getItem("expenses")) || [];
+function v(id){return Number(document.getElementById(id).value)||0;}
 
-let expenseNarration =
- localStorage.getItem("expenseNarration") || "";
-
-/* =================================================
-   SAVE
-================================================= */
-function save(){
- localStorage.setItem("expenses", JSON.stringify(expenses));
-}
-
-function saveNarration(){
- localStorage.setItem(
-  "expenseNarration",
-  document.getElementById("expenseNarration").value
- );
-}
-
-/* =================================================
-   ADD
-================================================= */
-document.getElementById("addVar").onclick = () => {
- expenses.push({
-  id: Date.now(),
-  type: "variable",
-  title:"",
-  unit:"",
-  qty:0,
-  rate:0,
-  life:null,
-  map:{}
- });
- save(); render();
-};
-
-document.getElementById("addFix").onclick = () => {
- expenses.push({
-  id: Date.now(),
-  type: "fixed",
-  title:"",
-  unit:"",
-  qty:0,
-  rate:0,
-  life:1,
-  map:{}
- });
- save(); render();
-};
-
-/* =================================================
-   DELETE
-================================================= */
-function deleteExpense(id){
- expenses = expenses.filter(e => e.id !== id);
- save(); render();
-}
-
-/* =================================================
-   MAP UI
-================================================= */
-function mapUI(exp){
- if(!productions.length){
-  return `<span class="mapNote">पहिले उत्पादन थप्नुहोस्</span>`;
+function render(){
+ if(!breeding.length){
+  document.getElementById("result").innerHTML =
+   "<p>पहिला animal-breeding-engine.html मा Run Engine गर्नुहोस्।</p>";
+  return;
  }
 
- return productions.map(p=>{
-  const obj = exp.map[p.id] || {};
-  return `
-<div>
-<label>
- ${p.name}
- <input class="percentBox" type="number" min="0" max="100"
-  value="${obj.percent || ''}"
-  onchange="setPercent(${exp.id},'${p.id}',this.value)"> %
-</label>
-</div>`;
- }).join("");
-}
+ let html=`<table>
+ <tr>
+  <th rowspan="2">वर्ष</th>
+  <th colspan="4">Feed खर्च</th>
+  <th rowspan="2">Vitamin</th>
+  <th rowspan="2">Medicine</th>
+  <th rowspan="2">कुल</th>
+ </tr>
+ <tr>
+  <th>९–१२ भाले</th>
+  <th>९–१२ पोथी</th>
+  <th>बयस्क भाले</th>
+  <th>माउ</th>
+ </tr>`;
 
-function setPercent(eid,pid,val){
- const e = expenses.find(x=>x.id===eid);
- if(!e.map) e.map = {};
- if(val>0) e.map[pid] = {percent:+val};
- else delete e.map[pid];
- save();
-}
+ breeding.forEach(y=>{
+  const f9M = y.sold9M * v("f912") * 365;
+  const f9F = y.sold9F * v("f912") * 365;
+  const fAM = y.stockMale * v("fadult") * 365;
+  const fAF = y.stockFemale * v("fadult") * 365;
 
-/* =================================================
-   RENDER
-================================================= */
-function render(){
- let varTotal = 0;
- let fixedDep = 0;
- let fixedCapital = 0;
+  const totalAnimals =
+    y.sold9M + y.sold9F + y.stockMale + y.stockFemale;
 
- const vb = document.getElementById("varBody");
- const fb = document.getElementById("fixBody");
- vb.innerHTML = "";
- fb.innerHTML = "";
+  const vit = totalAnimals * v("vit");
+  const med = totalAnimals * v("med");
 
- expenses.forEach(e=>{
-  if(e.type==="variable"){
-   const total = (e.qty * e.rate) || 0;
-   varTotal += total;
+  const total = f9M + f9F + fAM + fAF + vit + med;
 
-   const tr = document.createElement("tr");
-   tr.innerHTML = `
-<td><input></td>
-<td><input></td>
-<td><input type="number"></td>
-<td><input type="number"></td>
-<td>${total.toFixed(2)}</td>
-<td class="mapBox">${mapUI(e)}</td>
-<td><button class="btn del">🗑️</button></td>`;
-
-   const ins = tr.querySelectorAll("input");
-   ins[0].value = e.title;
-   ins[1].value = e.unit;
-   ins[2].value = e.qty;
-   ins[3].value = e.rate;
-
-   ins[0].oninput = ()=>{e.title=ins[0].value;save()};
-   ins[1].oninput = ()=>{e.unit=ins[1].value;save()};
-   ins[2].oninput = ()=>{e.qty=+ins[2].value||0;save()};
-   ins[3].oninput = ()=>{e.rate=+ins[3].value||0;save()};
-
-   tr.querySelector("button").onclick = ()=>deleteExpense(e.id);
-   vb.appendChild(tr);
-  }
-
-  if(e.type==="fixed"){
-   const cap = (e.qty * e.rate) || 0;
-   const dep = cap / (e.life || 1);
-   fixedCapital += cap;
-   fixedDep += dep;
-
-   const tr = document.createElement("tr");
-   tr.innerHTML = `
-<td><input></td>
-<td><input></td>
-<td><input type="number"></td>
-<td><input type="number"></td>
-<td><input type="number"></td>
-<td>${dep.toFixed(2)}</td>
-<td class="mapBox">${mapUI(e)}</td>
-<td><button class="btn del">🗑️</button></td>`;
-
-   const ins = tr.querySelectorAll("input");
-   ins[0].value = e.title;
-   ins[1].value = e.unit;
-   ins[2].value = e.qty;
-   ins[3].value = e.rate;
-   ins[4].value = e.life;
-
-   ins[0].oninput = ()=>{e.title=ins[0].value;save()};
-   ins[1].oninput = ()=>{e.unit=ins[1].value;save()};
-   ins[2].oninput = ()=>{e.qty=+ins[2].value||0;save()};
-   ins[3].oninput = ()=>{e.rate=+ins[3].value||0;save()};
-   ins[4].oninput = ()=>{e.life=+ins[4].value||1;save()};
-
-   tr.querySelector("button").onclick = ()=>deleteExpense(e.id);
-   fb.appendChild(tr);
-  }
+  html+=`
+  <tr>
+   <td>Year ${y.year}</td>
+   <td>${Math.round(f9M)}</td>
+   <td>${Math.round(f9F)}</td>
+   <td>${Math.round(fAM)}</td>
+   <td>${Math.round(fAF)}</td>
+   <td>${Math.round(vit)}</td>
+   <td>${Math.round(med)}</td>
+   <td><b>${Math.round(total)}</b></td>
+  </tr>`;
  });
 
- document.getElementById("previewBox").innerHTML =
-  `<b>Expense Summary</b><br>
-   कुल चालु खर्च: ${varTotal.toFixed(2)}<br>
-   कुल स्थिर पूँजी: ${fixedCapital.toFixed(2)}<br>
-   कुल वार्षिक ह्रास: ${fixedDep.toFixed(2)}`;
-
- /* ===== CONTRACT FOR CAPITAL SOURCE ===== */
- localStorage.setItem("variable_annual_cost", varTotal.toFixed(2));
- localStorage.setItem("fixed_total_capital", fixedCapital.toFixed(2));
-
- document.getElementById("expenseNarration").value = expenseNarration;
+ html+=`</table>`;
+ document.getElementById("result").innerHTML = html;
 }
 
 render();
