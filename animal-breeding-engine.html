@@ -1,1 +1,122 @@
-म,द चम
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Animal Breeding Engine – FINAL (Global Male Sale)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
+.container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+h1,h2,h3{color:#2e7d32;margin-top:0}
+table{width:100%;border-collapse:collapse;margin-top:14px}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+th{background:#eef5ee}
+input{width:64px}
+button{padding:10px 20px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
+.group{background:#f1f8e9;font-weight:bold}
+.note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-top:12px}
+.page-follow{position:fixed;right:12px;top:45%;display:flex;flex-direction:column;gap:10px;z-index:999}
+.pf-btn{width:44px;height:44px;border-radius:50%;background:#2e7d32;color:#fff;
+display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:20px}
+.small{font-size:12px;color:#555}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🐷 Animal Breeding Engine</h1>
+<p class="note">
+✔️ Global Rule: <b>भाले = सबै उमेर 100% बिक्री</b><br>
+✔️ Breeding Gate: <b>Next-Year Breeding = Adult Female Remain ONLY</b><br>
+✔️ 100% माउ बिक्री ⇒ अर्को वर्ष उत्पादन = 0 (Guaranteed)
+</p>
+
+<h2>🔢 प्रारम्भिक इनपुट</h2>
+<table>
+<tr><td>प्रारम्भिक माउ</td><td><input id="openingFemale" value="100"></td></tr>
+<tr><td>एक माउले वार्षिक बच्चा</td><td><input id="kidsPerFemale" value="20"></td></tr>
+<tr><td>व्याउने दर (%)</td><td><input id="breedRate" value="90"></td></tr>
+<tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
+</table>
+
+<h2>📤 बिक्री नीति</h2>
+<table>
+<tr><td>🔴 भाले सबै उमेर 100% बिक्री</td><td><b>ON (FINAL)</b></td></tr>
+<tr><td>माउ बिक्री %</td><td><input id="adultFY" value="10"></td></tr>
+</table>
+
+<br>
+<button onclick="runEngine()">⚙️ Run Breeding Engine (5 Years)</button>
+
+<hr>
+<h2>📊 ५ वर्षे नतिजा</h2>
+<div id="result"></div>
+
+</div>
+
+<div class="page-follow">
+  <a href="business-detail.html" class="pf-btn">⬅️</a>
+  <a href="feed-vitamin-medicine-5yr.html" class="pf-btn">➡️</a>
+</div>
+
+<script>
+function n(id){const e=document.getElementById(id);return e?Number(e.value)||0:0;}
+
+function runEngine(){
+  let breedingFemale = n("openingFemale");
+  const out=[];
+
+  for(let y=1;y<=5;y++){
+    let births = breedingFemale * n("kidsPerFemale") * (n("breedRate")/100) * (1-n("deathRate")/100);
+    let maleBorn = Math.floor(births/2);
+    let femaleBorn = Math.round(births-maleBorn);
+
+    // 🔴 GLOBAL MALE SALE
+    let maleSold = maleBorn;     // 100%
+    let maleRemain = 0;          // GUARANTEED
+
+    // Female juvenile → adult
+    let adultFemalePool = femaleBorn;
+
+    // Adult female sale
+    let soldAdultFemale = Math.round(adultFemalePool * n("adultFY")/100);
+    let remainAdultFemale = adultFemalePool - soldAdultFemale;
+
+    out.push({
+      year:y,
+      born:{male:maleBorn,female:femaleBorn},
+      sold:{male:maleSold,femaleAdult:soldAdultFemale},
+      breeding:{nextFemale:remainAdultFemale}
+    });
+
+    breedingFemale = remainAdultFemale;
+  }
+
+  render(out);
+}
+
+function render(d){
+  let h=`
+  <table>
+    <tr><th>वर्ष</th><th>जन्म भाले</th><th>भाले बिक्री</th>
+        <th>जन्म पोथी</th><th>माउ बिक्री</th>
+        <th><b>अर्का वर्ष माउ</b></th></tr>
+    ${d.map(x=>`
+      <tr>
+        <td>${x.year}</td>
+        <td>${x.born.male}</td>
+        <td>${x.sold.male}</td>
+        <td>${x.born.female}</td>
+        <td>${x.sold.femaleAdult}</td>
+        <td><b>${x.breeding.nextFemale}</b></td>
+      </tr>`).join("")}
+  </table>
+  <p class="small">नोट: भाले सबै उमेर 100% बिक्री भएकाले Inventory भाले = 0 सधैं।</p>
+  `;
+  document.getElementById("result").innerHTML=h;
+}
+</script>
+
+</body>
+</html>
