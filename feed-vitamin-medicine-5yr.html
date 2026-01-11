@@ -2,27 +2,44 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Feed • Vitamin • Medicine — वर्षवर्ष</title>
+<title>Animal Breeding Engine — FINAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1750px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+body{
+  font-family:"Noto Sans Devanagari","Kalimati",system-ui;
+  background:#f4f7f6;margin:0
+}
+.container{
+  max-width:1650px;margin:20px auto;
+  background:#fff;padding:24px;border-radius:12px
+}
 h1,h2,h3{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-input,textarea{width:120px}
-textarea{width:100%;min-height:80px}
-.note{font-size:14px;background:#f9fff6;border:1px dashed #9ccc65;padding:12px;margin:12px 0}
-.small{font-size:13px;color:#444}
-button{padding:8px 18px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
+input,textarea{width:80px}
+textarea{width:100%;min-height:90px}
+button{
+  padding:10px 22px;background:#2e7d32;
+  color:#fff;border:none;border-radius:6px;cursor:pointer
+}
+.note{
+  font-size:13px;background:#f9fff6;
+  border:1px dashed #9ccc65;padding:10px;margin-top:12px
+}
+.small{font-size:12px;color:#555}
 
 /* PAGE FOLLOW */
 .page-follow{
-  position:fixed;right:14px;top:50%;
+  position:fixed;
+  right:14px;
+  top:50%;
   transform:translateY(-50%);
-  display:flex;flex-direction:column;gap:12px;z-index:999
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  z-index:999;
 }
 .pf-btn{
   width:46px;height:46px;border-radius:50%;
@@ -32,7 +49,8 @@ button{padding:8px 18px;background:#2e7d32;color:#fff;border:none;border-radius:
 }
 .pf-btn:hover::after{
   content:attr(data-title);
-  position:absolute;right:52px;
+  position:absolute;
+  right:52px;
   background:#2e7d32;color:#fff;
   padding:6px 10px;border-radius:6px;
   font-size:12px;white-space:nowrap
@@ -41,103 +59,142 @@ button{padding:8px 18px;background:#2e7d32;color:#fff;border:none;border-radius:
 </head>
 
 <body>
+
 <div class="container">
 
-<h1>🌾 Feed • Vitamin • Medicine — उमेर अनुसार</h1>
+<h1>🐷 Animal Breeding Engine</h1>
 
-<div class="note">
-✔️ उमेर समूह अनुसार दाना हिसाब<br>
-✔️ ९–१२ महिना = बयस्क सरह<br>
-✔️ भिटामिन / औषधि = प्रतिवर्ष / प्रतिजनावर<br>
-✔️ Breeding Engine को गोठ डाटा प्रयोग
-</div>
+<p class="note">
+✔️ Year 1 उत्पादन = Input मा राखिएका माउ मात्र<br>
+✔️ नयाँ पोथी = अर्को वर्षदेखि मात्र उत्पादन<br>
+✔️ बिक्री = 9–12 महिना र बयस्कमा मात्र<br>
+✔️ Run गरेपछि डाटा सुरक्षित रहन्छ
+</p>
 
-<h2>🍽️ दाना दर (kg / जनावर / दिन)</h2>
+<h2>🔢 प्रारम्भिक इनपुट</h2>
 <table>
-<tr><th>उमेर समूह</th><th>दर (kg)</th></tr>
-<tr><td>१–३</td><td><input id="r13" value="1.0"></td></tr>
-<tr><td>४–५</td><td><input id="r45" value="1.5"></td></tr>
-<tr><td>६–८</td><td><input id="r68" value="2.0"></td></tr>
-<tr><td>९–१२ + बयस्क</td><td><input id="r912" value="3.0"></td></tr>
+<tr><td>प्रारम्भिक माउ (Year 1 उत्पादन)</td><td><input id="openingFemale" value="100"></td></tr>
+<tr><td>एक माउले वार्षिक बच्चा</td><td><input id="kidsPerFemale" value="20"></td></tr>
+<tr><td>व्याउने दर (%)</td><td><input id="breedRate" value="90"></td></tr>
+<tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
 </table>
 
-<h2>💊 भिटामिन / औषधि (Rs / जनावर / वर्ष)</h2>
+<h2>📤 बिक्री % (Year-wise)</h2>
 <table>
-<tr><th>प्रकार</th><th>दर</th></tr>
-<tr><td>भिटामिन</td><td><input id="vit" value="800"></td></tr>
-<tr><td>औषधि / खोप</td><td><input id="med" value="600"></td></tr>
+<tr>
+<th>वर्ष</th>
+<th>9–12 भाले %</th><th>9–12 पोथी %</th>
+<th>बयस्क भाले %</th><th>बयस्क माउ %</th>
+</tr>
+<tr><td>१</td><td><input id="m9Y1" value="50"></td><td><input id="f9Y1" value="40"></td><td><input id="amY1" value="0"></td><td><input id="afY1" value="0"></td></tr>
+<tr><td>२</td><td><input id="m9Y2" value="60"></td><td><input id="f9Y2" value="50"></td><td><input id="amY2" value="10"></td><td><input id="afY2" value="5"></td></tr>
+<tr><td>३</td><td><input id="m9Y3" value="70"></td><td><input id="f9Y3" value="60"></td><td><input id="amY3" value="15"></td><td><input id="afY3" value="8"></td></tr>
+<tr><td>४</td><td><input id="m9Y4" value="60"></td><td><input id="f9Y4" value="50"></td><td><input id="amY4" value="15"></td><td><input id="afY4" value="10"></td></tr>
+<tr><td>५</td><td><input id="m9Y5" value="50"></td><td><input id="f9Y5" value="40"></td><td><input id="amY5" value="20"></td><td><input id="afY5" value="12"></td></tr>
 </table>
 
 <h2>✍️ न्यारेसन / टिप्पणी</h2>
-<textarea placeholder="यो वर्ष दाना/औषधि खर्च किन यस्तो भयो ?"></textarea>
+<textarea id="narration" placeholder="यो breeding योजना सम्बन्धी टिप्पणी यहाँ लेख्नुहोस्..."></textarea>
 
-<br>
-<button onclick="render()">🔄 Recalculate</button>
+<br><br>
+<button onclick="runEngine()">⚙️ Run Breeding Engine</button>
 
 <hr>
-<h2>📊 वर्षवर्ष खर्च (Rs)</h2>
+<h2>📊 नतिजा</h2>
 <div id="result"></div>
 
 </div>
 
-<!-- PAGE FLOW -->
+<!-- PAGE FOLLOW -->
 <div class="page-follow">
-  <a href="animal-breeding-engine.html" class="pf-btn" data-title="Breeding Engine (Previous)">⬅️</a>
-  <a href="production.html" class="pf-btn" data-title="Production (Next)">➡️</a>
+  <a href="business-detail.html" class="pf-btn" data-title="Business Detail (Previous)">⬅️</a>
+  <a href="feed-vitamin-medicine-5yr.html" class="pf-btn" data-title="Feed • Vitamin • Medicine (Next)">➡️</a>
 </div>
 
 <script>
-// Load breeding inventory
-const data = JSON.parse(localStorage.getItem("BREEDING_ENGINE_5YR_RESULT")) || [];
+function n(id){return Number(document.getElementById(id)?.value)||0;}
 
-function v(id){return Number(document.getElementById(id).value)||0;}
+function runEngine(){
+  let adultFemale = n("openingFemale");
+  let adultMale = 0;
+  const out=[];
 
-function render(){
-  if(!data.length){
-    document.getElementById("result").innerHTML =
-      "<p class='small'>पहिला Breeding Engine run गर्नुहोस्।</p>";
-    return;
+  for(let y=1;y<=5;y++){
+    const births = adultFemale * n("kidsPerFemale")
+      * (n("breedRate")/100) * (1-n("deathRate")/100);
+
+    const maleBorn = Math.floor(births/2);
+    const femaleBorn = Math.round(births - maleBorn);
+
+    const m9Sold = Math.round(maleBorn * n(`m9Y${y}`)/100);
+    const f9Sold = Math.round(femaleBorn * n(`f9Y${y}`)/100);
+
+    const m9Remain = maleBorn - m9Sold;
+    const f9Remain = femaleBorn - f9Sold;
+
+    const adultMSold = Math.round(adultMale * n(`amY${y}`)/100);
+    const adultFSold = Math.round(adultFemale * n(`afY${y}`)/100);
+
+    adultMale -= adultMSold;
+    adultFemale -= adultFSold;
+
+    adultMale += m9Remain;
+    adultFemale += f9Remain;
+
+    out.push({
+      year:y,
+      bornM:maleBorn,bornF:femaleBorn,
+      sold9M:m9Sold,sold9F:f9Sold,
+      soldAdultM:adultMSold,soldAdultF:adultFSold,
+      stockMale:adultMale,
+      stockFemale:adultFemale
+    });
   }
 
-  let html=`<table>
-  <tr>
-    <th>वर्ष</th>
-    <th>दाना खर्च</th>
-    <th>भिटामिन खर्च</th>
-    <th>औषधि खर्च</th>
-    <th>कुल खर्च</th>
-  </tr>`;
+  localStorage.setItem(
+    "BREEDING_ENGINE_5YR_RESULT",
+    JSON.stringify(out)
+  );
+  localStorage.setItem(
+    "BREEDING_ENGINE_NARRATION",
+    document.getElementById("narration").value
+  );
 
-  data.forEach(y=>{
-    const total = (y.stockMale||0)+(y.stockFemale||0);
-
-    // age distribution
-    const a13 = total*0.25;
-    const a45 = total*0.20;
-    const a68 = total*0.25;
-    const a912 = total*0.30;
-
-    const feed =
-      (a13*v("r13")+a45*v("r45")+a68*v("r68")+a912*v("r912"))*365;
-
-    const vit = total*v("vit");
-    const med = total*v("med");
-
-    html+=`
-    <tr>
-      <td>${y.year}</td>
-      <td>${Math.round(feed)}</td>
-      <td>${Math.round(vit)}</td>
-      <td>${Math.round(med)}</td>
-      <td><b>${Math.round(feed+vit+med)}</b></td>
-    </tr>`;
-  });
-
-  html+=`</table>`;
-  document.getElementById("result").innerHTML=html;
+  render(out);
 }
 
-render();
+function render(d){
+  let h=`
+  <table>
+  <tr>
+    <th>वर्ष</th>
+    <th>भाले बाँकी</th>
+    <th>माउ बाँकी</th>
+  </tr>
+  ${d.map(x=>`
+    <tr>
+      <td>${x.year}</td>
+      <td>${x.stockMale}</td>
+      <td><b>${x.stockFemale}</b></td>
+    </tr>`).join("")}
+  </table>`;
+  document.getElementById("result").innerHTML=h;
+}
+
+// AUTO LOAD LAST RUN
+document.addEventListener("DOMContentLoaded",()=>{
+  const saved = localStorage.getItem("BREEDING_ENGINE_5YR_RESULT");
+  if(saved){
+    try{
+      const data = JSON.parse(saved);
+      if(Array.isArray(data) && data.length){
+        render(data);
+      }
+    }catch(e){}
+  }
+  const narr = localStorage.getItem("BREEDING_ENGINE_NARRATION");
+  if(narr) document.getElementById("narration").value = narr;
+});
 </script>
 
 </body>
