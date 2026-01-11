@@ -2,11 +2,12 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Animal Breeding Engine – Farm Logic FINAL</title>
+<title>Animal Breeding Engine – FINAL LOCKED</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1500px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+.container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
 h1,h2,h3{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
@@ -15,19 +16,46 @@ input{width:70px}
 button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
 .note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-top:12px}
 .small{font-size:12px;color:#555}
+
+/* PAGE FOLLOW */
+.page-follow{
+  position:fixed;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  z-index:999;
+}
+.pf-btn{
+  width:46px;height:46px;border-radius:50%;
+  background:#2e7d32;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;font-size:22px;position:relative;
+}
+.pf-btn:hover::after{
+  content:attr(data-title);
+  position:absolute;
+  right:52px;
+  background:#2e7d32;color:#fff;
+  padding:6px 10px;border-radius:6px;
+  font-size:12px;white-space:nowrap;
+}
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
-<h1>🐷 Animal Breeding Engine (Farmer Logic)</h1>
+<h1>🐷 Animal Breeding Engine</h1>
 
 <p class="note">
-✔️ Year 1 production = input mows only<br>
-✔️ New female produces from next year only<br>
-✔️ Sale only at <b>9–12 months</b> and <b>Adult</b><br>
-✔️ No automatic replacement
+✔️ Year 1 उत्पादन = Input माउ मात्र<br>
+✔️ नयाँ पोथी = अर्को वर्षदेखि मात्र उत्पादन<br>
+✔️ बिक्री = 9–12 महिना र बयस्कमा मात्र<br>
+✔️ भाले / पोथी सबै छुट्टाछुट्टै देखिन्छ
 </p>
 
 <h2>🔢 प्रारम्भिक इनपुट</h2>
@@ -40,7 +68,11 @@ button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius
 
 <h2>📤 बिक्री % (Year-wise)</h2>
 <table>
-<tr><th>वर्ष</th><th>9–12 भाले %</th><th>9–12 पोथी %</th><th>बयस्क भाले %</th><th>बयस्क माउ %</th></tr>
+<tr>
+<th>वर्ष</th>
+<th>9–12 भाले %</th><th>9–12 पोथी %</th>
+<th>बयस्क भाले %</th><th>बयस्क माउ %</th>
+</tr>
 <tr><td>१</td><td><input id="m9Y1" value="50"></td><td><input id="f9Y1" value="40"></td><td><input id="amY1" value="0"></td><td><input id="afY1" value="0"></td></tr>
 <tr><td>२</td><td><input id="m9Y2" value="60"></td><td><input id="f9Y2" value="50"></td><td><input id="amY2" value="10"></td><td><input id="afY2" value="5"></td></tr>
 <tr><td>३</td><td><input id="m9Y3" value="70"></td><td><input id="f9Y3" value="60"></td><td><input id="amY3" value="15"></td><td><input id="afY3" value="8"></td></tr>
@@ -57,67 +89,83 @@ button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius
 
 </div>
 
+<!-- PAGE FOLLOW -->
+<div class="page-follow">
+  <a href="business-detail.html" class="pf-btn" data-title="Business Detail (Previous)">⬅️</a>
+  <a href="feed-vitamin-medicine-5yr.html" class="pf-btn" data-title="Feed • Vitamin • Medicine (Next)">➡️</a>
+</div>
+
 <script>
 function n(id){return Number(document.getElementById(id)?.value)||0;}
 
 function runEngine(){
   let adultFemale = n("openingFemale");
   let adultMale = 0;
-  let carryFemale = 0;
   const out=[];
 
   for(let y=1;y<=5;y++){
-    // Birth only from adultFemale
+    // Birth
     const births = adultFemale * n("kidsPerFemale") * (n("breedRate")/100) * (1-n("deathRate")/100);
     const maleBorn = Math.floor(births/2);
     const femaleBorn = Math.round(births - maleBorn);
 
     // 9–12 sale
-    const m9sold = Math.round(maleBorn * n(`m9Y${y}`)/100);
-    const f9sold = Math.round(femaleBorn * n(`f9Y${y}`)/100);
-    const m9remain = maleBorn - m9sold;
-    const f9remain = femaleBorn - f9sold;
+    const m9Sold = Math.round(maleBorn * n(`m9Y${y}`)/100);
+    const f9Sold = Math.round(femaleBorn * n(`f9Y${y}`)/100);
+    const m9Remain = maleBorn - m9Sold;
+    const f9Remain = femaleBorn - f9Sold;
 
-    // Adult sale (culling)
+    // Adult sale
     const adultMSold = Math.round(adultMale * n(`amY${y}`)/100);
     const adultFSold = Math.round(adultFemale * n(`afY${y}`)/100);
 
     adultMale -= adultMSold;
     adultFemale -= adultFSold;
 
-    // Next year breeding
-    adultMale += m9remain;
-    adultFemale += f9remain;
+    // Next year stock
+    adultMale += m9Remain;
+    adultFemale += f9Remain;
 
     out.push({
       year:y,
       bornM:maleBorn,bornF:femaleBorn,
-      sold9M:m9sold,sold9F:f9sold,
+      sold9M:m9Sold,sold9F:f9Sold,
       soldAdultM:adultMSold,soldAdultF:adultFSold,
-      nextAdultF:adultFemale
+      stockMale:adultMale,
+      stockFemale:adultFemale
     });
   }
   render(out);
 }
 
 function render(d){
-  let h=`<table>
+  let h=`
+  <h3>A) जन्म र बिक्री</h3>
+  <table>
   <tr>
     <th>वर्ष</th>
-    <th>जन्म पोथी</th>
-    <th>9–12 पोथी बिक्री</th>
-    <th>बयस्क माउ बिक्री</th>
-    <th>अर्को वर्ष माउ</th>
+    <th>जन्म भाले</th><th>9–12 भाले बिक्री</th><th>बयस्क भाले बिक्री</th>
+    <th>जन्म पोथी</th><th>9–12 पोथी बिक्री</th><th>बयस्क माउ बिक्री</th>
   </tr>
   ${d.map(x=>`
     <tr>
       <td>${x.year}</td>
-      <td>${x.bornF}</td>
-      <td>${x.sold9F}</td>
-      <td>${x.soldAdultF}</td>
-      <td><b>${x.nextAdultF}</b></td>
+      <td>${x.bornM}</td><td>${x.sold9M}</td><td>${x.soldAdultM}</td>
+      <td>${x.bornF}</td><td>${x.sold9F}</td><td>${x.soldAdultF}</td>
     </tr>`).join("")}
-  </table>`;
+  </table>
+
+  <h3>B) गोठमा बाँकी (Inventory)</h3>
+  <table>
+  <tr><th>वर्ष</th><th>भाले बाँकी</th><th>माउ बाँकी</th></tr>
+  ${d.map(x=>`
+    <tr>
+      <td>${x.year}</td>
+      <td>${x.stockMale}</td>
+      <td><b>${x.stockFemale}</b></td>
+    </tr>`).join("")}
+  </table>
+  `;
   document.getElementById("result").innerHTML=h;
 }
 </script>
