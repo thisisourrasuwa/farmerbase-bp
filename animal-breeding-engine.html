@@ -2,195 +2,123 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Animal Breeding Engine – FINAL</title>
+<title>Animal Breeding Engine – Farm Logic FINAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-body{
-  font-family:"Noto Sans Devanagari","Kalimati",system-ui;
-  background:#f4f7f6;margin:0
-}
-.container{
-  max-width:1400px;margin:20px auto;
-  background:#fff;padding:24px;border-radius:12px
-}
+body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
+.container{max-width:1500px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
 h1,h2,h3{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
 input{width:70px}
-button{
-  padding:10px 22px;background:#2e7d32;
-  color:#fff;border:none;border-radius:6px;cursor:pointer
-}
-.note{
-  font-size:13px;background:#f9fff6;
-  border:1px dashed #9ccc65;padding:10px;margin-top:12px
-}
+button{padding:10px 22px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
+.note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-top:12px}
 .small{font-size:12px;color:#555}
-
-/* ---------- PAGE FOLLOW (FINAL) ---------- */
-.page-follow{
-  position:fixed;
-  right:14px;
-  top:50%;
-  transform:translateY(-50%);
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  z-index:999;
-}
-.pf-btn{
-  width:46px;height:46px;border-radius:50%;
-  background:#2e7d32;color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  text-decoration:none;font-size:22px;position:relative;
-}
-.pf-btn:hover::after{
-  content:attr(data-title);
-  position:absolute;
-  right:52px;
-  background:#2e7d32;
-  color:#fff;
-  padding:6px 10px;
-  border-radius:6px;
-  font-size:12px;
-  white-space:nowrap;
-}
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-<h1>🐷 Animal Breeding Engine</h1>
+<h1>🐷 Animal Breeding Engine (Farmer Logic)</h1>
 
 <p class="note">
-✔️ बेच्ने समय = <b>९–१२ महिना मात्र</b><br>
-✔️ Juvenile (१–३, ४–६) मा बिक्री छैन<br>
-✔️ <b>Baseline-safe:</b> अर्को वर्ष माउ ≥ प्रारम्भिक माउ<br>
-✔️ Replacement बढी भए मात्र growth
+✔️ Year 1 production = input mows only<br>
+✔️ New female produces from next year only<br>
+✔️ Sale only at <b>9–12 months</b> and <b>Adult</b><br>
+✔️ No automatic replacement
 </p>
 
 <h2>🔢 प्रारम्भिक इनपुट</h2>
 <table>
-<tr><td>प्रारम्भिक माउ (Baseline)</td><td><input id="openingFemale" value="100"></td></tr>
+<tr><td>प्रारम्भिक माउ (Year 1 उत्पादन)</td><td><input id="openingFemale" value="100"></td></tr>
 <tr><td>एक माउले वार्षिक बच्चा</td><td><input id="kidsPerFemale" value="20"></td></tr>
 <tr><td>व्याउने दर (%)</td><td><input id="breedRate" value="90"></td></tr>
 <tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
 </table>
 
-<h2>📤 ९–१२ महिना बिक्री % (Year-wise)</h2>
+<h2>📤 बिक्री % (Year-wise)</h2>
 <table>
-<tr><th>वर्ष</th><th>भाले बिक्री %</th><th>पोथी बिक्री %</th></tr>
-<tr><td>१</td><td><input id="mY1" value="50"></td><td><input id="fY1" value="40"></td></tr>
-<tr><td>२</td><td><input id="mY2" value="60"></td><td><input id="fY2" value="50"></td></tr>
-<tr><td>३</td><td><input id="mY3" value="70"></td><td><input id="fY3" value="60"></td></tr>
-<tr><td>४</td><td><input id="mY4" value="60"></td><td><input id="fY4" value="50"></td></tr>
-<tr><td>५</td><td><input id="mY5" value="50"></td><td><input id="fY5" value="40"></td></tr>
+<tr><th>वर्ष</th><th>9–12 भाले %</th><th>9–12 पोथी %</th><th>बयस्क भाले %</th><th>बयस्क माउ %</th></tr>
+<tr><td>१</td><td><input id="m9Y1" value="50"></td><td><input id="f9Y1" value="40"></td><td><input id="amY1" value="0"></td><td><input id="afY1" value="0"></td></tr>
+<tr><td>२</td><td><input id="m9Y2" value="60"></td><td><input id="f9Y2" value="50"></td><td><input id="amY2" value="10"></td><td><input id="afY2" value="5"></td></tr>
+<tr><td>३</td><td><input id="m9Y3" value="70"></td><td><input id="f9Y3" value="60"></td><td><input id="amY3" value="15"></td><td><input id="afY3" value="8"></td></tr>
+<tr><td>४</td><td><input id="m9Y4" value="60"></td><td><input id="f9Y4" value="50"></td><td><input id="amY4" value="15"></td><td><input id="afY4" value="10"></td></tr>
+<tr><td>५</td><td><input id="m9Y5" value="50"></td><td><input id="f9Y5" value="40"></td><td><input id="amY5" value="20"></td><td><input id="afY5" value="12"></td></tr>
 </table>
 
 <br>
-<button onclick="runEngine()">⚙️ Run Engine (5 Years)</button>
+<button onclick="runEngine()">⚙️ Run Engine</button>
 
 <hr>
-<h2>📊 ५ वर्षे नतिजा</h2>
+<h2>📊 नतिजा</h2>
 <div id="result"></div>
 
 </div>
 
-<!-- PAGE FOLLOW -->
-<div class="page-follow">
-  <a href="business-detail.html"
-     class="pf-btn"
-     data-title="Business Detail (Previous)">⬅️</a>
-
-  <a href="feed-vitamin-medicine-5yr.html"
-     class="pf-btn"
-     data-title="Feed • Vitamin • Medicine (Next)">➡️</a>
-</div>
-
 <script>
-function n(id){
-  return Number(document.getElementById(id)?.value)||0;
-}
+function n(id){return Number(document.getElementById(id)?.value)||0;}
 
 function runEngine(){
-  const openingFemale = n("openingFemale");
-  let breedingFemale = openingFemale;
-  let adultMaleStock = 0;
-  const rows=[];
+  let adultFemale = n("openingFemale");
+  let adultMale = 0;
+  let carryFemale = 0;
+  const out=[];
 
   for(let y=1;y<=5;y++){
-    // Birth
-    const births = breedingFemale
-      * n("kidsPerFemale")
-      * (n("breedRate")/100)
-      * (1-n("deathRate")/100);
-
+    // Birth only from adultFemale
+    const births = adultFemale * n("kidsPerFemale") * (n("breedRate")/100) * (1-n("deathRate")/100);
     const maleBorn = Math.floor(births/2);
     const femaleBorn = Math.round(births - maleBorn);
 
-    // 9–12 month sale only
-    const maleSold = Math.round(maleBorn * n(`mY${y}`)/100);
-    const femaleSold = Math.round(femaleBorn * n(`fY${y}`)/100);
+    // 9–12 sale
+    const m9sold = Math.round(maleBorn * n(`m9Y${y}`)/100);
+    const f9sold = Math.round(femaleBorn * n(`f9Y${y}`)/100);
+    const m9remain = maleBorn - m9sold;
+    const f9remain = femaleBorn - f9sold;
 
-    const maleRemain = maleBorn - maleSold;
-    const femaleRemain = femaleBorn - femaleSold;
+    // Adult sale (culling)
+    const adultMSold = Math.round(adultMale * n(`amY${y}`)/100);
+    const adultFSold = Math.round(adultFemale * n(`afY${y}`)/100);
 
-    // Inventory & baseline-safe breeding
-    adultMaleStock += maleRemain;
-    breedingFemale = Math.max(openingFemale, femaleRemain);
+    adultMale -= adultMSold;
+    adultFemale -= adultFSold;
 
-    rows.push({
+    // Next year breeding
+    adultMale += m9remain;
+    adultFemale += f9remain;
+
+    out.push({
       year:y,
-      bornM:maleBorn, soldM:maleSold,
-      bornF:femaleBorn, soldF:femaleSold,
-      nextBreeding:breedingFemale,
-      maleInventory:adultMaleStock
+      bornM:maleBorn,bornF:femaleBorn,
+      sold9M:m9sold,sold9F:f9sold,
+      soldAdultM:adultMSold,soldAdultF:adultFSold,
+      nextAdultF:adultFemale
     });
   }
-  render(rows);
+  render(out);
 }
 
 function render(d){
-  let h = `
-  <h3>A) जन्म र बिक्री (९–१२ महिना)</h3>
-  <table>
+  let h=`<table>
   <tr>
     <th>वर्ष</th>
-    <th>जन्म भाले</th><th>बेचेको भाले</th>
-    <th>जन्म पोथी</th><th>बेचेको पोथी</th>
+    <th>जन्म पोथी</th>
+    <th>9–12 पोथी बिक्री</th>
+    <th>बयस्क माउ बिक्री</th>
+    <th>अर्को वर्ष माउ</th>
   </tr>
   ${d.map(x=>`
     <tr>
       <td>${x.year}</td>
-      <td>${x.bornM}</td><td>${x.soldM}</td>
-      <td>${x.bornF}</td><td>${x.soldF}</td>
+      <td>${x.bornF}</td>
+      <td>${x.sold9F}</td>
+      <td>${x.soldAdultF}</td>
+      <td><b>${x.nextAdultF}</b></td>
     </tr>`).join("")}
-  </table>
-
-  <h3>B) Inventory (गोठमा बाँकी)</h3>
-  <table>
-  <tr><th>वर्ष</th><th>बाँकी भाले</th></tr>
-  ${d.map(x=>`
-    <tr><td>${x.year}</td><td>${x.maleInventory}</td></tr>`).join("")}
-  </table>
-
-  <h3>C) Next-Year Breeding (Baseline Safe)</h3>
-  <table>
-  <tr><th>वर्ष</th><th>अर्को वर्षका माउ</th></tr>
-  ${d.map(x=>`
-    <tr><td>${x.year}</td><td><b>${x.nextBreeding}</b></td></tr>`).join("")}
-  </table>
-
-  <p class="small">
-  नोट: प्रारम्भिक माउभन्दा कम replacement भए पनि माउ घट्दैन।
-  Replacement बढी भए मात्र growth देखिन्छ।
-  </p>
-  `;
-  document.getElementById("result").innerHTML = h;
+  </table>`;
+  document.getElementById("result").innerHTML=h;
 }
 </script>
 
