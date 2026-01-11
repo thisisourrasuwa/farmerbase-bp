@@ -3,131 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <title>Production</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
- font-family:Arial, sans-serif;
- background:#f7f7f7;
- margin:0
-}
+body{font-family:Arial,system-ui;background:#f7f7f7;margin:0}
+.container{max-width:1200px;margin:20px auto;background:#fff;padding:20px}
+h1{color:#2e7d32;margin-top:0}
 
-/* ===== HEADER ===== */
-.app-header{
- background:linear-gradient(90deg,#2e7d32,#43a047);
- padding:16px 20px;
- text-align:center;
- box-shadow:0 2px 8px rgba(0,0,0,0.15)
-}
-.app-title{
- color:#e8f5e9;
- font-size:22px;
- font-weight:700;
- letter-spacing:.5px
-}
-.page-title{
- margin-top:4px;
- color:#ffffff;
- font-size:18px;
- font-weight:600;
- border-top:1px solid rgba(255,255,255,.4);
- padding-top:6px
-}
-
-/* ===== SIDE PAGE FOLLOW ===== */
-.side-nav{
- position:fixed;
- top:50%;
- transform:translateY(-50%);
- width:48px;
- height:48px;
- border-radius:50%;
- background:#2e7d32;
- color:#fff;
- font-size:26px;
- display:flex;
- align-items:center;
- justify-content:center;
- cursor:pointer;
- z-index:999;
- box-shadow:0 4px 10px rgba(0,0,0,.25)
-}
-.side-nav.prev{left:15px}
-.side-nav.next{right:15px}
-.side-nav:hover{background:#1b5e20}
-
-/* ===== BODY ===== */
-.container{
- padding:20px;
- max-width:1100px;
- margin:auto;
- background:#fff;
- min-height:70vh
-}
-
-table{
- width:100%;
- border-collapse:collapse;
- margin-top:15px
-}
-th,td{
- border:1px solid #ccc;
- padding:10px;
- text-align:center;
- font-size:15px
-}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{border:1px solid #ccc;padding:10px;text-align:center}
 th{background:#e8f5e9}
 
-input{
- width:95%;
- padding:6px;
- font-size:14px
-}
+input{width:95%;padding:6px}
+button{padding:6px 12px;cursor:pointer}
 
-.btn{
- padding:6px 12px;
- cursor:pointer;
- border:none;
- font-size:14px
-}
-.add-btn{
- background:#2e7d32;
- color:#fff;
- margin-top:10px
-}
-.delete-btn{
- background:#c62828;
- color:#fff
-}
+.lock{background:#f1f8e9;font-weight:600}
+.delete{background:#c62828;color:#fff;border:none}
 
-.readonly{
- background:#f1f8e9;
- font-weight:600
+/* PAGE FLOW */
+.page-follow{
+ position:fixed;right:14px;top:50%;
+ transform:translateY(-50%);
+ display:flex;flex-direction:column;gap:12px;z-index:999
 }
-
-footer{
- background:#2e7d32;
- color:#fff;
- padding:12px 20px;
- text-align:center
+.pf-btn{
+ width:46px;height:46px;border-radius:50%;
+ background:#2e7d32;color:#fff;
+ display:flex;align-items:center;justify-content:center;
+ text-decoration:none;font-size:22px
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== PAGE FLOW ===== -->
-<div class="side-nav prev" onclick="location.href='feed-vitamin-medicine-5yr.html'">⬅</div>
-<div class="side-nav next" onclick="location.href='expenses.demo.html'">➡</div>
-
-<!-- ===== HEADER ===== -->
-<header class="app-header">
-  <div class="app-title">FarmerBase BP Engine</div>
-  <div class="page-title">उत्पादन विवरण</div>
-</header>
-
 <div class="container">
+<h1>📦 उत्पादन (Year-wise)</h1>
 
-<table id="productionTable">
+<table id="prodTable">
 <thead>
 <tr>
  <th>उत्पादन नाम</th>
@@ -140,100 +53,75 @@ footer{
 <tbody></tbody>
 </table>
 
-<button class="btn add-btn" onclick="addRow()">➕ अन्य उत्पादन थप्नुहोस्</button>
-
+<button onclick="addRow()">➕ अन्य उत्पादन थप्नुहोस्</button>
 </div>
 
-<footer>
-  🌱 FarmerBase BP Engine – Production Module
-</footer>
+<!-- PAGE FLOW -->
+<div class="page-follow">
+ <a href="feed-vitamin-medicine-5yr.html" class="pf-btn">⬅️</a>
+ <a href="expenses.demo.html" class="pf-btn">➡️</a>
+</div>
 
 <script>
-/* =================================================
-   LOAD BREEDING SALES (AUTO PRODUCT)
-================================================= */
+// ================= LOAD BREEDING DATA =================
 const breeding =
  JSON.parse(localStorage.getItem("BREEDING_ENGINE_5YR_RESULT")) || [];
 
-let autoQuantity = 0;
-breeding.forEach(y=>{
- autoQuantity +=
-  (y.sold9M || 0) +
-  (y.sold9F || 0) +
-  (y.soldAdultM || 0) +
-  (y.soldAdultF || 0);
-});
+// ================= LOAD MANUAL =================
+let manual =
+ JSON.parse(localStorage.getItem("MANUAL_PRODUCTION")) || [];
 
-/* =================================================
-   LOAD MANUAL PRODUCTIONS
-================================================= */
-let productions =
- JSON.parse(localStorage.getItem("productions")) || [];
-
-/* =================================================
-   SAVE
-================================================= */
+// ================= SAVE =================
 function save(){
- localStorage.setItem("productions", JSON.stringify(productions));
+ localStorage.setItem("MANUAL_PRODUCTION", JSON.stringify(manual));
 }
 
-/* =================================================
-   RENDER
-================================================= */
-function renderTable(){
- const tbody = document.querySelector("#productionTable tbody");
- tbody.innerHTML = "";
+// ================= RENDER =================
+function render(){
+ const tbody=document.querySelector("#prodTable tbody");
+ tbody.innerHTML="";
 
- /* ---- AUTO BREEDING SALE PRODUCT ---- */
- const autoRow = document.createElement("tr");
- autoRow.innerHTML = `
-<td>बंगुर बिक्री (Breeding Engine)</td>
-<td>जनावर</td>
-<td class="readonly">${autoQuantity}</td>
-<td class="readonly">Animal Breeding Engine बाट स्वचालित</td>
-<td class="readonly">🔒</td>`;
- tbody.appendChild(autoRow);
+ // ---- AUTO YEAR-WISE BREEDING SALES ----
+ breeding.forEach(y=>{
+  const qty =
+   (y.sold9M||0)+(y.sold9F||0)+(y.soldAdultM||0)+(y.soldAdultF||0);
 
- /* ---- MANUAL PRODUCTS ---- */
- productions.forEach((p, index)=>{
-  const row = document.createElement("tr");
-  row.innerHTML = `
-<td><input value="${p.name}" onchange="update(${index},'name',this.value)"></td>
-<td><input value="${p.unit}" onchange="update(${index},'unit',this.value)"></td>
-<td><input type="number" value="${p.quantity}" onchange="update(${index},'quantity',this.value)"></td>
-<td><input value="${p.note}" onchange="update(${index},'note',this.value)"></td>
-<td><button class="btn delete-btn" onclick="removeRow(${index})">🗑️</button></td>`;
-  tbody.appendChild(row);
+  const tr=document.createElement("tr");
+  tr.innerHTML=`
+   <td class="lock">बंगुर बिक्री (Year ${y.year})</td>
+   <td class="lock">जनावर</td>
+   <td class="lock">${qty}</td>
+   <td class="lock">Animal Breeding Engine बाट स्वचालित</td>
+   <td class="lock">🔒</td>`;
+  tbody.appendChild(tr);
+ });
+
+ // ---- MANUAL PRODUCTS ----
+ manual.forEach((p,i)=>{
+  const tr=document.createElement("tr");
+  tr.innerHTML=`
+   <td><input value="${p.name}" onchange="update(${i},'name',this.value)"></td>
+   <td><input value="${p.unit}" onchange="update(${i},'unit',this.value)"></td>
+   <td><input type="number" value="${p.qty}" onchange="update(${i},'qty',this.value)"></td>
+   <td><input value="${p.note}" onchange="update(${i},'note',this.value)"></td>
+   <td><button class="delete" onclick="del(${i})">🗑️</button></td>`;
+  tbody.appendChild(tr);
  });
 }
 
-/* =================================================
-   CRUD
-================================================= */
+// ================= CRUD =================
 function addRow(){
- productions.push({
-  id:"p"+Date.now(),
-  name:"",
-  unit:"",
-  quantity:"",
-  note:""
- });
- save(); renderTable();
+ manual.push({name:"",unit:"",qty:"",note:""});
+ save(); render();
 }
-
-function update(index, field, value){
- productions[index][field] = value;
- save();
-}
-
-function removeRow(index){
- if(confirm("यो उत्पादन हटाउने हो ?")){
-  productions.splice(index,1);
-  save(); renderTable();
+function update(i,f,v){manual[i][f]=v;save();}
+function del(i){
+ if(confirm("हटाउने हो ?")){
+  manual.splice(i,1);save();render();
  }
 }
 
-renderTable();
+render();
 </script>
 
 </body>
