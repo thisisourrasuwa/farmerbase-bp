@@ -1,121 +1,169 @@
 <!DOCTYPE html>
-<html lang="ne">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Animal Breeding Engine – FINAL (Global Male Sale)</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1600px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
-h1,h2,h3{color:#2e7d32;margin-top:0}
-table{width:100%;border-collapse:collapse;margin-top:14px}
-th,td{border:1px solid #ccc;padding:8px;text-align:center}
-th{background:#eef5ee}
-input{width:64px}
-button{padding:10px 20px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
-.group{background:#f1f8e9;font-weight:bold}
-.note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-top:12px}
-.page-follow{position:fixed;right:12px;top:45%;display:flex;flex-direction:column;gap:10px;z-index:999}
-.pf-btn{width:44px;height:44px;border-radius:50%;background:#2e7d32;color:#fff;
-display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:20px}
-.small{font-size:12px;color:#555}
-</style>
+  <meta charset="UTF-8">
+  <title>Animal Breeding Engine – Basic & Final</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
+    th, td { border: 1px solid #999; padding: 6px; text-align: center; }
+    th { background: #f0f0f0; }
+    h2 { margin-top: 40px; }
+    pre { background: #111; color: #0f0; padding: 10px; overflow-x: auto; }
+  </style>
 </head>
-
 <body>
-<div class="container">
 
-<h1>🐷 Animal Breeding Engine</h1>
-<p class="note">
-✔️ Global Rule: <b>भाले = सबै उमेर 100% बिक्री</b><br>
-✔️ Breeding Gate: <b>Next-Year Breeding = Adult Female Remain ONLY</b><br>
-✔️ 100% माउ बिक्री ⇒ अर्को वर्ष उत्पादन = 0 (Guaranteed)
-</p>
+<h1>🐄 Animal Breeding Engine (Basic – Stable)</h1>
 
-<h2>🔢 प्रारम्भिक इनपुट</h2>
-<table>
-<tr><td>प्रारम्भिक माउ</td><td><input id="openingFemale" value="100"></td></tr>
-<tr><td>एक माउले वार्षिक बच्चा</td><td><input id="kidsPerFemale" value="20"></td></tr>
-<tr><td>व्याउने दर (%)</td><td><input id="breedRate" value="90"></td></tr>
-<tr><td>मृत्युदर (%)</td><td><input id="deathRate" value="10"></td></tr>
-</table>
-
-<h2>📤 बिक्री नीति</h2>
-<table>
-<tr><td>🔴 भाले सबै उमेर 100% बिक्री</td><td><b>ON (FINAL)</b></td></tr>
-<tr><td>माउ बिक्री %</td><td><input id="adultFY" value="10"></td></tr>
-</table>
-
-<br>
-<button onclick="runEngine()">⚙️ Run Breeding Engine (5 Years)</button>
-
-<hr>
-<h2>📊 ५ वर्षे नतिजा</h2>
-<div id="result"></div>
-
-</div>
-
-<div class="page-follow">
-  <a href="business-detail.html" class="pf-btn">⬅️</a>
-  <a href="feed-vitamin-medicine-5yr.html" class="pf-btn">➡️</a>
-</div>
+<div id="output"></div>
 
 <script>
-function n(id){const e=document.getElementById(id);return e?Number(e.value)||0:0;}
+/* =========================
+   1. CONFIG (ONLY INPUT)
+========================= */
+const breedingConfig = {
+  animal: "Pig",
+  years: 5,
 
-function runEngine(){
-  let breedingFemale = n("openingFemale");
-  const out=[];
+  cohorts: ["piglet", "grower", "adult"],
 
-  for(let y=1;y<=5;y++){
-    let births = breedingFemale * n("kidsPerFemale") * (n("breedRate")/100) * (1-n("deathRate")/100);
-    let maleBorn = Math.floor(births/2);
-    let femaleBorn = Math.round(births-maleBorn);
+  initialStock: {
+    piglet: { male: 0, female: 0 },
+    grower: { male: 0, female: 0 },
+    adult:  { male: 5, female: 20 }
+  },
 
-    // 🔴 GLOBAL MALE SALE
-    let maleSold = maleBorn;     // 100%
-    let maleRemain = 0;          // GUARANTEED
+  reproduction: {
+    adult: {
+      birthPerFemalePerYear: 10,
+      maleRatio: 50,
+      femaleRatio: 50
+    }
+  },
 
-    // Female juvenile → adult
-    let adultFemalePool = femaleBorn;
+  // ✅ SALES AGE % + GENDER %
+  salesPolicy: {
+    piglet: {
+      male:   { sell: 0, retain: 100 },
+      female: { sell: 0, retain: 100 }
+    },
+    grower: {
+      male:   { sell: 50, retain: 50 },
+      female: { sell: 30, retain: 70 }
+    },
+    adult: {
+      male:   { sell: 80, retain: 20 },
+      female: { sell: 60, retain: 40 }
+    }
+  }
+};
 
-    // Adult female sale
-    let soldAdultFemale = Math.round(adultFemalePool * n("adultFY")/100);
-    let remainAdultFemale = adultFemalePool - soldAdultFemale;
-
-    out.push({
-      year:y,
-      born:{male:maleBorn,female:femaleBorn},
-      sold:{male:maleSold,femaleAdult:soldAdultFemale},
-      breeding:{nextFemale:remainAdultFemale}
+/* =========================
+   2. VALIDATION
+========================= */
+function validateSalesPolicy(policy) {
+  for (let c in policy) {
+    ["male", "female"].forEach(g => {
+      if (policy[c][g].sell + policy[c][g].retain !== 100) {
+        throw new Error(`Invalid sales policy: ${c} ${g}`);
+      }
     });
+  }
+}
 
-    breedingFemale = remainAdultFemale;
+/* =========================
+   3. ENGINE
+========================= */
+function runBreedingEngine(config) {
+
+  validateSalesPolicy(config.salesPolicy);
+
+  let stock = JSON.parse(JSON.stringify(config.initialStock));
+  let results = [];
+
+  for (let year = 1; year <= config.years; year++) {
+
+    let yearData = {
+      year,
+      beforeSale: JSON.parse(JSON.stringify(stock)),
+      sold: {},
+      afterSale: {}
+    };
+
+    /* ---- Birth ---- */
+    const adultFemales = stock.adult.female;
+    const births = adultFemales * config.reproduction.adult.birthPerFemalePerYear;
+
+    const maleBirths = births * (config.reproduction.adult.maleRatio / 100);
+    const femaleBirths = births * (config.reproduction.adult.femaleRatio / 100);
+
+    /* ---- Aging ---- */
+    let nextStock = {
+      piglet: { male: maleBirths, female: femaleBirths },
+      grower: { ...stock.piglet },
+      adult: {
+        male: stock.grower.male + stock.adult.male,
+        female: stock.grower.female + stock.adult.female
+      }
+    };
+
+    /* ---- Sales (Age % + Gender %) ---- */
+    for (let c in nextStock) {
+      yearData.sold[c] = { male: 0, female: 0 };
+
+      ["male", "female"].forEach(g => {
+        const total = nextStock[c][g];
+        const sellPct = config.salesPolicy[c][g].sell / 100;
+        const soldQty = total * sellPct;
+
+        yearData.sold[c][g] = soldQty;
+        nextStock[c][g] = total - soldQty;
+      });
+    }
+
+    yearData.afterSale = JSON.parse(JSON.stringify(nextStock));
+    results.push(yearData);
+    stock = nextStock;
   }
 
-  render(out);
+  return results;
 }
 
-function render(d){
-  let h=`
-  <table>
-    <tr><th>वर्ष</th><th>जन्म भाले</th><th>भाले बिक्री</th>
-        <th>जन्म पोथी</th><th>माउ बिक्री</th>
-        <th><b>अर्का वर्ष माउ</b></th></tr>
-    ${d.map(x=>`
+/* =========================
+   4. RUN & DISPLAY
+========================= */
+const data = runBreedingEngine(breedingConfig);
+const output = document.getElementById("output");
+
+data.forEach(y => {
+  output.innerHTML += `<h2>Year ${y.year}</h2>`;
+
+  let table = `<table>
+    <tr>
+      <th>Cohort</th>
+      <th>Male (Remain)</th>
+      <th>Female (Remain)</th>
+      <th>Male Sold</th>
+      <th>Female Sold</th>
+    </tr>`;
+
+  for (let c in y.afterSale) {
+    table += `
       <tr>
-        <td>${x.year}</td>
-        <td>${x.born.male}</td>
-        <td>${x.sold.male}</td>
-        <td>${x.born.female}</td>
-        <td>${x.sold.femaleAdult}</td>
-        <td><b>${x.breeding.nextFemale}</b></td>
-      </tr>`).join("")}
-  </table>
-  <p class="small">नोट: भाले सबै उमेर 100% बिक्री भएकाले Inventory भाले = 0 सधैं।</p>
-  `;
-  document.getElementById("result").innerHTML=h;
-}
+        <td>${c}</td>
+        <td>${y.afterSale[c].male.toFixed(1)}</td>
+        <td>${y.afterSale[c].female.toFixed(1)}</td>
+        <td>${y.sold[c].male.toFixed(1)}</td>
+        <td>${y.sold[c].female.toFixed(1)}</td>
+      </tr>`;
+  }
+
+  table += `</table>`;
+  output.innerHTML += table;
+});
+
+output.innerHTML += `<h2>🔍 Raw JSON (Debug)</h2><pre>${JSON.stringify(data, null, 2)}</pre>`;
 </script>
 
 </body>
