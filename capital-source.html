@@ -2,10 +2,14 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>पुँजिको स्रोत</title>
+<title>पुँजिको स्रोत (Capital Source)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{font-family:Arial;background:#f5f5f5;margin:0}
+body{
+ font-family:"Noto Sans Devanagari","Kalimati",system-ui;
+ background:#f4f7f6;margin:0
+}
 
 /* ===== HEADER ===== */
 header{
@@ -43,22 +47,25 @@ header{
 /* ===== CONTAINER ===== */
 .container{
  max-width:1200px;
- margin:auto;
+ margin:20px auto;
  background:#fff;
- padding:20px 70px;
+ padding:24px 60px;
+ border-radius:12px;
  min-height:70vh
 }
 
+/* ===== SUMMARY ===== */
 .summary{
  background:#f1f8e9;
- padding:15px;
+ padding:16px;
  margin-bottom:20px;
- font-size:15px
+ font-size:15px;
+ border-radius:8px
 }
 
-select,input{padding:5px}
+select,input{padding:6px}
 
-table{width:100%;border-collapse:collapse}
+table{width:100%;border-collapse:collapse;margin-top:12px}
 th,td{
  border:1px solid #ccc;
  padding:8px;
@@ -74,10 +81,11 @@ td input{width:100%;box-sizing:border-box}
 .del{background:#c62828;color:#fff}
 
 .tag{
- padding:4px 8px;
+ padding:4px 10px;
  background:#e0f2f1;
- border-radius:12px;
- font-size:12px
+ border-radius:14px;
+ font-size:12px;
+ white-space:nowrap
 }
 
 .ok{color:#2e7d32;font-weight:bold}
@@ -107,29 +115,31 @@ footer{
 
 <!-- ================= SUMMARY ================= -->
 <div class="summary">
-<b>स्थिर पूँजी:</b> <span id="fixedCap">0</span><br>
-<b>वार्षिक चालु खर्च:</b> <span id="annualVar">0</span><br><br>
+ <b>स्थिर पूँजी:</b> <span id="fixedCap">0</span><br>
+ <b>वार्षिक चालु खर्च:</b> <span id="annualVar">0</span>
 
-<b>कार्यशील पूँजी मोड:</b>
-<select id="wcMode" onchange="changeWCMode(this.value)">
- <option value="months">महिना आधारित</option>
- <option value="percent">प्रतिशत आधारित</option>
- <option value="manual">Manual</option>
-</select>
-<span id="wcOptions"></span>
+ <hr>
 
-<hr>
+ <b>कार्यशील पूँजी मोड:</b>
+ <select id="wcMode" onchange="changeWCMode(this.value)">
+  <option value="months">महिना आधारित</option>
+  <option value="percent">प्रतिशत आधारित</option>
+  <option value="manual">Manual</option>
+ </select>
+ <span id="wcOptions"></span>
 
-<b>कार्यशील पूँजी:</b> <span id="workingCap">0</span><br>
-<b>कुल आवश्यक पूँजी:</b> <span id="totalCapital">0</span><br>
-<b>कुल %:</b> <span id="totalPercent">0%</span>
-<span id="status"></span><br>
+ <hr>
 
-<b>वार्षिक ब्याज खर्च:</b> <span id="totalInterest">0</span>
+ <b>कार्यशील पूँजी:</b> <span id="workingCap">0</span><br>
+ <b>कुल आवश्यक पूँजी:</b> <span id="totalCapital">0</span><br>
+ <b>कुल %:</b> <span id="totalPercent">0%</span>
+ <span id="status"></span><br>
+
+ <b>वार्षिक ब्याज खर्च:</b> <span id="totalInterest">0</span>
 </div>
 
-<!-- ================= ADD TYPE BUTTONS ================= -->
-<div class="typeBtns">
+<!-- ================= ADD SOURCE ================= -->
+<div style="margin-bottom:12px">
  <button class="btn add" onclick="addSource('self')">➕ स्वलगानी</button>
  <button class="btn add" onclick="addSource('grant')">➕ अनुदान</button>
  <button class="btn add" onclick="addSource('loan')">➕ बैंक/सहकारी ऋण</button>
@@ -157,19 +167,33 @@ footer{
 </footer>
 
 <script>
-/* ================= LOAD FROM EXPENSES (NO LOGIC CHANGE) ================= */
+/* =====================================================
+   LOAD FROM EXPENSES (KEYS ALIGNED, LOGIC UNCHANGED)
+===================================================== */
 const cost = JSON.parse(localStorage.getItem("PROJECT_COST_5YR")) || {};
-const annualVar = cost.operating?.[0]?.total || 0;   // Year-1 operating
-const fixedCap  = cost.fixed || 0;
 
-/* ================= WORKING CAPITAL STATE ================= */
+// Year-1 operating cost
+const annualVar =
+ (cost.operating && cost.operating.length)
+   ? Number(cost.operating[0].total) || 0
+   : 0;
+
+// Fixed capital (project-level)
+const fixedCap =
+ Number(cost.fixedTotal || cost.fixed || 0);
+
+/* =====================================================
+   WORKING CAPITAL STATE (AS-IS)
+===================================================== */
 let wcState = JSON.parse(localStorage.getItem("wcState")) || {
  mode:"months", months:3, percent:20, manual:0
 };
 function saveWC(){localStorage.setItem("wcState",JSON.stringify(wcState));}
 function changeWCMode(m){wcState.mode=m;saveWC();render();}
 
-/* ================= CAPITAL SOURCES ================= */
+/* =====================================================
+   CAPITAL SOURCES (AS-IS)
+===================================================== */
 let sources = JSON.parse(localStorage.getItem("capitalSources")) || [];
 function saveSources(){localStorage.setItem("capitalSources",JSON.stringify(sources));}
 
@@ -189,20 +213,27 @@ function removeSource(id){
  }
 }
 
-/* ================= WORKING CAPITAL ================= */
+/* =====================================================
+   WORKING CAPITAL CALC (AS-IS)
+===================================================== */
 function calcWorkingCap(){
- if(wcState.mode==="months") return (annualVar/12)*(wcState.months||3);
- if(wcState.mode==="percent") return annualVar*(wcState.percent||0)/100;
- if(wcState.mode==="manual") return wcState.manual||0;
+ if(wcState.mode==="months")
+  return (annualVar/12)*(wcState.months||3);
+ if(wcState.mode==="percent")
+  return annualVar*(wcState.percent||0)/100;
+ if(wcState.mode==="manual")
+  return wcState.manual||0;
  return 0;
 }
 
-/* ================= RENDER ================= */
+/* =====================================================
+   RENDER
+===================================================== */
 function render(){
- fixedCapEl.innerText=fixedCap.toFixed(2);
- annualVarEl.innerText=annualVar.toFixed(2);
+ document.getElementById("fixedCap").innerText = fixedCap.toFixed(2);
+ document.getElementById("annualVar").innerText = annualVar.toFixed(2);
 
- wcMode.value=wcState.mode;
+ document.getElementById("wcMode").value = wcState.mode;
 
  let opt="";
  if(wcState.mode==="months"){
@@ -224,23 +255,25 @@ function render(){
   <input type="number" value="${wcState.manual}"
    onchange="wcState.manual=this.value;saveWC();render()" style="width:120px">`;
  }
- wcOptions.innerHTML=opt;
+ document.getElementById("wcOptions").innerHTML=opt;
 
- const workingCap=calcWorkingCap();
- const totalCapital=fixedCap+workingCap;
+ const workingCap = calcWorkingCap();
+ const totalCapital = fixedCap + workingCap;
 
- workingCapEl.innerText=workingCap.toFixed(2);
- totalCapitalEl.innerText=totalCapital.toFixed(2);
+ document.getElementById("workingCap").innerText = workingCap.toFixed(2);
+ document.getElementById("totalCapital").innerText = totalCapital.toFixed(2);
 
- const tb=capBody;
+ const tb=document.getElementById("capBody");
  tb.innerHTML="";
  let sumPct=0,totalInterest=0;
 
  sources.forEach(s=>{
   const pct=s.pct||0;
   const amt=totalCapital*pct/100;
-  const interestAmt=(s.type==="loan"||s.type==="other")
-   ? amt*(s.interest||0)/100 : 0;
+  const interestAmt=
+   (s.type==="loan"||s.type==="other")
+    ? amt*(s.interest||0)/100
+    : 0;
 
   sumPct+=pct; totalInterest+=interestAmt;
 
@@ -264,24 +297,13 @@ function render(){
 </tr>`;
  });
 
- totalPercent.innerText=sumPct+"%";
- totalInterestEl.innerText=totalInterest.toFixed(2);
- status.innerHTML=sumPct===100
-  ?'<span class="ok"> ✔️ 100% मिल्यो</span>'
-  :'<span class="warn"> ❗ 100% हुनुपर्छ</span>';
+ document.getElementById("totalPercent").innerText=sumPct+"%";
+ document.getElementById("totalInterest").innerText=totalInterest.toFixed(2);
+ document.getElementById("status").innerHTML=
+  sumPct===100
+   ?'<span class="ok"> ✔️ 100% मिल्यो</span>'
+   :'<span class="warn"> ❗ 100% हुनुपर्छ</span>';
 }
-
-/* ===== BIND ===== */
-const fixedCapEl=fixedCap;
-const annualVarEl=annualVar;
-const wcMode=document.getElementById("wcMode");
-const wcOptions=document.getElementById("wcOptions");
-const workingCapEl=document.getElementById("workingCap");
-const totalCapitalEl=document.getElementById("totalCapital");
-const totalPercent=document.getElementById("totalPercent");
-const totalInterestEl=document.getElementById("totalInterest");
-const status=document.getElementById("status");
-const capBody=document.getElementById("capBody");
 
 render();
 </script>
