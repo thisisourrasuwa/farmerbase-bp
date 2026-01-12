@@ -6,30 +6,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
- font-family:"Noto Sans Devanagari","Kalimati",system-ui;
- background:#f4f7f6;margin:0
-}
-.container{
- max-width:1600px;margin:20px auto;
- background:#fff;padding:24px;border-radius:12px
-}
+body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
+.container{max-width:1850px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
 h1,h2{color:#2e7d32;margin-top:0}
-
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-
-input{width:100%;padding:6px}
+input,select{padding:6px}
 .lock{background:#f1f8e9;font-weight:600}
+button{padding:6px 14px;cursor:pointer}
+.add{background:#2e7d32;color:#fff;border:none}
+.del{background:#c62828;color:#fff;border:none}
+.note{font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin:12px 0}
 
-.note{
- font-size:13px;background:#f9fff6;
- border:1px dashed #9ccc65;
- padding:10px;margin:12px 0
-}
-
-/* page flow */
 .page-follow{
  position:fixed;right:14px;top:50%;
  transform:translateY(-50%);
@@ -45,44 +34,40 @@ input{width:100%;padding:6px}
 </head>
 
 <body>
-
 <div class="container">
+
 <h1>💸 Expenses Summary (५ वर्ष)</h1>
 
 <div class="note">
-✔️ Feed • Vitamin • Medicine = चालु खर्च<br>
-✔️ अन्य चालु खर्च जोडिन्छ<br>
-✔️ स्थिर खर्च छुट्टै<br>
+✔️ Feed • Vitamin • Medicine = Auto (उत्पादन अनुसार)<br>
+✔️ अन्य खर्च = इकाई × दर × परिमाण<br>
+✔️ कुन उत्पादनमा लाग्छ स्पष्ट<br>
 ✔️ Capital logic यहाँ छैन
 </div>
 
-<!-- ================================================= -->
-<!-- A) FEED • VITAMIN • MEDICINE (AUTO) -->
-<!-- ================================================= -->
+<!-- ================= FEED AUTO ================= -->
 <h2>🍽️ Feed • Vitamin • Medicine (Auto)</h2>
 <div id="feedBlock"></div>
 
-<!-- ================================================= -->
-<!-- B) OTHER OPERATING EXPENSES -->
-<!-- ================================================= -->
+<!-- ================= OTHER OPERATING ================= -->
 <h2>⚙️ अन्य चालु खर्च</h2>
 <table id="opTable">
 <thead>
 <tr>
  <th>खर्च नाम</th>
- <th>Year 1</th>
- <th>Year 2</th>
- <th>Year 3</th>
- <th>Year 4</th>
- <th>Year 5</th>
+ <th>इकाई</th>
+ <th>दर</th>
+ <th>परिमाण</th>
+ <th>जम्मा</th>
+ <th>उत्पादन</th>
+ <th>Action</th>
 </tr>
 </thead>
 <tbody></tbody>
 </table>
+<button class="add" onclick="addOp()">➕ खर्च थप्नुहोस्</button>
 
-<!-- ================================================= -->
-<!-- C) FIXED EXPENSES -->
-<!-- ================================================= -->
+<!-- ================= FIXED ================= -->
 <h2>🏗️ स्थिर खर्च (Fixed)</h2>
 <table id="fixedTable">
 <thead>
@@ -96,7 +81,6 @@ input{width:100%;padding:6px}
 </table>
 
 <hr>
-
 <h2>📊 Expense Totals</h2>
 <div id="summary"></div>
 
@@ -109,45 +93,46 @@ input{width:100%;padding:6px}
 
 <script>
 // ================= LOAD DATA =================
-
-// Feed • Vitamin • Medicine
 const feed =
  JSON.parse(localStorage.getItem("FEED_COST_BREAKDOWN_5YR")) || [];
 
-// Other operating expenses
-const operating =
- JSON.parse(localStorage.getItem("OP_EXP_5YR")) || [];
+let operating =
+ JSON.parse(localStorage.getItem("OP_EXP_DETAILED")) || [];
 
-// Fixed assets
 const fixed =
  JSON.parse(localStorage.getItem("DEP_EXP_5YR")) || [];
+
+const PRODUCTS = [
+ "९–१२ भाले",
+ "९–१२ पोथी",
+ "बयस्क भाले",
+ "बयस्क माउ"
+];
 
 // ================= FEED RENDER =================
 function renderFeed(){
  if(!feed.length){
-  document.getElementById("feedBlock").innerHTML =
-   "<p>Feed page बाट डाटा भेटिएन।</p>";
+  document.getElementById("feedBlock").innerHTML="<p>Feed data छैन</p>";
   return;
  }
 
  let h=`<table>
  <tr>
   <th>वर्ष</th>
-  <th>Feed</th>
-  <th>Vitamin</th>
-  <th>Medicine</th>
-  <th>जम्मा (Feed)</th>
+  <th>९–१२ भाले</th>
+  <th>९–१२ पोथी</th>
+  <th>बयस्क भाले</th>
+  <th>बयस्क माउ</th>
  </tr>`;
 
  feed.forEach(f=>{
-  const total = f.feed.total + f.vitamin.total + f.medicine.total;
   h+=`
    <tr>
     <td>${f.year}</td>
-    <td class="lock">${Math.round(f.feed.total)}</td>
-    <td class="lock">${Math.round(f.vitamin.total)}</td>
-    <td class="lock">${Math.round(f.medicine.total)}</td>
-    <td class="lock"><b>${Math.round(total)}</b></td>
+    <td class="lock">${Math.round(f.feed.m912+f.vitamin.m912+f.medicine.m912)}</td>
+    <td class="lock">${Math.round(f.feed.f912+f.vitamin.f912+f.medicine.f912)}</td>
+    <td class="lock">${Math.round(f.feed.mA+f.vitamin.mA+f.medicine.mA)}</td>
+    <td class="lock">${Math.round(f.feed.fA+f.vitamin.fA+f.medicine.fA)}</td>
    </tr>`;
  });
 
@@ -156,100 +141,57 @@ function renderFeed(){
 }
 
 // ================= OPERATING =================
-function renderOperating(){
+function renderOp(){
  const tb=document.querySelector("#opTable tbody");
  tb.innerHTML="";
- operating.forEach(r=>{
+ operating.forEach((r,i)=>{
+  const total = (r.rate||0)*(r.qty||0);
   tb.innerHTML+=`
    <tr>
-    <td class="lock">${r.name||""}</td>
-    ${[1,2,3,4,5].map(y=>`
-     <td class="lock">${r['y'+y]||0}</td>`).join("")}
+    <td><input value="${r.name||""}" onchange="upd(${i},'name',this.value)"></td>
+    <td><input value="${r.unit||""}" onchange="upd(${i},'unit',this.value)"></td>
+    <td><input type="number" value="${r.rate||0}" onchange="upd(${i},'rate',this.value)"></td>
+    <td><input type="number" value="${r.qty||0}" onchange="upd(${i},'qty',this.value)"></td>
+    <td class="lock">${total}</td>
+    <td>
+      <select onchange="upd(${i},'product',this.value)">
+        <option value="">-- छान्नुहोस् --</option>
+        ${PRODUCTS.map(p=>`<option ${r.product===p?'selected':''}>${p}</option>`).join("")}
+      </select>
+    </td>
+    <td><button class="del" onclick="del(${i})">🗑️</button></td>
    </tr>`;
  });
 }
-
-// ================= FIXED =================
-function renderFixed(){
- const tb=document.querySelector("#fixedTable tbody");
- tb.innerHTML="";
- fixed.forEach(r=>{
-  tb.innerHTML+=`
-   <tr>
-    <td class="lock">${r.name||""}</td>
-    <td class="lock">${r.cost||0}</td>
-    <td class="lock">${r.years||0}</td>
-   </tr>`;
- });
-}
+function addOp(){operating.push({});save();renderOp();renderSummary();}
+function upd(i,f,v){operating[i][f]=v;save();renderSummary();}
+function del(i){operating.splice(i,1);save();renderOp();renderSummary();}
+function save(){localStorage.setItem("OP_EXP_DETAILED",JSON.stringify(operating));}
 
 // ================= SUMMARY =================
 function renderSummary(){
- let operatingTotals=[];
- for(let y=1;y<=5;y++){
-  const feedY = feed.find(f=>f.year===y);
-  const feedTotal = feedY
-    ? feedY.feed.total + feedY.vitamin.total + feedY.medicine.total
-    : 0;
-
-  const otherOp = operating.reduce(
-    (s,r)=>s+(+r['y'+y]||0),0
-  );
-
-  operatingTotals.push({
-    year:y,
-    total:feedTotal + otherOp
-  });
- }
-
- const fixedTotal = fixed.reduce(
-  (s,r)=>s+(+r.cost||0),0
+ const opTotal = operating.reduce(
+  (s,r)=>s+(r.rate||0)*(r.qty||0),0
  );
-
- const projectTotal =
-  operatingTotals.reduce((s,r)=>s+r.total,0) + fixedTotal;
+ const fixedTotal = fixed.reduce((s,r)=>s+(+r.cost||0),0);
+ const projectTotal = opTotal + fixedTotal;
 
  localStorage.setItem(
   "PROJECT_COST_5YR",
-  JSON.stringify({
-    operating:operatingTotals,
-    fixedTotal,
-    projectTotal
-  })
+  JSON.stringify({operating:opTotal,fixed:fixedTotal,projectTotal})
  );
 
- let h=`<table>
- <tr>
-  <th>वर्ष</th>
-  <th>चालु खर्च (Operating)</th>
- </tr>`;
-
- operatingTotals.forEach(r=>{
-  h+=`
-   <tr>
-    <td>Year ${r.year}</td>
-    <td class="lock">${Math.round(r.total)}</td>
-   </tr>`;
- });
-
- h+=`
- <tr>
-  <th>स्थिर खर्च (Fixed Total)</th>
-  <th class="lock">${Math.round(fixedTotal)}</th>
- </tr>
- <tr>
-  <th>कुल परियोजना लागत</th>
-  <th class="lock"><b>${Math.round(projectTotal)}</b></th>
- </tr>
- </table>`;
-
- document.getElementById("summary").innerHTML=h;
+ document.getElementById("summary").innerHTML=`
+  <table>
+   <tr><th>चालु खर्च जम्मा</th><td class="lock">${opTotal}</td></tr>
+   <tr><th>स्थिर खर्च जम्मा</th><td class="lock">${fixedTotal}</td></tr>
+   <tr><th>कुल परियोजना लागत</th><td class="lock"><b>${projectTotal}</b></td></tr>
+  </table>`;
 }
 
 // ================= INIT =================
 renderFeed();
-renderOperating();
-renderFixed();
+renderOp();
 renderSummary();
 </script>
 
