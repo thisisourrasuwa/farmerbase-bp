@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Expenses → Capital (5-Year)</title>
+<title>Expenses Summary (5-Year)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -11,18 +11,22 @@ body{
  background:#f4f7f6;margin:0
 }
 .container{
- max-width:1850px;margin:20px auto;
+ max-width:1600px;margin:20px auto;
  background:#fff;padding:24px;border-radius:12px
 }
-h1,h2,h3{color:#2e7d32;margin-top:0}
+h1,h2{color:#2e7d32;margin-top:0}
+
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
+
 input{width:100%;padding:6px}
 .lock{background:#f1f8e9;font-weight:600}
+
 .note{
  font-size:13px;background:#f9fff6;
- border:1px dashed #9ccc65;padding:10px;margin:12px 0
+ border:1px dashed #9ccc65;
+ padding:10px;margin:12px 0
 }
 
 /* page flow */
@@ -43,78 +47,80 @@ input{width:100%;padding:6px}
 <body>
 
 <div class="container">
-<h1>💸 खर्च → Capital Source (५ वर्ष)</h1>
+<h1>💸 Expenses Summary (५ वर्ष)</h1>
 
 <div class="note">
-✔️ सबै खर्च Project Cost मा<br>
-✔️ Feed/Vit/Med = Working Capital (3/6/9 महिना)<br>
-✔️ अन्य चालु = 12 महिना<br>
-✔️ स्थिर खर्च = Fixed Capital
+✔️ Feed • Vitamin • Medicine = चालु खर्च<br>
+✔️ अन्य चालु खर्च जोडिन्छ<br>
+✔️ स्थिर खर्च छुट्टै<br>
+✔️ Capital logic यहाँ छैन
 </div>
 
-<!-- ================= WORKING CAPITAL MODE ================= -->
-<h2>🔘 Feed • Vitamin • Medicine — Working Capital Mode</h2>
-<label><input type="radio" name="wcMode" value="3"> 3 महिना</label>
-<label><input type="radio" name="wcMode" value="6" checked> 6 महिना</label>
-<label><input type="radio" name="wcMode" value="9"> 9 महिना</label>
-
-<!-- ================= LOAD FEED DATA ================= -->
+<!-- ================================================= -->
+<!-- A) FEED • VITAMIN • MEDICINE (AUTO) -->
+<!-- ================================================= -->
 <h2>🍽️ Feed • Vitamin • Medicine (Auto)</h2>
 <div id="feedBlock"></div>
 
-<!-- ================= OTHER OPERATING ================= -->
+<!-- ================================================= -->
+<!-- B) OTHER OPERATING EXPENSES -->
+<!-- ================================================= -->
 <h2>⚙️ अन्य चालु खर्च</h2>
 <table id="opTable">
 <thead>
 <tr>
- <th>खर्च</th>
- <th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th>
+ <th>खर्च नाम</th>
+ <th>Year 1</th>
+ <th>Year 2</th>
+ <th>Year 3</th>
+ <th>Year 4</th>
+ <th>Year 5</th>
 </tr>
 </thead>
 <tbody></tbody>
 </table>
 
-<!-- ================= FIXED CAPITAL ================= -->
-<h2>🏗️ स्थिर खर्च (Capital Items)</h2>
-<table id="capTable">
+<!-- ================================================= -->
+<!-- C) FIXED EXPENSES -->
+<!-- ================================================= -->
+<h2>🏗️ स्थिर खर्च (Fixed)</h2>
+<table id="fixedTable">
 <thead>
 <tr>
  <th>सम्पत्ति</th>
  <th>कुल लागत</th>
- <th>लगानी हुने वर्ष</th>
+ <th>ह्रास अवधि (वर्ष)</th>
 </tr>
 </thead>
 <tbody></tbody>
 </table>
 
 <hr>
-<h2>📊 Capital Requirement Summary</h2>
+
+<h2>📊 Expense Totals</h2>
 <div id="summary"></div>
 
 </div>
 
 <div class="page-follow">
- <a href="production.html" class="pf-btn">⬅️</a>
+ <a href="feed-vitamin-medicine-5yr.html" class="pf-btn">⬅️</a>
  <a href="capital-source.html" class="pf-btn">➡️</a>
 </div>
 
 <script>
 // ================= LOAD DATA =================
+
+// Feed • Vitamin • Medicine
 const feed =
  JSON.parse(localStorage.getItem("FEED_COST_BREAKDOWN_5YR")) || [];
 
+// Other operating expenses
 const operating =
  JSON.parse(localStorage.getItem("OP_EXP_5YR")) || [];
 
-const capital =
- JSON.parse(localStorage.getItem("CAP_ITEMS")) || [];
-
-// ================= UTIL =================
-function getWCMode(){
- return Number(
-  document.querySelector('input[name="wcMode"]:checked').value
- );
-}
+// Fixed assets
+const fixed =
+ JSON.parse(localStorage.getItem("DEP_EXP_5YR")) || [];
 
 // ================= FEED RENDER =================
 function renderFeed(){
@@ -127,22 +133,21 @@ function renderFeed(){
  let h=`<table>
  <tr>
   <th>वर्ष</th>
-  <th>Feed+Vit+Med (Total)</th>
-  <th>Working Capital Portion</th>
-  <th>Owner Equity Portion</th>
+  <th>Feed</th>
+  <th>Vitamin</th>
+  <th>Medicine</th>
+  <th>जम्मा (Feed)</th>
  </tr>`;
 
- const m = getWCMode()/12;
-
  feed.forEach(f=>{
-  const wc = f.grandTotal * m;
-  const eq = f.grandTotal - wc;
+  const total = f.feed.total + f.vitamin.total + f.medicine.total;
   h+=`
    <tr>
     <td>${f.year}</td>
-    <td class="lock">${Math.round(f.grandTotal)}</td>
-    <td class="lock">${Math.round(wc)}</td>
-    <td class="lock">${Math.round(eq)}</td>
+    <td class="lock">${Math.round(f.feed.total)}</td>
+    <td class="lock">${Math.round(f.vitamin.total)}</td>
+    <td class="lock">${Math.round(f.medicine.total)}</td>
+    <td class="lock"><b>${Math.round(total)}</b></td>
    </tr>`;
  });
 
@@ -150,67 +155,101 @@ function renderFeed(){
  document.getElementById("feedBlock").innerHTML=h;
 }
 
+// ================= OPERATING =================
+function renderOperating(){
+ const tb=document.querySelector("#opTable tbody");
+ tb.innerHTML="";
+ operating.forEach(r=>{
+  tb.innerHTML+=`
+   <tr>
+    <td class="lock">${r.name||""}</td>
+    ${[1,2,3,4,5].map(y=>`
+     <td class="lock">${r['y'+y]||0}</td>`).join("")}
+   </tr>`;
+ });
+}
+
+// ================= FIXED =================
+function renderFixed(){
+ const tb=document.querySelector("#fixedTable tbody");
+ tb.innerHTML="";
+ fixed.forEach(r=>{
+  tb.innerHTML+=`
+   <tr>
+    <td class="lock">${r.name||""}</td>
+    <td class="lock">${r.cost||0}</td>
+    <td class="lock">${r.years||0}</td>
+   </tr>`;
+ });
+}
+
 // ================= SUMMARY =================
 function renderSummary(){
- let out=[];
+ let operatingTotals=[];
  for(let y=1;y<=5;y++){
-  const feedY = feed.find(f=>f.year===y)?.grandTotal||0;
-  const wcFeed = feedY * (getWCMode()/12);
+  const feedY = feed.find(f=>f.year===y);
+  const feedTotal = feedY
+    ? feedY.feed.total + feedY.vitamin.total + feedY.medicine.total
+    : 0;
 
-  const opY = operating.reduce((s,r)=>s+(+r['y'+y]||0),0);
+  const otherOp = operating.reduce(
+    (s,r)=>s+(+r['y'+y]||0),0
+  );
 
-  const capY = capital
-    .filter(c=>Number(c.year)===y)
-    .reduce((s,c)=>s+(+c.cost||0),0);
-
-  const working = wcFeed + opY;
-  const fixed = capY;
-  const total = working + fixed;
-
-  out.push({
-   year:y,
-   working,
-   fixed,
-   total
+  operatingTotals.push({
+    year:y,
+    total:feedTotal + otherOp
   });
  }
 
+ const fixedTotal = fixed.reduce(
+  (s,r)=>s+(+r.cost||0),0
+ );
+
+ const projectTotal =
+  operatingTotals.reduce((s,r)=>s+r.total,0) + fixedTotal;
+
  localStorage.setItem(
-  "CAPITAL_REQUIREMENT_5YR",
-  JSON.stringify(out)
+  "PROJECT_COST_5YR",
+  JSON.stringify({
+    operating:operatingTotals,
+    fixedTotal,
+    projectTotal
+  })
  );
 
  let h=`<table>
  <tr>
   <th>वर्ष</th>
-  <th>Working Capital</th>
-  <th>Fixed Capital</th>
-  <th>Total Capital Required</th>
+  <th>चालु खर्च (Operating)</th>
  </tr>`;
 
- out.forEach(r=>{
+ operatingTotals.forEach(r=>{
   h+=`
    <tr>
     <td>Year ${r.year}</td>
-    <td>${Math.round(r.working)}</td>
-    <td>${Math.round(r.fixed)}</td>
-    <td class="lock"><b>${Math.round(r.total)}</b></td>
+    <td class="lock">${Math.round(r.total)}</td>
    </tr>`;
  });
 
- h+=`</table>`;
+ h+=`
+ <tr>
+  <th>स्थिर खर्च (Fixed Total)</th>
+  <th class="lock">${Math.round(fixedTotal)}</th>
+ </tr>
+ <tr>
+  <th>कुल परियोजना लागत</th>
+  <th class="lock"><b>${Math.round(projectTotal)}</b></th>
+ </tr>
+ </table>`;
+
  document.getElementById("summary").innerHTML=h;
 }
 
-// ================= EVENTS =================
-document
- .querySelectorAll('input[name="wcMode"]')
- .forEach(r=>r.addEventListener('change',()=>{
-   renderFeed();
-   renderSummary();
- }));
-
+// ================= INIT =================
 renderFeed();
+renderOperating();
+renderFixed();
 renderSummary();
 </script>
 
