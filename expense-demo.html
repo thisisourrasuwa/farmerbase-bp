@@ -2,19 +2,19 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Expenses & Costing (5-Year)</title>
+<title>Expenses & Cost Allocation (5-Year)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1800px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+.container{max-width:1850px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
 h1,h2{color:#2e7d32;margin-top:0}
 
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
 
-input,select{width:100%;padding:6px}
+input,select{padding:6px;width:100%}
 .lock{background:#f1f8e9;font-weight:600}
 button{padding:6px 14px;cursor:pointer}
 
@@ -38,6 +38,10 @@ button{padding:6px 14px;cursor:pointer}
  display:flex;align-items:center;justify-content:center;
  text-decoration:none;font-size:22px
 }
+.products{
+ display:flex;gap:8px;flex-wrap:wrap;font-size:13px
+}
+.products label{white-space:nowrap}
 </style>
 </head>
 
@@ -47,71 +51,33 @@ button{padding:6px 14px;cursor:pointer}
 <h1>💸 खर्च तथा उत्पादन लागत (५ वर्ष)</h1>
 
 <div class="note">
-✔️ Feed • Vitamin • Medicine = Feed page बाट Auto (Read-only)<br>
-✔️ यहाँ कुनै double calculation हुँदैन<br>
-✔️ सबै खर्च ५ वर्षे, Subtotal सहित
+✔️ Subtotal छैन<br>
+✔️ ९–१२ भाले / ९–१२ पोथी / बयस्क भाले / माउ छुट्टाछुट्टै<br>
+✔️ प्रति–इकाई उत्पादन लागत निकाल्न तयार
 </div>
 
 <!-- ================================================= -->
-<!-- A) FEED • VITAMIN • MEDICINE (AUTO, READ ONLY) -->
+<!-- A) FEED • VITAMIN • MEDICINE (AUTO) -->
 <!-- ================================================= -->
 <h2>🍽️ Feed • Vitamin • Medicine (Auto)</h2>
 <div id="feedBlock"></div>
 
 <!-- ================================================= -->
-<!-- B) OPERATING EXPENSES -->
+<!-- B) OTHER EXPENSES WITH PRODUCT ALLOCATION -->
 <!-- ================================================= -->
-<h2>⚙️ चल्ती खर्च (Operating)</h2>
-<table id="opTable">
+<h2>🔗 अन्य खर्च (उत्पादनसँग बाँडफाँट)</h2>
+<table id="otherExp">
 <thead>
 <tr>
  <th>खर्च नाम</th>
+ <th>उत्पादन चयन</th>
  <th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th><th>Year 5</th>
- <th>Subtotal</th>
  <th>Action</th>
 </tr>
 </thead>
 <tbody></tbody>
 </table>
-<button class="add" onclick="addOp()">➕ खर्च थप्नुहोस्</button>
-
-<!-- ================================================= -->
-<!-- C) DEPRECIATION -->
-<!-- ================================================= -->
-<h2>🏗️ स्थिर खर्च (Depreciation)</h2>
-<table id="depTable">
-<thead>
-<tr>
- <th>सम्पत्ति</th>
- <th>कुल मूल्य</th>
- <th>ह्रास वर्ष</th>
- <th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th>
- <th>Subtotal</th>
- <th>Action</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-<button class="add" onclick="addDep()">➕ सम्पत्ति थप्नुहोस्</button>
-
-<!-- ================================================= -->
-<!-- D) PRODUCT LINKED EXPENSES -->
-<!-- ================================================= -->
-<h2>🔗 उत्पादनसँग जोडिएको खर्च</h2>
-<table id="prodExp">
-<thead>
-<tr>
- <th>खर्च नाम</th>
- <th>उत्पादन</th>
- <th>Allocation %</th>
- <th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th><th>Year 5</th>
- <th>Subtotal</th>
- <th>Action</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-<button class="add" onclick="addProdExp()">➕ उत्पादन–जोडिएको खर्च</button>
+<button class="add" onclick="addExp()">➕ खर्च थप्नुहोस्</button>
 
 </div>
 
@@ -123,24 +89,23 @@ button{padding:6px 14px;cursor:pointer}
 
 <script>
 // ================= LOAD DATA =================
-const feedData =
+const feed =
  JSON.parse(localStorage.getItem("FEED_COST_BREAKDOWN_5YR")) || [];
 
 const products =
- JSON.parse(localStorage.getItem("PRODUCTION_LIST")) || [];
+ JSON.parse(localStorage.getItem("PRODUCTION_LIST")) || [
+  {name:"९–१२ भाले बिक्री"},
+  {name:"९–१२ पोथी बिक्री"},
+  {name:"बयस्क भाले बिक्री"},
+  {name:"माउ बिक्री"}
+ ];
 
-let operating =
- JSON.parse(localStorage.getItem("OP_EXP_5YR")) || [];
-
-let depreciation =
- JSON.parse(localStorage.getItem("DEP_EXP_5YR")) || [];
-
-let prodExp =
- JSON.parse(localStorage.getItem("PROD_EXP_5YR")) || [];
+let otherExp =
+ JSON.parse(localStorage.getItem("OTHER_EXP_5YR")) || [];
 
 // ================= FEED RENDER =================
 function renderFeed(){
- if(!feedData.length){
+ if(!feed.length){
   document.getElementById("feedBlock").innerHTML =
    "<p>Feed page बाट डाटा भेटिएन।</p>";
   return;
@@ -149,20 +114,20 @@ function renderFeed(){
  let h=`<table>
  <tr>
   <th>वर्ष</th>
-  <th>Feed Subtotal</th>
-  <th>Vitamin Subtotal</th>
-  <th>Medicine Subtotal</th>
-  <th>Grand Total</th>
+  <th>९–१२ भाले</th>
+  <th>९–१२ पोथी</th>
+  <th>बयस्क भाले</th>
+  <th>माउ</th>
  </tr>`;
 
- feedData.forEach(f=>{
+ feed.forEach(f=>{
   h+=`
    <tr>
     <td>${f.year}</td>
-    <td class="lock">${Math.round(f.feed.total)}</td>
-    <td class="lock">${Math.round(f.vitamin.total)}</td>
-    <td class="lock">${Math.round(f.medicine.total)}</td>
-    <td class="lock"><b>${Math.round(f.grandTotal)}</b></td>
+    <td class="lock">${Math.round(f.feed.m912+f.vitamin.m912+f.medicine.m912)}</td>
+    <td class="lock">${Math.round(f.feed.f912+f.vitamin.f912+f.medicine.f912)}</td>
+    <td class="lock">${Math.round(f.feed.mA+f.vitamin.mA+f.medicine.mA)}</td>
+    <td class="lock">${Math.round(f.feed.fA+f.vitamin.fA+f.medicine.fA)}</td>
    </tr>`;
  });
 
@@ -170,98 +135,46 @@ function renderFeed(){
  document.getElementById("feedBlock").innerHTML=h;
 }
 
-// ================= OPERATING =================
-function renderOp(){
- const tb=document.querySelector("#opTable tbody");
+// ================= OTHER EXPENSE =================
+function renderOther(){
+ const tb=document.querySelector("#otherExp tbody");
  tb.innerHTML="";
- operating.forEach((r,i)=>{
-  const subtotal =
-   (Number(r.y1||0)+Number(r.y2||0)+Number(r.y3||0)+
-    Number(r.y4||0)+Number(r.y5||0));
-
+ otherExp.forEach((r,i)=>{
   tb.innerHTML+=`
    <tr>
-    <td><input value="${r.name||""}" onchange="updOp(${i},'name',this.value)"></td>
-    ${[1,2,3,4,5].map(y=>`
-     <td><input type="number" value="${r['y'+y]||""}"
-      onchange="updOp(${i},'y${y}',this.value)"></td>`).join("")}
-    <td class="lock">${subtotal}</td>
-    <td><button class="del" onclick="delOp(${i})">🗑️</button></td>
-   </tr>`;
- });
-}
-function addOp(){operating.push({});saveOp();renderOp();}
-function updOp(i,f,v){operating[i][f]=v;saveOp();}
-function delOp(i){operating.splice(i,1);saveOp();renderOp();}
-function saveOp(){localStorage.setItem("OP_EXP_5YR",JSON.stringify(operating));}
-
-// ================= DEPRECIATION =================
-function renderDep(){
- const tb=document.querySelector("#depTable tbody");
- tb.innerHTML="";
- depreciation.forEach((r,i)=>{
-  const yearly = (r.cost && r.years)?Math.round(r.cost/r.years):0;
-  const sub = yearly * Math.min(5,Number(r.years||0));
-
-  tb.innerHTML+=`
-   <tr>
-    <td><input value="${r.name||""}" onchange="updDep(${i},'name',this.value)"></td>
-    <td><input type="number" value="${r.cost||""}"
-      onchange="updDep(${i},'cost',this.value)"></td>
-    <td><input type="number" value="${r.years||""}"
-      onchange="updDep(${i},'years',this.value)"></td>
-    ${[1,2,3,4,5].map(y=>`
-     <td class="lock">${y<=r.years?yearly:0}</td>`).join("")}
-    <td class="lock">${sub}</td>
-    <td><button class="del" onclick="delDep(${i})">🗑️</button></td>
-   </tr>`;
- });
-}
-function addDep(){depreciation.push({});saveDep();renderDep();}
-function updDep(i,f,v){depreciation[i][f]=v;saveDep();renderDep();}
-function delDep(i){depreciation.splice(i,1);saveDep();renderDep();}
-function saveDep(){localStorage.setItem("DEP_EXP_5YR",JSON.stringify(depreciation));}
-
-// ================= PRODUCT LINKED =================
-function renderProdExp(){
- const tb=document.querySelector("#prodExp tbody");
- tb.innerHTML="";
- prodExp.forEach((r,i)=>{
-  const subtotal =
-   (Number(r.y1||0)+Number(r.y2||0)+Number(r.y3||0)+
-    Number(r.y4||0)+Number(r.y5||0));
-
-  tb.innerHTML+=`
-   <tr>
-    <td><input value="${r.name||""}" onchange="updPE(${i},'name',this.value)"></td>
+    <td><input value="${r.name||""}" onchange="upd(${i},'name',this.value)"></td>
     <td>
-     <select onchange="updPE(${i},'product',this.value)">
-      <option value="">-- उत्पादन छान्नुहोस् --</option>
+     <div class="products">
       ${products.map(p=>`
-       <option ${r.product===p.name?'selected':''}>${p.name}</option>
-      `).join("")}
-     </select>
+       <label>
+        <input type="checkbox"
+         ${r.products?.includes(p.name)?"checked":""}
+         onchange="toggleProd(${i},'${p.name}',this.checked)">
+        ${p.name}
+       </label>`).join("")}
+     </div>
     </td>
-    <td><input type="number" value="${r.pct||""}"
-      onchange="updPE(${i},'pct',this.value)"></td>
     ${[1,2,3,4,5].map(y=>`
      <td><input type="number" value="${r['y'+y]||""}"
-      onchange="updPE(${i},'y${y}',this.value)"></td>`).join("")}
-    <td class="lock">${subtotal}</td>
-    <td><button class="del" onclick="delPE(${i})">🗑️</button></td>
+      onchange="upd(${i},'y${y}',this.value)"></td>`).join("")}
+    <td><button class="del" onclick="del(${i})">🗑️</button></td>
    </tr>`;
  });
 }
-function addProdExp(){prodExp.push({});savePE();renderProdExp();}
-function updPE(i,f,v){prodExp[i][f]=v;savePE();}
-function delPE(i){prodExp.splice(i,1);savePE();renderProdExp();}
-function savePE(){localStorage.setItem("PROD_EXP_5YR",JSON.stringify(prodExp));}
+function addExp(){otherExp.push({products:[]});save();renderOther();}
+function upd(i,f,v){otherExp[i][f]=v;save();}
+function toggleProd(i,p,ck){
+ if(!otherExp[i].products) otherExp[i].products=[];
+ if(ck) otherExp[i].products.push(p);
+ else otherExp[i].products=otherExp[i].products.filter(x=>x!==p);
+ save();
+}
+function del(i){otherExp.splice(i,1);save();renderOther();}
+function save(){localStorage.setItem("OTHER_EXP_5YR",JSON.stringify(otherExp));}
 
 // ================= INIT =================
 renderFeed();
-renderOp();
-renderDep();
-renderProdExp();
+renderOther();
 </script>
 
 </body>
