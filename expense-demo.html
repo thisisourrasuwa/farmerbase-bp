@@ -2,7 +2,7 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Expenses Summary (Final)</title>
+<title>Expenses (Summary & Allocation)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -33,6 +33,8 @@ button{padding:6px 14px;cursor:pointer}
  padding:10px;margin:12px 0
 }
 
+.table-wrap{overflow-x:auto}
+
 .page-follow{
  position:fixed;right:14px;top:50%;
  transform:translateY(-50%);
@@ -44,27 +46,30 @@ button{padding:6px 14px;cursor:pointer}
  display:flex;align-items:center;justify-content:center;
  text-decoration:none;font-size:22px
 }
+.warn{color:#c62828;font-weight:bold}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>💸 Expenses Summary</h1>
+<h1>💸 Expenses (Summary & Allocation)</h1>
 
 <div class="note">
-✔️ अन्य चालु खर्च = कुल लागत (rate हटाइएको)<br>
-✔️ विवरण / इकाई लेख्न मिल्ने<br>
-✔️ स्थिर खर्चमा पनि विवरण field<br>
+✔️ Feed / Vitamin / Medicine = summary मात्र (feed page बाट auto)<br>
+✔️ अन्य चालु खर्च = कुल लागत मात्र (दर हटाइएको)<br>
+✔️ उत्पादन % = production.html बाट auto<br>
+✔️ स्थिर खर्च = विवरण + ह्रास अवधि<br>
 ✔️ कुनै costing logic परिवर्तन छैन
 </div>
 
-<!-- ================= FEED ================= -->
-<h2>🍽️ Feed • Vitamin • Medicine (Auto)</h2>
+<!-- ================= FEED SUMMARY ================= -->
+<h2>🍽️ Feed • Vitamin • Medicine (Auto Summary)</h2>
 <div id="feedBlock"></div>
 
 <!-- ================= OTHER OPERATING ================= -->
 <h2>⚙️ अन्य चालु खर्च</h2>
+<div class="table-wrap">
 <table id="opTable">
 <thead>
 <tr>
@@ -77,10 +82,12 @@ button{padding:6px 14px;cursor:pointer}
 </thead>
 <tbody></tbody>
 </table>
+</div>
 <button class="add" onclick="addOp()">➕ चालु खर्च थप्नुहोस्</button>
 
 <!-- ================= FIXED ================= -->
 <h2>🏗️ स्थिर खर्च (Fixed)</h2>
+<div class="table-wrap">
 <table id="fixTable">
 <thead>
 <tr>
@@ -94,6 +101,7 @@ button{padding:6px 14px;cursor:pointer}
 </thead>
 <tbody></tbody>
 </table>
+</div>
 <button class="add" onclick="addFix()">➕ स्थिर खर्च थप्नुहोस्</button>
 
 <!-- ================= NARRATION ================= -->
@@ -113,30 +121,78 @@ button{padding:6px 14px;cursor:pointer}
 </div>
 
 <script>
-/* ================= CONFIG ================= */
-const productionList =
- JSON.parse(localStorage.getItem("PRODUCTION_LIST")) || [];
+/* =====================================================
+   LOAD PRODUCTION (SINGLE SOURCE OF TRUTH)
+===================================================== */
+let productionList=[];
+try{
+ productionList = JSON.parse(localStorage.getItem("PRODUCTION_LIST")) || [];
+}catch(e){ productionList=[]; }
+
 const PRODUCTS = productionList.map(p=>p.name);
 
-/* ================= LOAD ================= */
-const feed = JSON.parse(localStorage.getItem("FEED_COST_BREAKDOWN_5YR")) || [];
-let operating = JSON.parse(localStorage.getItem("OP_EXP_SIMPLE")) || [];
-let fixed = JSON.parse(localStorage.getItem("FIX_EXP_DETAILED")) || [];
+/* =====================================================
+   LOAD FEED SUMMARY (AUTO, READ-ONLY)
+===================================================== */
+const feed5yr =
+ JSON.parse(localStorage.getItem("FEED_COST_BREAKDOWN_5YR")) || [];
 
-/* ================= FEED ================= */
+/* =====================================================
+   LOAD EXPENSE STATE
+===================================================== */
+let operating =
+ JSON.parse(localStorage.getItem("OP_EXP_SIMPLE")) || [];
+let fixed =
+ JSON.parse(localStorage.getItem("FIX_EXP_DETAILED")) || [];
+
+/* =====================================================
+   FEED SUMMARY RENDER
+===================================================== */
 function renderFeed(){
- if(!feed.length){feedBlock.innerHTML="<p>Feed data छैन</p>";return;}
+ if(!feed5yr.length){
+  feedBlock.innerHTML="<p class='warn'>Feed data छैन</p>";
+  return;
+ }
  let h=`<table>
- <tr><th>वर्ष</th><th>जम्मा Feed/Vit/Med</th></tr>`;
- feed.forEach(f=>{
-  const t=f.feed.total+f.vitamin.total+f.medicine.total;
-  h+=`<tr><td>${f.year}</td><td class="lock">${t}</td></tr>`;
+ <tr><th>वर्ष</th><th>Feed / Vitamin / Medicine</th></tr>`;
+ feed5yr.forEach(f=>{
+  const total =
+   (f.feed?.total||0) +
+   (f.vitamin?.total||0) +
+   (f.medicine?.total||0);
+  h+=`<tr><td>${f.year}</td><td class="lock">${total}</td></tr>`;
  });
  h+=`</table>`;
  feedBlock.innerHTML=h;
 }
 
-/* ================= OPERATING ================= */
+/* =====================================================
+   PRODUCT % UI
+===================================================== */
+function prodPctUI(r,i,type){
+ if(!PRODUCTS.length){
+  return `<span class="warn">पहिले production.html मा Save गर्नुहोस्</span>`;
+ }
+ return `<div class="products">
+ ${PRODUCTS.map(p=>`
+  <label>${p}
+   <input type="number" style="width:48px"
+    value="${r.alloc?.[p]||''}"
+    onchange="setPct('${type}',${i},'${p}',this.value)">%
+  </label>`).join("")}
+ </div>`;
+}
+
+function setPct(type,i,p,v){
+ const tgt = type==='op'?operating:fixed;
+ if(!tgt[i].alloc) tgt[i].alloc={};
+ tgt[i].alloc[p]=Number(v)||0;
+ save();
+}
+
+/* =====================================================
+   OPERATING (OTHER)
+===================================================== */
 function renderOp(){
  const tb=document.querySelector("#opTable tbody");
  tb.innerHTML="";
@@ -156,7 +212,9 @@ function addOp(){operating.push({alloc:{}});save();renderOp();renderSummary();}
 function uOp(i,f,v){operating[i][f]=v;save();renderSummary();}
 function delOp(i){operating.splice(i,1);save();renderOp();renderSummary();}
 
-/* ================= FIXED ================= */
+/* =====================================================
+   FIXED
+===================================================== */
 function renderFix(){
  const tb=document.querySelector("#fixTable tbody");
  tb.innerHTML="";
@@ -178,35 +236,19 @@ function addFix(){fixed.push({alloc:{}});save();renderFix();renderSummary();}
 function uFix(i,f,v){fixed[i][f]=v;save();renderSummary();}
 function delFix(i){fixed.splice(i,1);save();renderFix();renderSummary();}
 
-/* ================= PRODUCT % ================= */
-function prodPctUI(r,i,type){
- return `<div class="products">
- ${PRODUCTS.map(p=>`
-  <label>${p}
-   <input type="number" style="width:48px"
-    value="${r.alloc?.[p]||''}"
-    onchange="setPct('${type}',${i},'${p}',this.value)">%
-  </label>`).join("")}
- </div>`;
-}
-function setPct(type,i,p,v){
- const tgt=type==='op'?operating:fixed;
- if(!tgt[i].alloc) tgt[i].alloc={};
- tgt[i].alloc[p]=Number(v)||0;
- save();
-}
-
-/* ================= SUMMARY ================= */
+/* =====================================================
+   SUMMARY (PROJECT LEVEL)
+===================================================== */
 function renderSummary(){
- const feedTotal = feed.reduce(
-  (s,f)=>s+f.feed.total+f.vitamin.total+f.medicine.total,0);
+ const feedTotal = feed5yr.reduce(
+  (s,f)=>s+(f.feed?.total||0)+(f.vitamin?.total||0)+(f.medicine?.total||0),0);
  const opOther = operating.reduce((s,r)=>s+(+r.cost||0),0);
  const fixTotal = fixed.reduce((s,r)=>s+(+r.cost||0),0);
  const projectTotal = feedTotal + opOther + fixTotal;
 
  summary.innerHTML=`
  <table>
-  <tr><th>Feed/Vit/Med</th><td class="lock">${feedTotal}</td></tr>
+  <tr><th>Feed / Vitamin / Medicine</th><td class="lock">${feedTotal}</td></tr>
   <tr><th>अन्य चालु खर्च</th><td class="lock">${opOther}</td></tr>
   <tr><th>स्थिर खर्च</th><td class="lock">${fixTotal}</td></tr>
   <tr><th>कुल परियोजना लागत</th>
@@ -214,7 +256,9 @@ function renderSummary(){
  </table>`;
 }
 
-/* ================= SAVE ================= */
+/* =====================================================
+   SAVE
+===================================================== */
 function save(){
  localStorage.setItem("OP_EXP_SIMPLE",JSON.stringify(operating));
  localStorage.setItem("FIX_EXP_DETAILED",JSON.stringify(fixed));
@@ -224,7 +268,9 @@ function save(){
  );
 }
 
-/* ================= INIT ================= */
+/* =====================================================
+   INIT
+===================================================== */
 document.getElementById("expenseNarration").value =
  localStorage.getItem("EXPENSE_NARRATION")||"";
 
