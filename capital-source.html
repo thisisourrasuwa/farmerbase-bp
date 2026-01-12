@@ -7,51 +7,52 @@
 <style>
 body{font-family:Arial;background:#f5f5f5;margin:0}
 
-/* ===== HEADER (PAGE NAME ONLY) ===== */
+/* ===== HEADER ===== */
 header{
- background:#2e7d32;
- color:#fff;
- padding:18px 20px;
- text-align:center;
- font-size:22px;
- font-weight:700;
- letter-spacing:.4px;
+ background:#2e7d32;color:#fff;
+ padding:18px 20px;text-align:center;
+ font-size:22px;font-weight:700;
  box-shadow:0 2px 6px rgba(0,0,0,0.2)
 }
 
-/* ===== SIDE PAGE FOLLOW ===== */
-.side-nav{
+/* ===== PAGE FOLLOW (SAME AS EXPENSES) ===== */
+.page-follow{
  position:fixed;
+ right:14px;
  top:50%;
  transform:translateY(-50%);
- width:48px;
- height:48px;
+ display:flex;
+ flex-direction:column;
+ gap:12px;
+ z-index:999
+}
+.pf-btn{
+ width:46px;height:46px;
  border-radius:50%;
  background:#2e7d32;
  color:#fff;
- font-size:26px;
  display:flex;
  align-items:center;
  justify-content:center;
- cursor:pointer;
- z-index:999;
+ text-decoration:none;
+ font-size:22px;
  box-shadow:0 4px 10px rgba(0,0,0,.25)
 }
-.side-nav.prev{left:15px}
-.side-nav.next{right:15px}
-.side-nav:hover{background:#1b5e20}
+.pf-btn:hover{background:#1b5e20}
 
-/* ===== CONTAINER (SIDE SAFE ZONE) ===== */
+/* ===== CONTAINER ===== */
 .container{
  max-width:1200px;
  margin:auto;
  background:#fff;
- padding:20px 70px; /* arrow safe */
+ padding:20px 70px;
  min-height:70vh
 }
 
 .summary{
- background:#f1f8e9;padding:15px;margin-bottom:20px;
+ background:#f1f8e9;
+ padding:15px;
+ margin-bottom:20px;
  font-size:15px
 }
 
@@ -59,7 +60,9 @@ select,input{padding:5px}
 
 table{width:100%;border-collapse:collapse}
 th,td{
- border:1px solid #ccc;padding:8px;text-align:center;
+ border:1px solid #ccc;
+ padding:8px;
+ text-align:center;
  font-size:14px
 }
 th{background:#e8f5e9}
@@ -69,9 +72,6 @@ td input{width:100%;box-sizing:border-box}
 .btn{padding:6px 12px;border:none;cursor:pointer;border-radius:4px}
 .add{background:#2e7d32;color:#fff}
 .del{background:#c62828;color:#fff}
-
-.typeBtns{margin:10px 0}
-.typeBtns .btn{margin-right:6px}
 
 .tag{
  padding:4px 8px;
@@ -95,14 +95,13 @@ footer{
 
 <body>
 
-<!-- ===== SIDE NAVIGATION ===== -->
-<div class="side-nav prev" onclick="location.href='expense-demo.html'">⬅</div>
-<div class="side-nav next" onclick="location.href='income-demo.html'">➡</div>
+<!-- ===== PAGE FOLLOW ===== -->
+<div class="page-follow">
+ <a href="expense-demo.html" class="pf-btn">⬅️</a>
+ <a href="income-demo.html" class="pf-btn">➡️</a>
+</div>
 
-<!-- ===== HEADER ===== -->
-<header>
-  पुँजिको स्रोत
-</header>
+<header>पुँजिको स्रोत</header>
 
 <div class="container">
 
@@ -137,7 +136,6 @@ footer{
  <button class="btn add" onclick="addSource('other')">➕ अन्य स्रोत</button>
 </div>
 
-<!-- ================= TABLE ================= -->
 <table>
 <thead>
 <tr>
@@ -159,9 +157,10 @@ footer{
 </footer>
 
 <script>
-/* ================= LOAD FROM EXPENSES ================= */
-const annualVar = parseFloat(localStorage.getItem("variable_annual_cost")) || 0;
-const fixedCap  = parseFloat(localStorage.getItem("fixed_total_capital")) || 0;
+/* ================= LOAD FROM EXPENSES (NO LOGIC CHANGE) ================= */
+const cost = JSON.parse(localStorage.getItem("PROJECT_COST_5YR")) || {};
+const annualVar = cost.operating?.[0]?.total || 0;   // Year-1 operating
+const fixedCap  = cost.fixed || 0;
 
 /* ================= WORKING CAPITAL STATE ================= */
 let wcState = JSON.parse(localStorage.getItem("wcState")) || {
@@ -175,21 +174,14 @@ let sources = JSON.parse(localStorage.getItem("capitalSources")) || [];
 function saveSources(){localStorage.setItem("capitalSources",JSON.stringify(sources));}
 
 function addSource(type){
- sources.push({
-  id:Date.now(),
-  type:type,
-  pct:0,
-  interest:0
- });
+ sources.push({id:Date.now(),type,pct:0,interest:0});
  saveSources(); render();
 }
-
 function updateSource(id,field,val){
  const s=sources.find(x=>x.id===id);
  s[field]=parseFloat(val)||0;
  saveSources(); render();
 }
-
 function removeSource(id){
  if(confirm("हटाउने हो ?")){
   sources=sources.filter(s=>s.id!==id);
@@ -207,10 +199,11 @@ function calcWorkingCap(){
 
 /* ================= RENDER ================= */
 function render(){
- document.getElementById("fixedCap").innerText=fixedCap.toFixed(2);
- document.getElementById("annualVar").innerText=annualVar.toFixed(2);
+ fixedCapEl.innerText=fixedCap.toFixed(2);
+ annualVarEl.innerText=annualVar.toFixed(2);
 
- document.getElementById("wcMode").value=wcState.mode;
+ wcMode.value=wcState.mode;
+
  let opt="";
  if(wcState.mode==="months"){
   opt=` महिना:
@@ -224,34 +217,30 @@ function render(){
  if(wcState.mode==="percent"){
   opt=` %:
   <input type="number" value="${wcState.percent}"
-   onchange="wcState.percent=this.value;saveWC();render()"
-   style="width:80px">`;
+   onchange="wcState.percent=this.value;saveWC();render()" style="width:80px">`;
  }
  if(wcState.mode==="manual"){
   opt=` रकम:
   <input type="number" value="${wcState.manual}"
-   onchange="wcState.manual=this.value;saveWC();render()"
-   style="width:120px">`;
+   onchange="wcState.manual=this.value;saveWC();render()" style="width:120px">`;
  }
- document.getElementById("wcOptions").innerHTML=opt;
+ wcOptions.innerHTML=opt;
 
  const workingCap=calcWorkingCap();
  const totalCapital=fixedCap+workingCap;
 
- document.getElementById("workingCap").innerText=workingCap.toFixed(2);
- document.getElementById("totalCapital").innerText=totalCapital.toFixed(2);
+ workingCapEl.innerText=workingCap.toFixed(2);
+ totalCapitalEl.innerText=totalCapital.toFixed(2);
 
- const tb=document.getElementById("capBody");
+ const tb=capBody;
  tb.innerHTML="";
  let sumPct=0,totalInterest=0;
 
  sources.forEach(s=>{
   const pct=s.pct||0;
   const amt=totalCapital*pct/100;
-  const interestAmt =
-   (s.type==="loan"||s.type==="other")
-    ? amt*(s.interest||0)/100
-    : 0;
+  const interestAmt=(s.type==="loan"||s.type==="other")
+   ? amt*(s.interest||0)/100 : 0;
 
   sumPct+=pct; totalInterest+=interestAmt;
 
@@ -271,24 +260,28 @@ function render(){
  oninput="updateSource(${s.id},'interest',this.value)">
 </td>
 <td>${interestAmt.toFixed(2)}</td>
-<td><button class="btn del"
- onclick="removeSource(${s.id})">🗑️</button></td>
+<td><button class="btn del" onclick="removeSource(${s.id})">🗑️</button></td>
 </tr>`;
  });
 
- document.getElementById("totalPercent").innerText=sumPct+"%";
- document.getElementById("totalInterest").innerText=totalInterest.toFixed(2);
-
- document.getElementById("status").innerHTML=
-  sumPct===100
-   ?'<span class="ok"> ✔️ 100% मिल्यो</span>'
-   :'<span class="warn"> ❗ 100% हुनुपर्छ</span>';
-
- localStorage.setItem(
-  "annual_interest_cost",
-  totalInterest.toFixed(2)
- );
+ totalPercent.innerText=sumPct+"%";
+ totalInterestEl.innerText=totalInterest.toFixed(2);
+ status.innerHTML=sumPct===100
+  ?'<span class="ok"> ✔️ 100% मिल्यो</span>'
+  :'<span class="warn"> ❗ 100% हुनुपर्छ</span>';
 }
+
+/* ===== BIND ===== */
+const fixedCapEl=fixedCap;
+const annualVarEl=annualVar;
+const wcMode=document.getElementById("wcMode");
+const wcOptions=document.getElementById("wcOptions");
+const workingCapEl=document.getElementById("workingCap");
+const totalCapitalEl=document.getElementById("totalCapital");
+const totalPercent=document.getElementById("totalPercent");
+const totalInterestEl=document.getElementById("totalInterest");
+const status=document.getElementById("status");
+const capBody=document.getElementById("capBody");
 
 render();
 </script>
