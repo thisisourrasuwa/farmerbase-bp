@@ -2,31 +2,30 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Expenses & Cost Allocation (5-Year)</title>
+<title>Expenses → Capital (5-Year)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1850px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
-h1,h2{color:#2e7d32;margin-top:0}
-
+body{
+ font-family:"Noto Sans Devanagari","Kalimati",system-ui;
+ background:#f4f7f6;margin:0
+}
+.container{
+ max-width:1850px;margin:20px auto;
+ background:#fff;padding:24px;border-radius:12px
+}
+h1,h2,h3{color:#2e7d32;margin-top:0}
 table{width:100%;border-collapse:collapse;margin-top:14px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-
-input,select{padding:6px;width:100%}
+input{width:100%;padding:6px}
 .lock{background:#f1f8e9;font-weight:600}
-button{padding:6px 14px;cursor:pointer}
-
-.add{background:#2e7d32;color:#fff;border:none}
-.del{background:#c62828;color:#fff;border:none}
-
 .note{
- font-size:13px;background:#f9fff6;border:1px dashed #9ccc65;
- padding:10px;margin:12px 0
+ font-size:13px;background:#f9fff6;
+ border:1px dashed #9ccc65;padding:10px;margin:12px 0
 }
 
-/* PAGE FLOW */
+/* page flow */
 .page-follow{
  position:fixed;right:14px;top:50%;
  transform:translateY(-50%);
@@ -38,50 +37,62 @@ button{padding:6px 14px;cursor:pointer}
  display:flex;align-items:center;justify-content:center;
  text-decoration:none;font-size:22px
 }
-.products{
- display:flex;gap:8px;flex-wrap:wrap;font-size:13px
-}
-.products label{white-space:nowrap}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-<h1>💸 खर्च तथा उत्पादन लागत (५ वर्ष)</h1>
+<h1>💸 खर्च → Capital Source (५ वर्ष)</h1>
 
 <div class="note">
-✔️ Subtotal छैन<br>
-✔️ ९–१२ भाले / ९–१२ पोथी / बयस्क भाले / माउ छुट्टाछुट्टै<br>
-✔️ प्रति–इकाई उत्पादन लागत निकाल्न तयार
+✔️ सबै खर्च Project Cost मा<br>
+✔️ Feed/Vit/Med = Working Capital (3/6/9 महिना)<br>
+✔️ अन्य चालु = 12 महिना<br>
+✔️ स्थिर खर्च = Fixed Capital
 </div>
 
-<!-- ================================================= -->
-<!-- A) FEED • VITAMIN • MEDICINE (AUTO) -->
-<!-- ================================================= -->
+<!-- ================= WORKING CAPITAL MODE ================= -->
+<h2>🔘 Feed • Vitamin • Medicine — Working Capital Mode</h2>
+<label><input type="radio" name="wcMode" value="3"> 3 महिना</label>
+<label><input type="radio" name="wcMode" value="6" checked> 6 महिना</label>
+<label><input type="radio" name="wcMode" value="9"> 9 महिना</label>
+
+<!-- ================= LOAD FEED DATA ================= -->
 <h2>🍽️ Feed • Vitamin • Medicine (Auto)</h2>
 <div id="feedBlock"></div>
 
-<!-- ================================================= -->
-<!-- B) OTHER EXPENSES WITH PRODUCT ALLOCATION -->
-<!-- ================================================= -->
-<h2>🔗 अन्य खर्च (उत्पादनसँग बाँडफाँट)</h2>
-<table id="otherExp">
+<!-- ================= OTHER OPERATING ================= -->
+<h2>⚙️ अन्य चालु खर्च</h2>
+<table id="opTable">
 <thead>
 <tr>
- <th>खर्च नाम</th>
- <th>उत्पादन चयन</th>
- <th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th><th>Year 5</th>
- <th>Action</th>
+ <th>खर्च</th>
+ <th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th>
 </tr>
 </thead>
 <tbody></tbody>
 </table>
-<button class="add" onclick="addExp()">➕ खर्च थप्नुहोस्</button>
+
+<!-- ================= FIXED CAPITAL ================= -->
+<h2>🏗️ स्थिर खर्च (Capital Items)</h2>
+<table id="capTable">
+<thead>
+<tr>
+ <th>सम्पत्ति</th>
+ <th>कुल लागत</th>
+ <th>लगानी हुने वर्ष</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<hr>
+<h2>📊 Capital Requirement Summary</h2>
+<div id="summary"></div>
 
 </div>
 
-<!-- PAGE FLOW -->
 <div class="page-follow">
  <a href="production.html" class="pf-btn">⬅️</a>
  <a href="capital-source.html" class="pf-btn">➡️</a>
@@ -92,16 +103,18 @@ button{padding:6px 14px;cursor:pointer}
 const feed =
  JSON.parse(localStorage.getItem("FEED_COST_BREAKDOWN_5YR")) || [];
 
-const products =
- JSON.parse(localStorage.getItem("PRODUCTION_LIST")) || [
-  {name:"९–१२ भाले बिक्री"},
-  {name:"९–१२ पोथी बिक्री"},
-  {name:"बयस्क भाले बिक्री"},
-  {name:"माउ बिक्री"}
- ];
+const operating =
+ JSON.parse(localStorage.getItem("OP_EXP_5YR")) || [];
 
-let otherExp =
- JSON.parse(localStorage.getItem("OTHER_EXP_5YR")) || [];
+const capital =
+ JSON.parse(localStorage.getItem("CAP_ITEMS")) || [];
+
+// ================= UTIL =================
+function getWCMode(){
+ return Number(
+  document.querySelector('input[name="wcMode"]:checked').value
+ );
+}
 
 // ================= FEED RENDER =================
 function renderFeed(){
@@ -114,20 +127,22 @@ function renderFeed(){
  let h=`<table>
  <tr>
   <th>वर्ष</th>
-  <th>९–१२ भाले</th>
-  <th>९–१२ पोथी</th>
-  <th>बयस्क भाले</th>
-  <th>माउ</th>
+  <th>Feed+Vit+Med (Total)</th>
+  <th>Working Capital Portion</th>
+  <th>Owner Equity Portion</th>
  </tr>`;
 
+ const m = getWCMode()/12;
+
  feed.forEach(f=>{
+  const wc = f.grandTotal * m;
+  const eq = f.grandTotal - wc;
   h+=`
    <tr>
     <td>${f.year}</td>
-    <td class="lock">${Math.round(f.feed.m912+f.vitamin.m912+f.medicine.m912)}</td>
-    <td class="lock">${Math.round(f.feed.f912+f.vitamin.f912+f.medicine.f912)}</td>
-    <td class="lock">${Math.round(f.feed.mA+f.vitamin.mA+f.medicine.mA)}</td>
-    <td class="lock">${Math.round(f.feed.fA+f.vitamin.fA+f.medicine.fA)}</td>
+    <td class="lock">${Math.round(f.grandTotal)}</td>
+    <td class="lock">${Math.round(wc)}</td>
+    <td class="lock">${Math.round(eq)}</td>
    </tr>`;
  });
 
@@ -135,46 +150,68 @@ function renderFeed(){
  document.getElementById("feedBlock").innerHTML=h;
 }
 
-// ================= OTHER EXPENSE =================
-function renderOther(){
- const tb=document.querySelector("#otherExp tbody");
- tb.innerHTML="";
- otherExp.forEach((r,i)=>{
-  tb.innerHTML+=`
+// ================= SUMMARY =================
+function renderSummary(){
+ let out=[];
+ for(let y=1;y<=5;y++){
+  const feedY = feed.find(f=>f.year===y)?.grandTotal||0;
+  const wcFeed = feedY * (getWCMode()/12);
+
+  const opY = operating.reduce((s,r)=>s+(+r['y'+y]||0),0);
+
+  const capY = capital
+    .filter(c=>Number(c.year)===y)
+    .reduce((s,c)=>s+(+c.cost||0),0);
+
+  const working = wcFeed + opY;
+  const fixed = capY;
+  const total = working + fixed;
+
+  out.push({
+   year:y,
+   working,
+   fixed,
+   total
+  });
+ }
+
+ localStorage.setItem(
+  "CAPITAL_REQUIREMENT_5YR",
+  JSON.stringify(out)
+ );
+
+ let h=`<table>
+ <tr>
+  <th>वर्ष</th>
+  <th>Working Capital</th>
+  <th>Fixed Capital</th>
+  <th>Total Capital Required</th>
+ </tr>`;
+
+ out.forEach(r=>{
+  h+=`
    <tr>
-    <td><input value="${r.name||""}" onchange="upd(${i},'name',this.value)"></td>
-    <td>
-     <div class="products">
-      ${products.map(p=>`
-       <label>
-        <input type="checkbox"
-         ${r.products?.includes(p.name)?"checked":""}
-         onchange="toggleProd(${i},'${p.name}',this.checked)">
-        ${p.name}
-       </label>`).join("")}
-     </div>
-    </td>
-    ${[1,2,3,4,5].map(y=>`
-     <td><input type="number" value="${r['y'+y]||""}"
-      onchange="upd(${i},'y${y}',this.value)"></td>`).join("")}
-    <td><button class="del" onclick="del(${i})">🗑️</button></td>
+    <td>Year ${r.year}</td>
+    <td>${Math.round(r.working)}</td>
+    <td>${Math.round(r.fixed)}</td>
+    <td class="lock"><b>${Math.round(r.total)}</b></td>
    </tr>`;
  });
-}
-function addExp(){otherExp.push({products:[]});save();renderOther();}
-function upd(i,f,v){otherExp[i][f]=v;save();}
-function toggleProd(i,p,ck){
- if(!otherExp[i].products) otherExp[i].products=[];
- if(ck) otherExp[i].products.push(p);
- else otherExp[i].products=otherExp[i].products.filter(x=>x!==p);
- save();
-}
-function del(i){otherExp.splice(i,1);save();renderOther();}
-function save(){localStorage.setItem("OTHER_EXP_5YR",JSON.stringify(otherExp));}
 
-// ================= INIT =================
+ h+=`</table>`;
+ document.getElementById("summary").innerHTML=h;
+}
+
+// ================= EVENTS =================
+document
+ .querySelectorAll('input[name="wcMode"]')
+ .forEach(r=>r.addEventListener('change',()=>{
+   renderFeed();
+   renderSummary();
+ }));
+
 renderFeed();
-renderOther();
+renderSummary();
 </script>
 
 </body>
