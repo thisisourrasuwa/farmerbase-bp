@@ -7,24 +7,24 @@
 
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
-.container{max-width:1900px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
+.container{max-width:1950px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
 h1,h2{color:#2e7d32;margin-top:0}
 
 table{width:100%;border-collapse:collapse;margin-top:14px}
-th,td{border:1px solid #ccc;padding:8px;text-align:center}
+th,td{border:1px solid #ccc;padding:6px;text-align:center}
 th{background:#eef5ee}
 
-input{padding:6px}
+input{padding:5px}
 .lock{background:#f1f8e9;font-weight:600}
+
 button{padding:6px 14px;cursor:pointer}
 .add{background:#2e7d32;color:#fff;border:none}
 .del{background:#c62828;color:#fff;border:none}
 
 .products{
- display:flex;gap:8px;flex-wrap:wrap;
- justify-content:center;font-size:13px
+ display:flex;flex-wrap:wrap;gap:6px;
+ justify-content:center;font-size:12px
 }
-.products label{white-space:nowrap}
 
 .note{
  font-size:13px;background:#f9fff6;
@@ -53,28 +53,31 @@ button{padding:6px 14px;cursor:pointer}
 <h1>💸 Expenses Summary (५ वर्ष)</h1>
 
 <div class="note">
-✔️ चालु र स्थिर खर्च add गर्न मिल्छ<br>
-✔️ खर्च कुन कुन उत्पादनमा जान्छ (% सहित)<br>
-✔️ Feed/Vit/Med Auto + Read-only<br>
+✔️ चालु खर्च = Feed/Vit/Med + अन्य चालु खर्च<br>
+✔️ अन्य चालु खर्च ५ वर्षे (Year-wise)<br>
+✔️ स्थिर खर्च छुट्टै<br>
 ✔️ Capital logic यहाँ छैन
 </div>
 
-<!-- ================= FEED AUTO ================= -->
+<!-- ================= FEED ================= -->
 <h2>🍽️ Feed • Vitamin • Medicine (Auto)</h2>
 <div id="feedBlock"></div>
 
-<!-- ================= OPERATING ================= -->
-<h2>⚙️ अन्य चालु खर्च</h2>
+<!-- ================= OTHER OPERATING ================= -->
+<h2>⚙️ अन्य चालु खर्च (५ वर्षे)</h2>
 <table id="opTable">
 <thead>
 <tr>
- <th>खर्च</th>
- <th>इकाई</th>
- <th>दर</th>
- <th>परिमाण</th>
- <th>जम्मा</th>
- <th>उत्पादन (%)</th>
- <th>Action</th>
+ <th rowspan="2">खर्च</th>
+ <th rowspan="2">इकाई</th>
+ <th rowspan="2">दर</th>
+ <th colspan="5">परिमाण (Qty)</th>
+ <th rowspan="2">जम्मा</th>
+ <th rowspan="2">उत्पादन (%)</th>
+ <th rowspan="2">Action</th>
+</tr>
+<tr>
+ <th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th>
 </tr>
 </thead>
 <tbody></tbody>
@@ -110,28 +113,29 @@ button{padding:6px 14px;cursor:pointer}
 
 <script>
 // ================= CONFIG =================
-const PRODUCTS = ["९–१२ भाले","९–१२ पोथी","बयस्क भाले","बयस्क माउ"];
+const PRODUCTS=["९–१२ भाले","९–१२ पोथी","बयस्क भाले","बयस्क माउ"];
 
 // ================= LOAD =================
 const feed = JSON.parse(localStorage.getItem("FEED_COST_BREAKDOWN_5YR")) || [];
-let operating = JSON.parse(localStorage.getItem("OP_EXP_DETAILED")) || [];
+let operating = JSON.parse(localStorage.getItem("OP_EXP_5YR_DETAILED")) || [];
 let fixed = JSON.parse(localStorage.getItem("FIX_EXP_DETAILED")) || [];
 
 // ================= FEED =================
 function renderFeed(){
- if(!feed.length){
-  feedBlock.innerHTML="<p>Feed data छैन</p>"; return;
- }
+ if(!feed.length){feedBlock.innerHTML="<p>Feed data छैन</p>";return;}
  let h=`<table>
- <tr><th>वर्ष</th>${PRODUCTS.map(p=>`<th>${p}</th>`).join("")}</tr>`;
+ <tr><th>वर्ष</th>${PRODUCTS.map(p=>`<th>${p}</th>`).join("")}<th>जम्मा</th></tr>`;
  feed.forEach(f=>{
+  const t =
+   f.feed.total+f.vitamin.total+f.medicine.total;
   h+=`
    <tr>
     <td>${f.year}</td>
-    <td class="lock">${Math.round(f.feed.m912+f.vitamin.m912+f.medicine.m912)}</td>
-    <td class="lock">${Math.round(f.feed.f912+f.vitamin.f912+f.medicine.f912)}</td>
-    <td class="lock">${Math.round(f.feed.mA+f.vitamin.mA+f.medicine.mA)}</td>
-    <td class="lock">${Math.round(f.feed.fA+f.vitamin.fA+f.medicine.fA)}</td>
+    <td class="lock">${f.feed.m912+f.vitamin.m912+f.medicine.m912}</td>
+    <td class="lock">${f.feed.f912+f.vitamin.f912+f.medicine.f912}</td>
+    <td class="lock">${f.feed.mA+f.vitamin.mA+f.medicine.mA}</td>
+    <td class="lock">${f.feed.fA+f.vitamin.fA+f.medicine.fA}</td>
+    <td class="lock"><b>${t}</b></td>
    </tr>`;
  });
  h+=`</table>`;
@@ -143,13 +147,17 @@ function renderOp(){
  const tb=document.querySelector("#opTable tbody");
  tb.innerHTML="";
  operating.forEach((r,i)=>{
-  const total=(r.rate||0)*(r.qty||0);
+  const total =
+   [1,2,3,4,5].reduce(
+    (s,y)=>s+(r.rate||0)*(r['y'+y]||0),0);
   tb.innerHTML+=`
    <tr>
-    <td><input value="${r.name||""}" onchange="uOp(${i},'name',this.value)"></td>
-    <td><input value="${r.unit||""}" onchange="uOp(${i},'unit',this.value)"></td>
+    <td><input value="${r.name||''}" onchange="uOp(${i},'name',this.value)"></td>
+    <td><input value="${r.unit||''}" onchange="uOp(${i},'unit',this.value)"></td>
     <td><input type="number" value="${r.rate||0}" onchange="uOp(${i},'rate',this.value)"></td>
-    <td><input type="number" value="${r.qty||0}" onchange="uOp(${i},'qty',this.value)"></td>
+    ${[1,2,3,4,5].map(y=>`
+     <td><input type="number" value="${r['y'+y]||0}"
+      onchange="uOp(${i},'y${y}',this.value)"></td>`).join("")}
     <td class="lock">${total}</td>
     <td>${prodPctUI(r,i,'op')}</td>
     <td><button class="del" onclick="delOp(${i})">🗑️</button></td>
@@ -157,7 +165,7 @@ function renderOp(){
  });
 }
 function addOp(){operating.push({alloc:{}});save();renderOp();renderSummary();}
-function uOp(i,f,v){operating[i][f]=v;save();renderSummary();}
+function uOp(i,f,v){operating[i][f]=Number(v)||v;save();renderSummary();}
 function delOp(i){operating.splice(i,1);save();renderOp();renderSummary();}
 
 // ================= FIXED =================
@@ -167,7 +175,7 @@ function renderFix(){
  fixed.forEach((r,i)=>{
   tb.innerHTML+=`
    <tr>
-    <td><input value="${r.name||""}" onchange="uFix(${i},'name',this.value)"></td>
+    <td><input value="${r.name||''}" onchange="uFix(${i},'name',this.value)"></td>
     <td><input type="number" value="${r.cost||0}" onchange="uFix(${i},'cost',this.value)"></td>
     <td><input type="number" value="${r.years||0}" onchange="uFix(${i},'years',this.value)"></td>
     <td>${prodPctUI(r,i,'fix')}</td>
@@ -176,49 +184,75 @@ function renderFix(){
  });
 }
 function addFix(){fixed.push({alloc:{}});save();renderFix();renderSummary();}
-function uFix(i,f,v){fixed[i][f]=v;save();renderSummary();}
+function uFix(i,f,v){fixed[i][f]=Number(v)||v;save();renderSummary();}
 function delFix(i){fixed.splice(i,1);save();renderFix();renderSummary();}
 
-// ================= PRODUCT % UI =================
+// ================= PRODUCT % =================
 function prodPctUI(r,i,type){
  return `<div class="products">
  ${PRODUCTS.map(p=>`
   <label>${p}
-   <input type="number" style="width:55px"
+   <input type="number" style="width:48px"
     value="${r.alloc?.[p]||''}"
     onchange="setPct('${type}',${i},'${p}',this.value)">%
   </label>`).join("")}
  </div>`;
 }
 function setPct(type,i,p,v){
- const tgt= type==='op'?operating:fixed;
+ const tgt=type==='op'?operating:fixed;
  if(!tgt[i].alloc) tgt[i].alloc={};
- tgt[i].alloc[p]=v;
+ tgt[i].alloc[p]=Number(v)||0;
  save();
 }
 
 // ================= SUMMARY =================
 function renderSummary(){
- const opTotal = operating.reduce((s,r)=>s+(r.rate||0)*(r.qty||0),0);
+ let opByYear=[];
+ for(let y=1;y<=5;y++){
+  const feedY = feed.find(f=>f.year===y);
+  const feedTotal = feedY
+    ? feedY.feed.total+feedY.vitamin.total+feedY.medicine.total
+    : 0;
+  const other = operating.reduce(
+    (s,r)=>s+(r.rate||0)*(r['y'+y]||0),0);
+  opByYear.push({
+    year:y,
+    feed:feedTotal,
+    other,
+    total:feedTotal+other
+  });
+ }
  const fixTotal = fixed.reduce((s,r)=>s+(+r.cost||0),0);
- const projectTotal = opTotal + fixTotal;
+ const projectTotal =
+  opByYear.reduce((s,r)=>s+r.total,0)+fixTotal;
 
  localStorage.setItem(
   "PROJECT_COST_5YR",
-  JSON.stringify({operating:opTotal,fixed:fixTotal,projectTotal})
+  JSON.stringify({operating:opByYear,fixed:fixTotal,projectTotal})
  );
 
- summary.innerHTML=`
-  <table>
-   <tr><th>चालु खर्च जम्मा</th><td class="lock">${opTotal}</td></tr>
-   <tr><th>स्थिर खर्च जम्मा</th><td class="lock">${fixTotal}</td></tr>
-   <tr><th>कुल परियोजना लागत</th><td class="lock"><b>${projectTotal}</b></td></tr>
-  </table>`;
+ let h=`<table>
+ <tr><th>वर्ष</th><th>Feed</th><th>अन्य चालु</th><th>जम्मा चालु</th></tr>`;
+ opByYear.forEach(r=>{
+  h+=`
+   <tr>
+    <td>Y${r.year}</td>
+    <td class="lock">${r.feed}</td>
+    <td class="lock">${r.other}</td>
+    <td class="lock"><b>${r.total}</b></td>
+   </tr>`;
+ });
+ h+=`
+ <tr><th colspan="3">स्थिर खर्च जम्मा</th><th class="lock">${fixTotal}</th></tr>
+ <tr><th colspan="3">कुल परियोजना लागत</th>
+     <th class="lock"><b>${projectTotal}</b></th></tr>
+ </table>`;
+ summary.innerHTML=h;
 }
 
 // ================= SAVE =================
 function save(){
- localStorage.setItem("OP_EXP_DETAILED",JSON.stringify(operating));
+ localStorage.setItem("OP_EXP_5YR_DETAILED",JSON.stringify(operating));
  localStorage.setItem("FIX_EXP_DETAILED",JSON.stringify(fixed));
 }
 
