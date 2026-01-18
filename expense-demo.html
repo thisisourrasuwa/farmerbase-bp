@@ -2,350 +2,119 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Expenses — Final Version</title>
+<title>Feed • Vitamin • Medicine (5 Years)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
 .container{max-width:1800px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
-h1,h2{color:#2e7d32;margin-top:0}
-table{width:100%;border-collapse:collapse;margin:16px 0}
-th,td{border:1px solid #ccc;padding:8px;text-align:center;vertical-align:top}
-th{background:#eef5ee;font-weight:bold}
-input,textarea{width:100%;padding:6px}
-textarea{min-height:60px}
-button{padding:6px 14px;border:none;border-radius:6px;cursor:pointer}
-.addBtn{background:#2e7d32;color:#fff}
-.delBtn{background:#c62828;color:#fff}
-
-.prodBox{display:flex;flex-direction:column;gap:4px;text-align:left;font-size:14px}
-.prodRow{display:flex;align-items:center;gap:6px}
-.prodRow input{width:70px}
-
-.page-follow{position:fixed;right:12px;top:46%;display:flex;flex-direction:column;gap:10px;z-index:999}
-.pf-btn{width:44px;height:44px;border-radius:50%;background:#2e7d32;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;text-decoration:none}
-
-.note{background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-bottom:20px;font-size:14px}
+h1{color:#2e7d32;margin-top:0}
+table{width:100%;border-collapse:collapse;margin-top:16px}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+th{background:#eef5ee}
+input{width:80px}
+button{padding:10px 18px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer}
+.note{background:#f9fff6;border:1px dashed #9ccc65;padding:10px;margin-bottom:14px}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>💰 खर्च (Expenses)</h1>
+<h1>🍽 Feed • Vitamin • Medicine (५ वर्ष)</h1>
 
 <div class="note">
-✔ Feed/Vit/Med डेटा स्वतः आयात हुन्छ (4-category split)<br>
-✔ उत्पादन % = (९–१२ भाले, ९–१२ पोथी, बयस्क माउ, बयस्क भाले)<br>
-✔ चालु तथा स्थिर खर्च थप्न सकिन्छ<br>
+✔ उमेर/लिङ्ग अनुसार खर्च<br>
+✔ ५ वर्षे auto calculation<br>
+✔ Expenses page का लागि data save हुन्छ
 </div>
 
-<!-- ===========================================================
-   FEED / VITAMIN / MEDICINE SUMMARY AUTO
-=========================================================== -->
-<h2>🍽 Feed • Vitamin • Medicine (५ वर्ष — category-wise)</h2>
+<h2>📌 वार्षिक खर्च दर (Rs / जनावर)</h2>
 
-<table id="feedTable">
-<thead>
+<table>
 <tr>
-  <th>वर्ष</th>
-  <th colspan="5">Feed</th>
-  <th colspan="5">Vitamin</th>
-  <th colspan="5">Medicine</th>
+<th>Category</th><th>Feed</th><th>Vitamin</th><th>Medicine</th>
 </tr>
-
-<tr>
-  <th></th>
-
-  <th>९–१२ भाले</th>
-  <th>९–१२ पोथी</th>
-  <th>बयस्क भाले</th>
-  <th>माउ</th>
-  <th>Subtotal</th>
-
-  <th>९–१२ भाले</th>
-  <th>९–१२ पोथी</th>
-  <th>बयस्क भाले</th>
-  <th>माउ</th>
-  <th>Subtotal</th>
-
-  <th>९–१२ भाले</th>
-  <th>९–१२ पोथी</th>
-  <th>बयस्क भाले</th>
-  <th>माउ</th>
-  <th>Subtotal</th>
-</tr>
-</thead>
-<tbody></tbody>
+<tr><td>९–१२ भाले</td><td><input id="f_m12" value="4500"></td><td><input id="v_m12" value="320"></td><td><input id="m_m12" value="400"></td></tr>
+<tr><td>९–१२ पोथी</td><td><input id="f_f12" value="4200"></td><td><input id="v_f12" value="350"></td><td><input id="m_f12" value="420"></td></tr>
+<tr><td>बयस्क भाले</td><td><input id="f_am" value="6200"></td><td><input id="v_am" value="500"></td><td><input id="m_am" value="650"></td></tr>
+<tr><td>बयस्क माउ</td><td><input id="f_af" value="6800"></td><td><input id="v_af" value="550"></td><td><input id="m_af" value="700"></td></tr>
 </table>
 
-<hr>
-
-<!-- ===========================================================
-   OTHER RUNNING EXPENSES
-=========================================================== -->
-<h2>⚙ अन्य चालु खर्च</h2>
-
-<table id="runTable">
-<thead>
-<tr>
-  <th>खर्च नाम</th>
-  <th>विवरण / इकाई</th>
-  <th>कुल लागत (Rs)</th>
-  <th>उत्पादन (%)</th>
-  <th>Action</th>
-</tr>
-</thead>
-<tbody id="runBody"></tbody>
-
-<tr>
-  <td><input id="run_name"></td>
-  <td><textarea id="run_desc"></textarea></td>
-  <td><input id="run_cost" type="number"></td>
-  <td>
-    <div class="prodBox">
-      <div class="prodRow">९–१२ भाले <input id="run_m12" type="number"></div>
-      <div class="prodRow">९–१२ पोथी <input id="run_f12" type="number"></div>
-      <div class="prodRow">बयस्क माउ <input id="run_af" type="number"></div>
-      <div class="prodRow">बयस्क भाले <input id="run_am" type="number"></div>
-    </div>
-  </td>
-  <td><button class="addBtn" onclick="addRunning()">➕</button></td>
-</tr>
-
-</table>
-
-<h3>चालु खर्च जम्मा: Rs <span id="runTotal">0</span></h3>
+<br>
+<button onclick="run()">🔄 Run & Save (5 Years)</button>
 
 <hr>
-
-<!-- ===========================================================
-   FIXED EXPENSES
-=========================================================== -->
-<h2>🏗 स्थिर खर्च (Fixed)</h2>
-
-<table id="fixTable">
-<thead>
-<tr>
-  <th>खर्च नाम</th>
-  <th>विवरण / इकाई</th>
-  <th>कुल लागत (Rs)</th>
-  <th>उत्पादन (%)</th>
-  <th>Action</th>
-</tr>
-</thead>
-<tbody id="fixBody"></tbody>
-
-<tr>
-  <td><input id="fix_name"></td>
-  <td><textarea id="fix_desc"></textarea></td>
-  <td><input id="fix_cost" type="number"></td>
-  <td>
-    <div class="prodBox">
-      <div class="prodRow">९–१२ भाले <input id="fix_m12" type="number"></div>
-      <div class="prodRow">९–१२ पोथी <input id="fix_f12" type="number"></div>
-      <div class="prodRow">बयस्क माउ <input id="fix_af" type="number"></div>
-      <div class="prodRow">बयस्क भाले <input id="fix_am" type="number"></div>
-    </div>
-  </td>
-  <td><button class="addBtn" onclick="addFixed()">➕</button></td>
-</tr>
-
-</table>
-
-<h3>स्थिर खर्च जम्मा: Rs <span id="fixTotal">0</span></h3>
-
-<hr>
-
-<h2>📝 समग्र न्यारेसन</h2>
-<textarea id="notes" placeholder="यस परियोजनाको खर्च विवरण उत्पादन क्षमताको आधारमा तयार गरिएको छ..."></textarea>
-
-<br><br>
-<button class="addBtn" onclick="saveAll()">💾 Save All</button>
+<h2>📊 ५ वर्षे Summary</h2>
+<div id="result"></div>
 
 </div>
 
-<!-- ===========================================================
-   PAGE FLOW BUTTONS
-=========================================================== -->
-<div class="page-follow">
-  <a href="production.html" class="pf-btn">⬅️</a>
-  <a href="capital-source.html" class="pf-btn">➡️</a>
-</div>
-
-<!-- ===========================================================
-   SCRIPT (Pure Logic Preserved)
-=========================================================== -->
 <script>
+function n(id){return Number(document.getElementById(id).value)||0;}
 
-// ----------------------------------------------------------------
-// FEED DATA LOADER (auto)
-// ----------------------------------------------------------------
-function loadFeed(){
- const data = JSON.parse(localStorage.getItem("FEED_COST_BREAKDOWN_5YR")) || [];
-  let html="";
+function run(){
 
-  data.forEach(y=>{
-    html += `
-    <tr>
-      <td>${y.year}</td>
+  // DEMO population growth (stable logic)
+  const base = [
+    {m12:80,f12:70,am:10,af:20},
+    {m12:140,f12:120,am:18,af:35},
+    {m12:220,f12:190,am:25,af:60},
+    {m12:350,f12:300,am:40,af:90},
+    {m12:520,f12:470,am:60,af:140}
+  ];
 
-      <td>${y.feed.m12}</td>
-      <td>${y.feed.f12}</td>
-      <td>${y.feed.adm}</td>
-      <td>${y.feed.adf}</td>
-      <td>${y.feed.total}</td>
+  let out=[];
 
-      <td>${y.vit.m12}</td>
-      <td>${y.vit.f12}</td>
-      <td>${y.vit.adm}</td>
-      <td>${y.vit.adf}</td>
-      <td>${y.vit.total}</td>
+  base.forEach((p,i)=>{
+    const feed = {
+      m12:p.m12*n("f_m12"),
+      f12:p.f12*n("f_f12"),
+      adm:p.am*n("f_am"),
+      adf:p.af*n("f_af")
+    };
+    feed.total = feed.m12+feed.f12+feed.adm+feed.adf;
 
-      <td>${y.med.m12}</td>
-      <td>${y.med.f12}</td>
-      <td>${y.med.adm}</td>
-      <td>${y.med.adf}</td>
-      <td>${y.med.total}</td>
+    const vit = {
+      m12:p.m12*n("v_m12"),
+      f12:p.f12*n("v_f12"),
+      adm:p.am*n("v_am"),
+      adf:p.af*n("v_af")
+    };
+    vit.total = vit.m12+vit.f12+vit.adm+vit.adf;
+
+    const med = {
+      m12:p.m12*n("m_m12"),
+      f12:p.f12*n("m_f12"),
+      adm:p.am*n("m_am"),
+      adf:p.af*n("m_af")
+    };
+    med.total = med.m12+med.f12+med.adm+med.adf;
+
+    out.push({
+      year:i+1,
+      feed,vit,med
+    });
+  });
+
+  localStorage.setItem("FEED_COST_BREAKDOWN_5YR", JSON.stringify(out));
+  render(out);
+}
+
+function render(d){
+  let h=`<table>
+  <tr><th>वर्ष</th><th>Feed</th><th>Vitamin</th><th>Medicine</th><th>कुल</th></tr>`;
+  d.forEach(x=>{
+    h+=`<tr>
+      <td>${x.year}</td>
+      <td>${x.feed.total}</td>
+      <td>${x.vit.total}</td>
+      <td>${x.med.total}</td>
+      <td><b>${x.feed.total+x.vit.total+x.med.total}</b></td>
     </tr>`;
   });
-
-  document.querySelector("#feedTable tbody").innerHTML = html;
+  h+=`</table>`;
+  result.innerHTML=h;
 }
-
-// ----------------------------------------------------------------
-// RUNNING EXPENSES
-// ----------------------------------------------------------------
-function addRunning(){
-  const name = run_name.value;
-  const desc = run_desc.value;
-  const cost = Number(run_cost.value);
-
-  if(!name || !cost){ alert("कृपया खर्च नाम र लागत भर्नुहोस्"); return; }
-
-  let arr = JSON.parse(localStorage.getItem("RUN_EXP")) || [];
-
-  arr.push({
-    name,desc,cost,
-    m12:Number(run_m12.value)||0,
-    f12:Number(run_f12.value)||0,
-    af:Number(run_af.value)||0,
-    am:Number(run_am.value)||0
-  });
-
-  localStorage.setItem("RUN_EXP", JSON.stringify(arr));
-  loadRunning();
-}
-
-function loadRunning(){
-  let arr = JSON.parse(localStorage.getItem("RUN_EXP")) || [];
-  let html="", total=0;
-
-  arr.forEach((r,i)=>{
-    total += r.cost;
-    html += `
-    <tr>
-      <td>${r.name}</td>
-      <td>${r.desc}</td>
-      <td>${r.cost}</td>
-      <td>
-        <div class="prodBox">
-          <div class="prodRow">९–१२ भाले ${r.m12}%</div>
-          <div class="prodRow">९–१२ पोथी ${r.f12}%</div>
-          <div class="prodRow">बयस्क माउ ${r.af}%</div>
-          <div class="prodRow">बयस्क भाले ${r.am}%</div>
-        </div>
-      </td>
-      <td><button class="delBtn" onclick="delRun(${i})">❌</button></td>
-    </tr>`;
-  });
-
-  runBody.innerHTML = html;
-  runTotal.innerText = total;
-}
-
-function delRun(i){
-  let arr = JSON.parse(localStorage.getItem("RUN_EXP")) || [];
-  arr.splice(i,1);
-  localStorage.setItem("RUN_EXP", JSON.stringify(arr));
-  loadRunning();
-}
-
-// ----------------------------------------------------------------
-// FIXED EXPENSES
-// ----------------------------------------------------------------
-function addFixed(){
-  const name = fix_name.value;
-  const desc = fix_desc.value;
-  const cost = Number(fix_cost.value);
-
-  if(!name || !cost){ alert("कृपया खर्च नाम र लागत भर्नुहोस्"); return; }
-
-  let arr = JSON.parse(localStorage.getItem("FIX_EXP")) || [];
-
-  arr.push({
-    name,desc,cost,
-    m12:Number(fix_m12.value)||0,
-    f12:Number(fix_f12.value)||0,
-    af:Number(fix_af.value)||0,
-    am:Number(fix_am.value)||0
-  });
-
-  localStorage.setItem("FIX_EXP", JSON.stringify(arr));
-  loadFixed();
-}
-
-function loadFixed(){
-  let arr = JSON.parse(localStorage.getItem("FIX_EXP")) || [];
-  let html="", total=0;
-
-  arr.forEach((r,i)=>{
-    total += r.cost;
-    html += `
-    <tr>
-      <td>${r.name}</td>
-      <td>${r.desc}</td>
-      <td>${r.cost}</td>
-      <td>
-        <div class="prodBox">
-          <div class="prodRow">९–१२ भाले ${r.m12}%</div>
-          <div class="prodRow">९–१२ पोथी ${r.f12}%</div>
-          <div class="prodRow">बयस्क माउ ${r.af}%</div>
-          <div class="prodRow">बयस्क भाले ${r.am}%</div>
-        </div>
-      </td>
-      <td><button class="delBtn" onclick="delFix(${i})">❌</button></td>
-    </tr>`;
-  });
-
-  fixBody.innerHTML = html;
-  fixTotal.innerText = total;
-}
-
-function delFix(i){
-  let arr = JSON.parse(localStorage.getItem("FIX_EXP")) || [];
-  arr.splice(i,1);
-  localStorage.setItem("FIX_EXP", JSON.stringify(arr));
-  loadFixed();
-}
-
-// ----------------------------------------------------------------
-// SAVE NOTES
-// ----------------------------------------------------------------
-function saveAll(){
-  localStorage.setItem("EXP_NOTES", notes.value);
-  alert("Saved ✔");
-}
-
-// ----------------------------------------------------------------
-// INIT
-// ----------------------------------------------------------------
-window.onload = () => {
-  loadFeed();
-  loadRunning();
-  loadFixed();
-  notes.value = localStorage.getItem("EXP_NOTES") || "";
-};
 </script>
 
 </body>
