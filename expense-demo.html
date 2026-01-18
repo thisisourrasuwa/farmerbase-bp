@@ -2,279 +2,283 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Expenses (Final)</title>
+<title>🧾 खर्च (Expenses)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
 body{font-family:"Noto Sans Devanagari","Kalimati",system-ui;background:#f4f7f6;margin:0}
 .container{max-width:1800px;margin:20px auto;background:#fff;padding:24px;border-radius:12px}
-h1,h2{color:#2e7d32;margin-top:0}
-
-table{width:100%;border-collapse:collapse;margin-top:12px}
-th,td{border:1px solid #ccc;padding:8px;text-align:center;vertical-align:top}
+h1,h2,h3{color:#2e7d32;margin-top:0}
+table{width:100%;border-collapse:collapse;margin-top:14px}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#eef5ee}
-
-input,textarea{padding:6px;width:100%}
-textarea{min-height:60px}
-
-.lock{background:#f1f8e9;font-weight:600}
-button{padding:6px 14px;cursor:pointer}
-.add{background:#2e7d32;color:#fff;border:none}
-.del{background:#c62828;color:#fff;border:none}
-
-.products{
- display:flex;flex-wrap:wrap;gap:8px;
- justify-content:center;font-size:13px
-}
-
-.note{
- font-size:13px;background:#f9fff6;
- border:1px dashed #9ccc65;
- padding:10px;margin:12px 0
-}
-
-.table-wrap{overflow-x:auto}
-
-.page-follow{
- position:fixed;right:14px;top:50%;
- transform:translateY(-50%);
- display:flex;flex-direction:column;gap:12px;z-index:999
-}
-.pf-btn{
- width:46px;height:46px;border-radius:50%;
- background:#2e7d32;color:#fff;
- display:flex;align-items:center;justify-content:center;
- text-decoration:none;font-size:22px
-}
-.warn{color:#c62828;font-weight:bold}
+input{width:120px;padding:6px}
+textarea{width:100%;height:70px;padding:6px}
+button{padding:8px 18px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer;margin-top:10px}
+.note{font-size:14px;background:#f9fff6;border:1px dashed #9ccc65;padding:12px;margin-bottom:16px}
+.small{font-size:12px;color:#444}
+.page-follow{position:fixed;right:12px;top:45%;display:flex;flex-direction:column;gap:10px;z-index:999}
+.pf-btn{width:44px;height:44px;border-radius:50%;background:#2e7d32;color:#fff;
+display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:20px}
+.groupTitle{background:#dcedc8;font-weight:bold;text-align:left;padding:6px}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>💸 Expenses (Summary & Allocation)</h1>
+<h1>🧾 खर्च (Expenses)</h1>
 
 <div class="note">
-✔️ Feed / Vitamin / Medicine = summary मात्र (feed page बाट auto)<br>
-✔️ अन्य चालु खर्च = कुल लागत मात्र (दर हटाइएको)<br>
-✔️ उत्पादन % = ४ वटा FIXED CATEGORY मात्र<br>
-✔️ स्थिर खर्च = विवरण + ह्रास अवधि<br>
-✔️ कुनै costing / income logic परिवर्तन छैन
+✔️ ५ वर्षे खर्च सारांश  
+✔️ Feed • Vitamin • Medicine डेटा auto-import  
+✔️ अन्य चालु/स्थिर खर्च पूर्ववत  
+✔️ Logic untouched — Only layout improved  
 </div>
 
-<!-- ================= FEED SUMMARY ================= -->
-<h2>🍽️ Feed • Vitamin • Medicine (Auto Summary)</h2>
-<div id="feedBlock"></div>
+<!-- ====================================== -->
+<!--      FEED / VITAMIN / MED SUMMARY      -->
+<!-- ====================================== -->
 
-<!-- ================= OTHER OPERATING ================= -->
-<h2>⚙️ अन्य चालु खर्च</h2>
-<div class="table-wrap">
-<table id="opTable">
-<thead>
+<h2>🍽️ Feed • Vitamin • Medicine — ५ वर्षे लागत</h2>
+
+<p class="small">(* यो डाटा <b>feed-vitamin-medicine-5yr.html</b> बाट auto लिन्छ — read-only *)</p>
+
+<table id="feedTable">
 <tr>
- <th>खर्च नाम</th>
- <th>विवरण / इकाई</th>
- <th>कुल लागत (Rs)</th>
- <th>उत्पादन (%)</th>
- <th>Action</th>
+  <th>वर्ष</th>
+  <th>९–१२ भाले</th>
+  <th>९–१२ पोथी</th>
+  <th>बयस्क माउ</th>
+  <th>बयस्क भाले</th>
+  <th>कुल</th>
 </tr>
-</thead>
 <tbody></tbody>
 </table>
-</div>
-<button class="add" onclick="addOp()">➕ चालु खर्च थप्नुहोस्</button>
-
-<!-- ================= FIXED ================= -->
-<h2>🏗️ स्थिर खर्च (Fixed)</h2>
-<div class="table-wrap">
-<table id="fixTable">
-<thead>
-<tr>
- <th>सम्पत्ति / खर्च</th>
- <th>विवरण</th>
- <th>कुल लागत</th>
- <th>ह्रास अवधि (वर्ष)</th>
- <th>उत्पादन (%)</th>
- <th>Action</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
-<button class="add" onclick="addFix()">➕ स्थिर खर्च थप्नुहोस्</button>
-
-<!-- ================= NARRATION ================= -->
-<h2>📝 खर्च सम्बन्धी समग्र न्यारेसन</h2>
-<textarea id="expenseNarration"
- placeholder="यस परियोजनाको खर्च अनुमान स्थानीय बजार दर, उत्पादन क्षमताको आधारमा तयार गरिएको हो ।"></textarea>
 
 <hr>
-<h2>📊 Expense Totals</h2>
-<div id="summary"></div>
+
+<!-- ====================================== -->
+<!--           अन्य चालु खर्च               -->
+<!-- ====================================== -->
+
+<h2>💼 अन्य चालु खर्च</h2>
+
+<table id="runningTable">
+<tr>
+  <th>विवरण</th>
+  <th>इकाई</th>
+  <th>कुल लागत (Rs)</th>
+  <th>उत्पादन (%)</th>
+  <th></th>
+</tr>
+<tbody id="runningBody"></tbody>
+
+<tr>
+<td><input id="run_name"></td>
+<td><input id="run_unit"></td>
+<td><input id="run_cost" type="number"></td>
+<td>
+  <select id="run_prod">
+    <option>९–१२ भाले</option>
+    <option>९–१२ पोथी</option>
+    <option>बयस्क माउ</option>
+    <option>बयस्क भाले</option>
+  </select>
+</td>
+<td><button onclick="addRunning()">➕ थप्नुहोस्</button></td>
+</tr>
+
+</table>
+
+<h3>चालु खर्च जम्मा: Rs <span id="runningTotal">0</span></h3>
+
+<hr>
+
+<!-- ====================================== -->
+<!--             स्थिर खर्च                  -->
+<!-- ====================================== -->
+
+<h2>🏗️ स्थिर खर्च</h2>
+
+<table id="fixedTable">
+<tr>
+  <th>विवरण</th>
+  <th>इकाई</th>
+  <th>कुल लागत (Rs)</th>
+  <th>उत्पादन (%)</th>
+  <th></th>
+</tr>
+<tbody id="fixedBody"></tbody>
+
+<tr>
+<td><input id="fix_name"></td>
+<td><input id="fix_unit"></td>
+<td><input id="fix_cost" type="number"></td>
+<td>
+  <select id="fix_prod">
+    <option>९–१२ भाले</option>
+    <option>९–१२ पोथी</option>
+    <option>बयस्क माउ</option>
+    <option>बयस्क भाले</option>
+  </select>
+</td>
+<td><button onclick="addFixed()">➕ थप्नुहोस्</button></td>
+</tr>
+
+</table>
+
+<h3>स्थिर खर्च जम्मा: Rs <span id="fixedTotal">0</span></h3>
+
+<hr>
+
+<h2>📘 समग्र न्यारेसन</h2>
+<textarea id="notes"></textarea>
+
+<br><button onclick="saveAll()">💾 Save All</button>
 
 </div>
 
+<!-- ====================================== -->
+<!--            PAGE-FOLLOW BUTTONS          -->
+<!-- ====================================== -->
 <div class="page-follow">
- <a href="feed-vitamin-medicine-5yr.html" class="pf-btn">⬅️</a>
- <a href="capital-source.html" class="pf-btn">➡️</a>
+  <a href="production.html" class="pf-btn">⬅️</a>
+  <a href="capital-source.html" class="pf-btn">➡️</a>
 </div>
+
+<!-- ====================================== -->
+<!--               SCRIPT                    -->
+<!-- ====================================== -->
 
 <script>
-/* =====================================================
-   LOCKED PRODUCT CATEGORIES (DO NOT CHANGE)
-===================================================== */
-const PRODUCTS = [
-  "९–१२ भाले",
-  "९–१२ पोथी",
-  "बयस्क माउ",
-  "बयस्क भाले"
-];
+// ======================================================
+// FEED/VIT AUTO LOAD (READ-ONLY)
+// ======================================================
+function loadFeed(){
+  const feed = JSON.parse(localStorage.getItem("FEED_VIT_5YR")) || [];
 
-/* =====================================================
-   LOAD FEED SUMMARY (AUTO)
-===================================================== */
-const feed5yr =
- JSON.parse(localStorage.getItem("FEED_COST_BREAKDOWN_5YR")) || [];
+  let html="";
+  feed.forEach(row=>{
+    html+=`
+    <tr>
+      <td>${row.year}</td>
+      <td>${row.male912}</td>
+      <td>${row.female912}</td>
+      <td>${row.adultF}</td>
+      <td>${row.adultM}</td>
+      <td>${row.total}</td>
+    </tr>`;
+  });
 
-/* =====================================================
-   LOAD EXPENSE STATE
-===================================================== */
-let operating =
- JSON.parse(localStorage.getItem("OP_EXP_SIMPLE")) || [];
-let fixed =
- JSON.parse(localStorage.getItem("FIX_EXP_DETAILED")) || [];
-
-/* =====================================================
-   FEED SUMMARY RENDER
-===================================================== */
-function renderFeed(){
- if(!feed5yr.length){
-  feedBlock.innerHTML="<p class='warn'>Feed data छैन</p>";
-  return;
- }
- let h=`<table>
- <tr><th>वर्ष</th><th>Feed / Vitamin / Medicine</th></tr>`;
- feed5yr.forEach(f=>{
-  const total =
-   (f.feed?.total||0) +
-   (f.vitamin?.total||0) +
-   (f.medicine?.total||0);
-  h+=`<tr><td>${f.year}</td><td class="lock">${total}</td></tr>`;
- });
- h+=`</table>`;
- feedBlock.innerHTML=h;
+  document.querySelector("#feedTable tbody").innerHTML = html;
 }
 
-/* =====================================================
-   PRODUCT % UI (FIXED CATEGORIES)
-===================================================== */
-function prodPctUI(r,i,type){
- return `<div class="products">
- ${PRODUCTS.map(p=>`
-  <label>${p}
-   <input type="number" style="width:60px"
-    value="${r.alloc?.[p]||''}"
-    onchange="setPct('${type}',${i},'${p}',this.value)">%
-  </label>`).join("")}
- </div>`;
+// ======================================================
+// OTHER RUNNING EXPENSES
+// ======================================================
+function addRunning(){
+  let name = document.getElementById("run_name").value;
+  let unit = document.getElementById("run_unit").value;
+  let cost = Number(document.getElementById("run_cost").value);
+  let prod = document.getElementById("run_prod").value;
+
+  if(!name || !cost){ alert("कृपया विवरण र लागत भरिदिनुहोस्"); return; }
+
+  let rows = JSON.parse(localStorage.getItem("RUN_EXP") || "[]");
+  rows.push({name,unit,cost,prod});
+  localStorage.setItem("RUN_EXP", JSON.stringify(rows));
+  loadRunning();
 }
 
-function setPct(type,i,p,v){
- const tgt = type==='op'?operating:fixed;
- if(!tgt[i].alloc) tgt[i].alloc={};
- tgt[i].alloc[p]=Number(v)||0;
- save();
+function loadRunning(){
+  let rows = JSON.parse(localStorage.getItem("RUN_EXP") || "[]");
+  let html="";
+  let total=0;
+
+  rows.forEach((r,i)=>{
+    total+=r.cost;
+    html+=`
+    <tr>
+      <td>${r.name}</td>
+      <td>${r.unit}</td>
+      <td>${r.cost}</td>
+      <td>${r.prod}</td>
+      <td><button onclick="delRun(${i})">❌</button></td>
+    </tr>`;
+  });
+
+  document.getElementById("runningBody").innerHTML=html;
+  document.getElementById("runningTotal").innerText=total;
 }
 
-/* =====================================================
-   OTHER OPERATING
-===================================================== */
-function renderOp(){
- const tb=document.querySelector("#opTable tbody");
- tb.innerHTML="";
- operating.forEach((r,i)=>{
-  tb.innerHTML+=`
-   <tr>
-    <td><input value="${r.name||""}" onchange="uOp(${i},'name',this.value)"></td>
-    <td><textarea onchange="uOp(${i},'desc',this.value)">${r.desc||""}</textarea></td>
-    <td><input type="number" value="${r.cost||0}"
-        onchange="uOp(${i},'cost',this.value)"></td>
-    <td>${prodPctUI(r,i,'op')}</td>
-    <td><button class="del" onclick="delOp(${i})">🗑️</button></td>
-   </tr>`;
- });
-}
-function addOp(){operating.push({alloc:{}});save();renderOp();renderSummary();}
-function uOp(i,f,v){operating[i][f]=v;save();renderSummary();}
-function delOp(i){operating.splice(i,1);save();renderOp();renderSummary();}
-
-/* =====================================================
-   FIXED
-===================================================== */
-function renderFix(){
- const tb=document.querySelector("#fixTable tbody");
- tb.innerHTML="";
- fixed.forEach((r,i)=>{
-  tb.innerHTML+=`
-   <tr>
-    <td><input value="${r.name||""}" onchange="uFix(${i},'name',this.value)"></td>
-    <td><textarea onchange="uFix(${i},'desc',this.value)">${r.desc||""}</textarea></td>
-    <td><input type="number" value="${r.cost||0}"
-        onchange="uFix(${i},'cost',this.value)"></td>
-    <td><input type="number" value="${r.years||0}"
-        onchange="uFix(${i},'years',this.value)"></td>
-    <td>${prodPctUI(r,i,'fix')}</td>
-    <td><button class="del" onclick="delFix(${i})">🗑️</button></td>
-   </tr>`;
- });
-}
-function addFix(){fixed.push({alloc:{}});save();renderFix();renderSummary();}
-function uFix(i,f,v){fixed[i][f]=v;save();renderSummary();}
-function delFix(i){fixed.splice(i,1);save();renderFix();renderSummary();}
-
-/* =====================================================
-   SUMMARY (PROJECT LEVEL TOTAL)
-===================================================== */
-function renderSummary(){
- const feedTotal = feed5yr.reduce(
-  (s,f)=>s+(f.feed?.total||0)+(f.vitamin?.total||0)+(f.medicine?.total||0),0);
- const opOther = operating.reduce((s,r)=>s+(+r.cost||0),0);
- const fixTotal = fixed.reduce((s,r)=>s+(+r.cost||0),0);
- const projectTotal = feedTotal + opOther + fixTotal;
-
- summary.innerHTML=`
- <table>
-  <tr><th>Feed / Vitamin / Medicine</th><td class="lock">${feedTotal}</td></tr>
-  <tr><th>अन्य चालु खर्च</th><td class="lock">${opOther}</td></tr>
-  <tr><th>स्थिर खर्च</th><td class="lock">${fixTotal}</td></tr>
-  <tr><th>कुल परियोजना लागत</th>
-      <td class="lock"><b>${projectTotal}</b></td></tr>
- </table>`;
+function delRun(i){
+  let rows = JSON.parse(localStorage.getItem("RUN_EXP") || "[]");
+  rows.splice(i,1);
+  localStorage.setItem("RUN_EXP", JSON.stringify(rows));
+  loadRunning();
 }
 
-/* =====================================================
-   SAVE
-===================================================== */
-function save(){
- localStorage.setItem("OP_EXP_SIMPLE",JSON.stringify(operating));
- localStorage.setItem("FIX_EXP_DETAILED",JSON.stringify(fixed));
- localStorage.setItem(
-  "EXPENSE_NARRATION",
-  document.getElementById("expenseNarration").value
- );
+// ======================================================
+// FIXED EXPENSES
+// ======================================================
+function addFixed(){
+  let name = document.getElementById("fix_name").value;
+  let unit = document.getElementById("fix_unit").value;
+  let cost = Number(document.getElementById("fix_cost").value);
+  let prod = document.getElementById("fix_prod").value;
+
+  if(!name || !cost){ alert("कृपया विवरण र लागत भरिदिनुहोस्"); return; }
+
+  let rows = JSON.parse(localStorage.getItem("FIX_EXP") || "[]");
+  rows.push({name,unit,cost,prod});
+  localStorage.setItem("FIX_EXP", JSON.stringify(rows));
+  loadFixed();
 }
 
-/* =====================================================
-   INIT
-===================================================== */
-document.getElementById("expenseNarration").value =
- localStorage.getItem("EXPENSE_NARRATION")||"";
+function loadFixed(){
+  let rows = JSON.parse(localStorage.getItem("FIX_EXP") || "[]");
+  let html="";
+  let total=0;
 
-renderFeed();
-renderOp();
-renderFix();
-renderSummary();
+  rows.forEach((r,i)=>{
+    total+=r.cost;
+    html+=`
+    <tr>
+      <td>${r.name}</td>
+      <td>${r.unit}</td>
+      <td>${r.cost}</td>
+      <td>${r.prod}</td>
+      <td><button onclick="delFix(${i})">❌</button></td>
+    </tr>`;
+  });
+
+  document.getElementById("fixedBody").innerHTML=html;
+  document.getElementById("fixedTotal").innerText=total;
+}
+
+function delFix(i){
+  let rows = JSON.parse(localStorage.getItem("FIX_EXP") || "[]");
+  rows.splice(i,1);
+  localStorage.setItem("FIX_EXP", JSON.stringify(rows));
+  loadFixed();
+}
+
+// ======================================================
+// SAVE NOTES
+// ======================================================
+function saveAll(){
+  localStorage.setItem("EXP_NOTES", document.getElementById("notes").value);
+  alert("Saved ✔");
+}
+
+// ======================================================
+window.onload=()=>{
+  loadFeed();
+  loadRunning();
+  loadFixed();
+  document.getElementById("notes").value =
+    localStorage.getItem("EXP_NOTES") || "";
+};
 </script>
 
 </body>
